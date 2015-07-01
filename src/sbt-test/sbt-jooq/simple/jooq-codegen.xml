@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.6.0.xsd">
+    <jdbc>
+        <driver>org.h2.Driver</driver>
+        <url>jdbc:h2:./test</url>
+    </jdbc>
+    <generator>
+        <database>
+            <name>org.jooq.util.h2.H2Database</name>
+            <includes>.*</includes>
+            <inputSchema>PUBLIC</inputSchema>
+        </database>
+        <generate>
+            <deprecated>false</deprecated>
+        </generate>
+        <target>
+            <packageName>com.example.db</packageName>
+            <directory>src/main/java</directory>
+        </target>
+    </generator>
+</configuration>
