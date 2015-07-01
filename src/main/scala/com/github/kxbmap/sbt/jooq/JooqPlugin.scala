@@ -75,14 +75,13 @@ object JooqPlugin extends AutoPlugin {
   }
 
   private def codegenTask = Def.task {
-    val exitValue = IO.withTemporaryFile("jooq-codegen", ".xml") { file =>
+    IO.withTemporaryFile("jooq-codegen", ".xml") { file =>
       XML.save(file.getAbsolutePath, jooqConfig.value, "UTF-8", xmlDecl = true)
       runCodegen(mainClass.value, file, forkOptions.value)
+    } match {
+      case 0 => (sourceManaged.value ** ("*.java" || "*.scala")).get
+      case e => sys.error(s"jOOQ codegen failure: $e")
     }
-    if (exitValue != 0) {
-      sys.error(s"jOOQ codegen failure: $exitValue")
-    }
-    (sourceManaged.value ** ("*.java" || "*.scala")).get
   }
 
   private def forkOptions = Def.task {

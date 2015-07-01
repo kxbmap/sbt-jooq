@@ -1,4 +1,4 @@
-> jooq:codegen
+> show jooq:codegen
 $ exists target/scala-2.11/src_managed/jooq/com/example/db/Tables.java target/scala-2.11/src_managed/jooq/com/example/db/Keys.java target/scala-2.11/src_managed/jooq/com/example/db/Public.java target/scala-2.11/src_managed/jooq/com/example/db/tables/Test.java target/scala-2.11/src_managed/jooq/com/example/db/tables/records/TestRecord.java
 
 > clean
