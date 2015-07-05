@@ -25,6 +25,7 @@ object JooqCodegen extends AutoPlugin {
   private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
     jooqCodegen <<= codegenTask,
+    jooqCodegenTargetDirectory <<= sourceManaged in Compile,
     jooqCodegenConfigRewriteRules <<= configRewriteRules,
     jooqCodegenConfig <<= configTask,
     ivyConfigurations += jooq,
@@ -53,7 +54,7 @@ object JooqCodegen extends AutoPlugin {
   }
 
   private def configRewriteRules = Def.setting {
-    def directory = <directory>{(sourceManaged in Compile).value}</directory>
+    def directory = <directory>{jooqCodegenTargetDirectory.value}</directory>
     Seq(
       rewriteRule("replaceTargetDirectory") {
         case Elem(_, "directory", _, _, _) => directory
@@ -72,13 +73,13 @@ object JooqCodegen extends AutoPlugin {
       XML.save(file.getAbsolutePath, jooqCodegenConfig.value, "UTF-8", xmlDecl = true)
       runCodegen((mainClass in jooq).value, file, (forkOptions in jooq).value)
     } match {
-      case 0 => sourcesIn((sourceManaged in Compile).value)
+      case 0 => sourcesIn(packageDir(jooqCodegenTargetDirectory.value, jooqCodegenConfig.value))
       case e => sys.error(s"jOOQ codegen failure: $e")
     }
   }
 
   private def codegenIfAbsentTask = Def.taskDyn {
-    val fs = sourcesIn((sourceManaged in Compile).value)
+    val fs = sourcesIn(packageDir(jooqCodegenTargetDirectory.value, jooqCodegenConfig.value))
     if (fs.isEmpty)
       Def.task(jooqCodegen.value)
     else
@@ -86,6 +87,11 @@ object JooqCodegen extends AutoPlugin {
   }
 
   private def sourcesIn(dir: File): Seq[File] = (dir ** ("*.java" || "*.scala")).get
+
+  private def packageDir(target: File, config: xml.Node): File = {
+    val p = config \ "generator" \ "target" \ "packageName"
+    p.text.trim.split('.').foldLeft(target)(_ / _)
+  }
 
   private def forkOptionsTask = Def.task {
     ForkOptions(
