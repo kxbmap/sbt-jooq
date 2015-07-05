@@ -29,7 +29,6 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegenConfig <<= configTask,
     ivyConfigurations += jooq,
     sourceGenerators in Compile <+= codegenIfAbsentTask,
-    managedSourceDirectories in Compile += (sourceManaged in jooq).value,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
       "org.jooq" % "jooq-codegen" % jooqVersion.value % jooq,
@@ -37,7 +36,6 @@ object JooqCodegen extends AutoPlugin {
       "org.slf4j" % "slf4j-simple" % "1.7.12" % jooq
     )
   ) ++ inConfig(jooq)(Seq(
-    sourceManaged <<= Defaults.configSrcSub(sourceManaged),
     managedClasspath := Classpaths.managedJars(jooq, classpathTypes.value, update.value),
     mainClass := Some(CodegenMainClass),
     javaOptions ++= Seq(
@@ -55,7 +53,7 @@ object JooqCodegen extends AutoPlugin {
   }
 
   private def configRewriteRules = Def.setting {
-    def directory = <directory>{(sourceManaged in jooq).value}</directory>
+    def directory = <directory>{(sourceManaged in Compile).value}</directory>
     Seq(
       rewriteRule("replaceTargetDirectory") {
         case Elem(_, "directory", _, _, _) => directory
@@ -74,13 +72,13 @@ object JooqCodegen extends AutoPlugin {
       XML.save(file.getAbsolutePath, jooqCodegenConfig.value, "UTF-8", xmlDecl = true)
       runCodegen((mainClass in jooq).value, file, (forkOptions in jooq).value)
     } match {
-      case 0 => sourcesIn((sourceManaged in jooq).value)
+      case 0 => sourcesIn((sourceManaged in Compile).value)
       case e => sys.error(s"jOOQ codegen failure: $e")
     }
   }
 
   private def codegenIfAbsentTask = Def.taskDyn {
-    val fs = sourcesIn((sourceManaged in jooq).value)
+    val fs = sourcesIn((sourceManaged in Compile).value)
     if (fs.isEmpty)
       Def.task(jooqCodegen.value)
     else
