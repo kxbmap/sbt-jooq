@@ -2,7 +2,7 @@ scalaVersion := "2.11.7"
 
 enablePlugins(JooqCodegen)
 
-jooqCodegenConfigFile := file("jooq-codegen.xml")
+jooqCodegenConfigFile := Some(file("jooq-codegen.xml"))
 
 javaOptions in jooq += "-Dfile.encoding=utf8"
 

@@ -6,6 +6,7 @@ $ exists target/scala-2.11/src_managed/main/com/example/db/tables/Test.java
 $ exists target/scala-2.11/src_managed/main/com/example/db/tables/records/TestRecord.java
 
 > compile
-
-> clean
 > runMain com.example.Main
+
+> set jooqCodegenConfigFile := None
+-> jooqCodegen

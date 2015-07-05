@@ -26,6 +26,7 @@ object JooqCodegen extends AutoPlugin {
     jooqVersion := DefaultJooqVersion,
     jooqCodegen <<= codegenTask,
     jooqCodegenTargetDirectory <<= sourceManaged in Compile,
+    jooqCodegenConfigFile := None,
     jooqCodegenConfigRewriteRules <<= configRewriteRules,
     jooqCodegenConfig <<= configTask,
     ivyConfigurations += jooq,
@@ -64,8 +65,9 @@ object JooqCodegen extends AutoPlugin {
   }
 
   private def configTask = Def.task {
+    val config = jooqCodegenConfigFile.value.getOrElse(sys.error("jooqCodegenConfigFile should be set"))
     val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
-    transformer(IO.reader(jooqCodegenConfigFile.value)(XML.load))
+    transformer(IO.reader(config)(XML.load))
   }
 
   private def codegenTask = Def.task {
