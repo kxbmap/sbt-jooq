@@ -1,6 +1,6 @@
 scalaVersion := "2.11.7"
 
-enablePlugins(JooqPlugin)
+enablePlugins(JooqCodegen)
 
 jooqCodegenConfigFile := file("jooq-codegen.xml")
 

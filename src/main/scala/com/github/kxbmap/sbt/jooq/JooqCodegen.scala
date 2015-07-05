@@ -7,7 +7,7 @@ import sbt.plugins.JvmPlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Elem, XML}
 
-object JooqPlugin extends AutoPlugin {
+object JooqCodegen extends AutoPlugin {
 
   val DefaultJooqVersion = "3.6.2"
   val CodegenMainClass = "org.jooq.util.GenerationTool"

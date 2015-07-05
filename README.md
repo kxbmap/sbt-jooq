@@ -23,7 +23,7 @@ In your `build.sbt`:
 * Enable the plugin:
 
   ```scala
-  enablePlugins(JooqPlugin)
+  enablePlugins(JooqCodegen)
   ```
 
 * Setting the jOOQ codegen configuration file:
