@@ -16,24 +16,19 @@ object JooqPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = jooqCodegenSettings
 
-  object autoImport {
-    lazy val jooq = config("jooq").hide
-
-    lazy val codegen = taskKey[Seq[File]]("Run jOOQ codegen")
-    lazy val jooqVersion = settingKey[String]("jOOQ version")
-    lazy val jooqConfigFile = settingKey[File]("jOOQ codegen configuration file")
-    lazy val jooqConfigRewriteRules = settingKey[Seq[RewriteRule]]("jOOQ codegen configuration rewrite rules")
-    lazy val jooqConfig = taskKey[xml.Node]("jOOQ codegen configuration")
-  }
+  val autoImport = JooqKeys
 
   import autoImport._
 
+  private val forkOptions = taskKey[ForkOptions]("fork options")
+
   private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
-    jooqConfigRewriteRules <<= rewriteRules,
-    jooqConfig <<= configurationTask,
+    jooqCodegen <<= codegenTask,
+    jooqCodegenConfigRewriteRules <<= configRewriteRules,
+    jooqCodegenConfig <<= configTask,
     ivyConfigurations += jooq,
-    sourceGenerators in Compile += (codegen in jooq).taskValue,
+    sourceGenerators in Compile <+= codegenIfAbsentTask,
     managedSourceDirectories in Compile += (sourceManaged in jooq).value,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
@@ -42,7 +37,6 @@ object JooqPlugin extends AutoPlugin {
       "org.slf4j" % "slf4j-simple" % "1.7.12" % jooq
     )
   ) ++ inConfig(jooq)(Seq(
-    codegen <<= codegenTask,
     sourceManaged <<= Defaults.configSrcSub(sourceManaged),
     managedClasspath := Classpaths.managedJars(jooq, classpathTypes.value, update.value),
     mainClass := Some(CodegenMainClass),
@@ -51,7 +45,8 @@ object JooqPlugin extends AutoPlugin {
       "-Dorg.slf4j.simpleLogger.logFile=System.out",
       "-Dorg.slf4j.simpleLogger.showLogName=false",
       "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
-    )
+    ),
+    forkOptions <<= forkOptionsTask
   ))
 
   def rewriteRule(name0: String)(f: PartialFunction[xml.Node, Seq[xml.Node]]): RewriteRule = new RewriteRule {
@@ -59,7 +54,7 @@ object JooqPlugin extends AutoPlugin {
     override def transform(n: xml.Node): Seq[xml.Node] = f.applyOrElse(n, (_: xml.Node) => n)
   }
 
-  private def rewriteRules = Def.setting {
+  private def configRewriteRules = Def.setting {
     def directory = <directory>{(sourceManaged in jooq).value}</directory>
     Seq(
       rewriteRule("replaceTargetDirectory") {
@@ -69,22 +64,32 @@ object JooqPlugin extends AutoPlugin {
     )
   }
 
-  private def configurationTask = Def.task {
-    val transformer = new RuleTransformer(jooqConfigRewriteRules.value: _*)
-    transformer(IO.reader(jooqConfigFile.value)(XML.load))
+  private def configTask = Def.task {
+    val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
+    transformer(IO.reader(jooqCodegenConfigFile.value)(XML.load))
   }
 
   private def codegenTask = Def.task {
-    IO.withTemporaryFile("jooq-codegen", ".xml") { file =>
-      XML.save(file.getAbsolutePath, jooqConfig.value, "UTF-8", xmlDecl = true)
-      runCodegen(mainClass.value, file, forkOptions.value)
+    IO.withTemporaryFile("jooq-codegen-", ".xml") { file =>
+      XML.save(file.getAbsolutePath, jooqCodegenConfig.value, "UTF-8", xmlDecl = true)
+      runCodegen((mainClass in jooq).value, file, (forkOptions in jooq).value)
     } match {
-      case 0 => (sourceManaged.value ** ("*.java" || "*.scala")).get
+      case 0 => sourcesIn((sourceManaged in jooq).value)
       case e => sys.error(s"jOOQ codegen failure: $e")
     }
   }
 
-  private def forkOptions = Def.task {
+  private def codegenIfAbsentTask = Def.taskDyn {
+    val fs = sourcesIn((sourceManaged in jooq).value)
+    if (fs.isEmpty)
+      Def.task(jooqCodegen.value)
+    else
+      Def.task(fs)
+  }
+
+  private def sourcesIn(dir: File): Seq[File] = (dir ** ("*.java" || "*.scala")).get
+
+  private def forkOptionsTask = Def.task {
     ForkOptions(
       javaHome = javaHome.value,
       outputStrategy = outputStrategy.value,

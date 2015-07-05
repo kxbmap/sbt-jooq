@@ -29,7 +29,7 @@ In your `build.sbt`:
 * Setting the jOOQ codegen configuration file:
 
   ```scala
-  jooqConfigFile := file("path") / "to" / "jooq-codegen.xml"
+  jooqCodegenConfigFile := file("path") / "to" / "jooq-codegen.xml"
   ```
   
 * Add your database driver dependency to `jooq` scope:
