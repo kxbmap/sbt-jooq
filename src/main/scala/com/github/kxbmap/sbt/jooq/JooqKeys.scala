@@ -13,6 +13,6 @@ object JooqKeys {
   val jooqCodegenTargetDirectory = settingKey[File]("jOOQ codegen target directory")
   val jooqCodegenConfigFile = settingKey[Option[File]]("jOOQ codegen configuration file")
   val jooqCodegenConfigRewriteRules = settingKey[Seq[RewriteRule]]("jOOQ codegen configuration rewrite rules")
-  val jooqCodegenConfig = taskKey[xml.Node]("jOOQ codegen configuration")
+  val jooqCodegenConfig = taskKey[Option[xml.Node]]("jOOQ codegen configuration")
 
 }

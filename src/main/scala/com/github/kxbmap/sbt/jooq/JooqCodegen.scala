@@ -14,7 +14,7 @@ object JooqCodegen extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
-  override def projectSettings: Seq[Setting[_]] = jooqCodegenSettings
+  override lazy val projectSettings: Seq[Setting[_]] = jooqCodegenCommonSettings ++ jooqCodegenSettingsIn(Compile)
 
   val autoImport = JooqKeys
 
@@ -22,19 +22,11 @@ object JooqCodegen extends AutoPlugin {
 
   private val forkOptions = taskKey[ForkOptions]("fork options")
 
-  private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
+  private lazy val jooqCodegenCommonSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
-    jooqCodegen <<= codegenTask,
-    jooqCodegenTargetDirectory <<= sourceManaged in Compile,
-    jooqCodegenConfigFile := None,
-    jooqCodegenConfigRewriteRules <<= configRewriteRules,
-    jooqCodegenConfig <<= configTask,
     ivyConfigurations += jooq,
-    sourceGenerators in Compile <+= codegenIfAbsentTask,
     libraryDependencies ++= Seq(
-      "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
       "org.jooq" % "jooq-codegen" % jooqVersion.value % jooq,
-      "org.jooq" % "jooq-meta" % jooqVersion.value % jooq,
       "org.slf4j" % "slf4j-simple" % "1.7.12" % jooq
     )
   ) ++ inConfig(jooq)(Seq(
@@ -48,6 +40,16 @@ object JooqCodegen extends AutoPlugin {
     ),
     forkOptions <<= forkOptionsTask
   ))
+
+  def jooqCodegenSettingsIn(c: Configuration): Seq[Setting[_]] = inConfig(c)(Seq(
+    jooqCodegen <<= codegenTask,
+    jooqCodegenTargetDirectory <<= sourceManaged,
+    jooqCodegenConfigFile := None,
+    jooqCodegenConfigRewriteRules <<= configRewriteRules,
+    jooqCodegenConfig <<= configTask,
+    sourceGenerators <+= codegenIfAbsentTask
+  ))
+
 
   def rewriteRule(name0: String)(f: PartialFunction[xml.Node, Seq[xml.Node]]): RewriteRule = new RewriteRule {
     override val name: String = name0
@@ -65,27 +67,32 @@ object JooqCodegen extends AutoPlugin {
   }
 
   private def configTask = Def.task {
-    val config = jooqCodegenConfigFile.value.getOrElse(sys.error("jooqCodegenConfigFile should be set"))
-    val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
-    transformer(IO.reader(config)(XML.load))
+    jooqCodegenConfigFile.value.map { config =>
+      val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
+      transformer(IO.reader(config)(XML.load))
+    }
   }
 
   private def codegenTask = Def.task {
-    IO.withTemporaryFile("jooq-codegen-", ".xml") { file =>
-      XML.save(file.getAbsolutePath, jooqCodegenConfig.value, "UTF-8", xmlDecl = true)
-      runCodegen((mainClass in jooq).value, file, (forkOptions in jooq).value)
-    } match {
-      case 0 => sourcesIn(packageDir(jooqCodegenTargetDirectory.value, jooqCodegenConfig.value))
-      case e => sys.error(s"jOOQ codegen failure: $e")
+    jooqCodegenConfig.value.toSeq.flatMap { config =>
+      IO.withTemporaryFile("jooq-codegen-", ".xml") { file =>
+        XML.save(file.getAbsolutePath, config, "UTF-8", xmlDecl = true)
+        runCodegen((mainClass in jooq).value, file, (forkOptions in jooq).value)
+      } match {
+        case 0 => sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
+        case e => sys.error(s"jOOQ codegen failure: $e")
+      }
     }
   }
 
   private def codegenIfAbsentTask = Def.taskDyn {
-    val fs = sourcesIn(packageDir(jooqCodegenTargetDirectory.value, jooqCodegenConfig.value))
-    if (fs.isEmpty)
-      Def.task(jooqCodegen.value)
-    else
-      Def.task(fs)
+    jooqCodegenConfig.value.map { config =>
+      sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
+    } match {
+      case Some(fs) if fs.isEmpty => Def.task(jooqCodegen.value)
+      case Some(fs)               => Def.task(fs)
+      case None                   => Def.task(Seq.empty[File])
+    }
   }
 
   private def sourcesIn(dir: File): Seq[File] = (dir ** ("*.java" || "*.scala")).get
@@ -94,8 +101,8 @@ object JooqCodegen extends AutoPlugin {
     val p = config \ "generator" \ "target" \ "packageName"
     val r = """^\w+(\.\w+)*$""".r
     p.text.trim match {
-      case t@r(_) => t.split('.').foldLeft(target)(_ / _)
-      case _      => target
+      case t@r(_)  => t.split('.').foldLeft(target)(_ / _)
+      case invalid => sys.error(s"invalid packageName format: $invalid")
     }
   }
 

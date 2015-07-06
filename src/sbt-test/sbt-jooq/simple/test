@@ -5,8 +5,12 @@ $ exists target/scala-2.11/src_managed/main/com/example/db/Public.java
 $ exists target/scala-2.11/src_managed/main/com/example/db/tables/Test.java
 $ exists target/scala-2.11/src_managed/main/com/example/db/tables/records/TestRecord.java
 
+> clean
 > compile
 > runMain com.example.Main
 
-> set jooqCodegenConfigFile := None
--> jooqCodegen
+> clean
+> set jooqCodegenConfigFile in Compile := None
+> jooqCodegen
+$ absent target/scala-2.11/src_managed/main/com/example/db/Tables.java
+-> compile
