@@ -92,7 +92,11 @@ object JooqCodegen extends AutoPlugin {
 
   private def packageDir(target: File, config: xml.Node): File = {
     val p = config \ "generator" \ "target" \ "packageName"
-    p.text.trim.split('.').foldLeft(target)(_ / _)
+    val r = """^\w+(\.\w+)*$""".r
+    p.text.trim match {
+      case t@r(_) => t.split('.').foldLeft(target)(_ / _)
+      case _      => target
+    }
   }
 
   private def forkOptionsTask = Def.task {
