@@ -10,7 +10,6 @@ import scala.xml.{Elem, XML}
 object JooqCodegen extends AutoPlugin {
 
   val DefaultJooqVersion = "3.6.2"
-  val CodegenMainClass = "org.jooq.util.GenerationTool"
 
   override def requires: Plugins = JvmPlugin
 
@@ -31,7 +30,7 @@ object JooqCodegen extends AutoPlugin {
     )
   ) ++ inConfig(jooq)(Seq(
     managedClasspath := Classpaths.managedJars(jooq, classpathTypes.value, update.value),
-    mainClass := Some(CodegenMainClass),
+    mainClass := Some("org.jooq.util.GenerationTool"),
     javaOptions ++= Seq(
       "-classpath", Path.makeString(data(managedClasspath.value)),
       "-Dorg.slf4j.simpleLogger.logFile=System.out",
@@ -76,8 +75,9 @@ object JooqCodegen extends AutoPlugin {
   private def codegenTask = Def.task {
     jooqCodegenConfig.value.toSeq.flatMap { config =>
       IO.withTemporaryFile("jooq-codegen-", ".xml") { file =>
+        val main = (mainClass in jooq).value.getOrElse(sys.error("mainClass in jooq is required"))
         XML.save(file.getAbsolutePath, config, "UTF-8", xmlDecl = true)
-        runCodegen((mainClass in jooq).value, file, (forkOptions in jooq).value)
+        runCodegen(main, file, (forkOptions in jooq).value)
       } match {
         case 0 => sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
         case e => sys.error(s"jOOQ codegen failure: $e")
@@ -118,10 +118,8 @@ object JooqCodegen extends AutoPlugin {
     )
   }
 
-  private def runCodegen(mainClass: Option[String], config: File, forkOptions: ForkOptions): Int = {
-    val main = mainClass.getOrElse(CodegenMainClass)
-    val args = Seq(config.getAbsolutePath)
-    val process = Fork.java.fork(forkOptions, main +: args)
+  private def runCodegen(mainClass: String, config: File, forkOptions: ForkOptions): Int = {
+    val process = Fork.java.fork(forkOptions, Seq(mainClass, config.getAbsolutePath))
     try
       process.exitValue()
     catch {
