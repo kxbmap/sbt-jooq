@@ -1,8 +1,8 @@
 sbtPlugin := true
 
 name := "sbt-jooq"
+version := "0.1.0"
 description := "jOOQ plugin for SBT 0.13.5+"
-version := "0.1.0-SNAPSHOT"
 organization := "com.github.kxbmap"
 
 scalacOptions ++= Seq(
