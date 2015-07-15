@@ -13,7 +13,7 @@ object JooqCodegen extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
-  override lazy val projectSettings: Seq[Setting[_]] = jooqCodegenCommonSettings ++ jooqCodegenSettingsIn(Compile)
+  override def projectSettings: Seq[Setting[_]] = jooqCodegenSettings
 
   val autoImport = JooqKeys
 
@@ -21,8 +21,14 @@ object JooqCodegen extends AutoPlugin {
 
   private val forkOptions = taskKey[ForkOptions]("fork options")
 
-  private lazy val jooqCodegenCommonSettings: Seq[Setting[_]] = Seq(
+  private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
+    jooqCodegen <<= codegenTask,
+    jooqCodegenConfigFile := None,
+    jooqCodegenTargetDirectory <<= sourceManaged in Compile,
+    jooqCodegenConfigRewriteRules <<= configRewriteRules,
+    jooqCodegenConfig <<= codegenConfigTask,
+    sourceGenerators in Compile <+= codegenIfAbsentTask,
     ivyConfigurations += jooq,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq-codegen" % jooqVersion.value % jooq,
@@ -38,15 +44,6 @@ object JooqCodegen extends AutoPlugin {
       "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
     ),
     forkOptions <<= forkOptionsTask
-  ))
-
-  def jooqCodegenSettingsIn(c: Configuration): Seq[Setting[_]] = inConfig(c)(Seq(
-    jooqCodegen <<= codegenTask,
-    jooqCodegenTargetDirectory <<= sourceManaged,
-    jooqCodegenConfigFile := None,
-    jooqCodegenConfigRewriteRules <<= configRewriteRules,
-    jooqCodegenConfig <<= configTask,
-    sourceGenerators <+= codegenIfAbsentTask
   ))
 
 
@@ -65,33 +62,29 @@ object JooqCodegen extends AutoPlugin {
     )
   }
 
-  private def configTask = Def.task {
-    jooqCodegenConfigFile.value.map { config =>
-      val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
-      transformer(IO.reader(config)(XML.load))
-    }
+  private def codegenConfigTask = Def.task {
+    val base = baseDirectory.value
+    val file = jooqCodegenConfigFile.value.getOrElse(sys.error("required: jooqCodegenConfigFile or jooqCodegenConfig"))
+    val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
+    transformer(IO.reader(IO.resolve(base, file))(XML.load))
   }
 
   private def codegenTask = Def.task {
-    jooqCodegenConfig.value.toSeq.flatMap { config =>
-      IO.withTemporaryFile("jooq-codegen-", ".xml") { file =>
-        val main = (mainClass in jooq).value.getOrElse(sys.error("mainClass in jooq is required"))
-        XML.save(file.getAbsolutePath, config, "UTF-8", xmlDecl = true)
-        runCodegen(main, file, (forkOptions in jooq).value)
-      } match {
-        case 0 => sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
-        case e => sys.error(s"jOOQ codegen failure: $e")
-      }
+    val config = jooqCodegenConfig.value
+    IO.withTemporaryFile("jooq-codegen-", ".xml") { file =>
+      val main = (mainClass in jooq).value.getOrElse(sys.error("required: mainClass in jooq"))
+      XML.save(file.getAbsolutePath, config, "UTF-8", xmlDecl = true)
+      runCodegen(main, file, (forkOptions in jooq).value)
+    } match {
+      case 0 => sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
+      case e => sys.error(s"jOOQ codegen failure: $e")
     }
   }
 
   private def codegenIfAbsentTask = Def.taskDyn {
-    jooqCodegenConfig.value.map { config =>
-      sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
-    } match {
-      case Some(fs) if fs.isEmpty => Def.task(jooqCodegen.value)
-      case Some(fs)               => Def.task(fs)
-      case None                   => Def.task(Seq.empty[File])
+    sourcesIn(packageDir(jooqCodegenTargetDirectory.value, jooqCodegenConfig.value)) match {
+      case fs if fs.isEmpty => Def.task(jooqCodegen.value)
+      case fs               => Def.task(fs)
     }
   }
 

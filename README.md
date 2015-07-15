@@ -38,10 +38,10 @@ jooqVersion := "3.6.2"
 
 // required: configuration file
 // NOTE: target directory will replace by jooqCodegenTargetDirectory
-jooqCodegenConfigFile in Compile := Some(file("path") / "to" / "jooq-codegen.xml")
+jooqCodegenConfigFile := Some(file("path") / "to" / "jooq-codegen.xml")
 
 // optional: generator target directory (default: sourceManaged in Compile)
-jooqCodegenTargetDirectory in Compile := file("path") / "to" / "target" / "directory"
+jooqCodegenTargetDirectory := file("path") / "to" / "target" / "directory"
 ```
 
 License

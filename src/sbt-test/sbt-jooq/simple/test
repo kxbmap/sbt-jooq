@@ -8,9 +8,3 @@ $ exists target/scala-2.11/src_managed/main/com/example/db/tables/records/TestRe
 > clean
 > compile
 > runMain com.example.Main
-
-> clean
-> set jooqCodegenConfigFile in Compile := None
-> jooqCodegen
-$ absent target/scala-2.11/src_managed/main/com/example/db/Tables.java
--> compile

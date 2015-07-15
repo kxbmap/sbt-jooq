@@ -2,7 +2,7 @@
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.6.0.xsd">
     <jdbc>
         <driver>org.h2.Driver</driver>
-        <url>jdbc:h2:./test</url>
+        <url>jdbc:h2:../test</url>
     </jdbc>
     <generator>
         <database>
