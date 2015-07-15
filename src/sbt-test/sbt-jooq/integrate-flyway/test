@@ -1,0 +1,16 @@
+> jooqCodegen
+$ exists target/scala-2.11/src_managed/main/com/example/db/Tables.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/Keys.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/Public.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/Programmer.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/Company.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/Skill.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/ProgrammerSkill.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/records/ProgrammerRecord.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/records/CompanyRecord.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/records/SkillRecord.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/records/ProgrammerSkillRecord.java
+
+> clean
+> compile
+> runMain com.example.Main
