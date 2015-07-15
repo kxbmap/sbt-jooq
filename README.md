@@ -11,12 +11,14 @@ Add the following to your `project/plugins.sbt`:
 
 * Stable version
 
-  Not yet released.
+  ```scala
+  addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.1.0")
+  ```
 
 * Snapshot version
 
   ```scala
-  addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.1.0-SNAPSHOT")
+  addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.2.0-SNAPSHOT")
 
   resolvers += Opts.resolver.sonatypeSnapshots
   ```
