@@ -1,0 +1,10 @@
+> jooqCodegen
+$ exists target/scala-2.11/src_managed/main/com/example/db/Tables.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/Keys.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/Public.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/Test.java
+$ exists target/scala-2.11/src_managed/main/com/example/db/tables/records/TestRecord.java
+
+> clean
+> compile
+> runMain com.example.Main

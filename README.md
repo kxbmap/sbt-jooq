@@ -33,15 +33,31 @@ enablePlugins(JooqCodegen)
 // Add your database driver dependency to `jooq` scope
 libraryDependencies += "com.h2database" % "h2" % "1.4.187" % "jooq"
 
-// optional: jOOQ library version (default: 3.6.2)
+// jOOQ library version
+// default: 3.6.2
 jooqVersion := "3.6.2"
 
-// required: configuration file
-// NOTE: target directory will replace by jooqCodegenTargetDirectory
+// jOOQ codegen configuration file path
+// required this or jooqCodegenConfig
+// target directory will replace by jooqCodegenTargetDirectory
 jooqCodegenConfigFile := Some(file("path") / "to" / "jooq-codegen.xml")
 
-// optional: generator target directory (default: sourceManaged in Compile)
+// generator target directory
+// default: sourceManaged in Compile
 jooqCodegenTargetDirectory := file("path") / "to" / "target" / "directory"
+
+// configuration file rewrite rules
+// default: replace target directory
+jooqCodegenConfigRewriteRules += /* scala.xml.transform.RewriteRule */
+
+// jOOQ codegen configuration
+// required this or jooqCodegenConfigFile
+// If setting, jooqCodegenConfigFile, jooqCodegenTargetDirectory and jooqCodegenConfigRewriteRules are ignored
+jooqCodegenConfig :=
+  <configuration>
+    <!-- configurations... -->
+  </configuration>
+
 ```
 
 License
