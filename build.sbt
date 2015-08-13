@@ -11,5 +11,3 @@ scalacOptions ++= Seq(
   "-feature",
   "-Xlint"
 )
-
-Publish.settings

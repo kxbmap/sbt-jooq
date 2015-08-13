@@ -1,9 +1,20 @@
 import sbt.Keys._
 import sbt._
 
-object Publish {
+object Publish extends AutoPlugin {
 
-  lazy val settings = Seq(
+  override def trigger = allRequirements
+
+  object autoImport {
+    val disablePublishSettings: Seq[Setting[_]] = Seq(
+      publishArtifact := false,
+      publish := {},
+      publishLocal := {},
+      publishM2 := {}
+    )
+  }
+
+  override lazy val projectSettings: Seq[Setting[_]] = Seq(
     publishMavenStyle := true,
     publishTo := {
       if (isSnapshot.value)
@@ -24,12 +35,6 @@ object Publish {
     developers := List(
       Developer("kxbmap", "Tsukasa Kitachi", "kxbmap@gmail.com", url("https://github.com/kxbmap"))
     )
-  )
-
-  lazy val disable = Seq(
-    publish := {},
-    publishLocal := {},
-    publishArtifact := false
   )
 
 }
