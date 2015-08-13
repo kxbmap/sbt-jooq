@@ -1,5 +1,6 @@
 sbt-jooq
 ========
+[![Build Status](https://travis-ci.org/kxbmap/sbt-jooq.svg?branch=master)](https://travis-ci.org/kxbmap/sbt-jooq)
 
 jOOQ plugin for SBT 0.13.5+
 
