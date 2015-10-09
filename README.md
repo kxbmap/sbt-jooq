@@ -37,8 +37,8 @@ enablePlugins(JooqCodegen)
 libraryDependencies += "com.h2database" % "h2" % "1.4.187" % "jooq"
 
 // jOOQ library version
-// default: 3.6.2
-jooqVersion := "3.6.2"
+// default: 3.7.0
+jooqVersion := "3.7.0"
 
 // jOOQ codegen configuration file path
 // required this or jooqCodegenConfig
