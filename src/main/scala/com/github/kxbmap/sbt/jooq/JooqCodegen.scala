@@ -33,7 +33,7 @@ object JooqCodegen extends AutoPlugin {
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
       "org.jooq" % "jooq-codegen" % jooqVersion.value % jooq,
-      "org.slf4j" % "slf4j-simple" % "1.7.12" % jooq
+      "org.slf4j" % "slf4j-simple" % "1.7.18" % jooq
     )
   ) ++ inConfig(jooq)(Seq(
     managedClasspath := Classpaths.managedJars(jooq, classpathTypes.value, update.value),
