@@ -34,7 +34,7 @@ In your `build.sbt`:
 enablePlugins(JooqCodegen)
 
 // Add your database driver dependency to `jooq` scope
-libraryDependencies += "com.h2database" % "h2" % "1.4.187" % "jooq"
+libraryDependencies += "com.h2database" % "h2" % "1.4.191" % "jooq"
 
 // jOOQ library version
 // default: 3.7.0

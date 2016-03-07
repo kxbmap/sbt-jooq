@@ -25,5 +25,5 @@ jooqCodegenConfig :=
   </configuration>
 
 libraryDependencies ++= Seq("runtime", "jooq").map { conf =>
-  "com.h2database" % "h2" % "1.4.187" % conf
+  "com.h2database" % "h2" % "1.4.191" % conf
 }
