@@ -6,6 +6,8 @@ jooqCodegen <<= jooqCodegen.dependsOn(flywayMigrate in migration)
 
 jooqCodegenConfigFile := Some(file("jooq-codegen.xml"))
 
+jooqCodegenStrategy := CodegenStrategy.Always
+
 libraryDependencies ++= Seq("runtime", "jooq").map { conf =>
   "com.h2database" % "h2" % "1.4.191" % conf
 }

@@ -15,9 +15,23 @@ object JooqCodegen extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = jooqCodegenSettings
 
-  val autoImport = JooqKeys
+  object autoImport {
 
-  import autoImport._
+    val jooq = config("jooq").hide
+
+    val jooqVersion = settingKey[String]("jOOQ version")
+    val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
+    val jooqCodegenConfigFile = settingKey[Option[File]]("jOOQ codegen configuration file")
+    val jooqCodegenTargetDirectory = settingKey[File]("jOOQ codegen target directory")
+    val jooqCodegenConfigRewriteRules = settingKey[Seq[RewriteRule]]("jOOQ codegen configuration rewrite rules")
+    val jooqCodegenConfig = taskKey[xml.Node]("jOOQ codegen configuration")
+    val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
+
+    val CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
+
+  }
+
+  import autoImport.{CodegenStrategy => _, _}
 
   private val forkOptions = taskKey[ForkOptions]("fork options")
 
@@ -28,7 +42,8 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegenTargetDirectory <<= sourceManaged in Compile,
     jooqCodegenConfigRewriteRules <<= configRewriteRules,
     jooqCodegenConfig <<= codegenConfigTask,
-    sourceGenerators in Compile <+= codegenIfAbsentTask,
+    jooqCodegenStrategy := CodegenStrategy.IfAbsent,
+    sourceGenerators in Compile <+= autoCodegenTask,
     ivyConfigurations += jooq,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
@@ -82,10 +97,17 @@ object JooqCodegen extends AutoPlugin {
     }
   }
 
-  private def codegenIfAbsentTask = Def.taskDyn {
-    sourcesIn(packageDir(jooqCodegenTargetDirectory.value, jooqCodegenConfig.value)) match {
-      case fs if fs.isEmpty => Def.task(jooqCodegen.value)
-      case fs               => Def.task(fs)
+  private def autoCodegenTask = Def.taskDyn {
+    jooqCodegenStrategy.value match {
+      case CodegenStrategy.Always => Def.task(jooqCodegen.value)
+      case CodegenStrategy.IfAbsent =>
+        Def.taskDyn {
+          val fs = sourcesIn(packageDir(jooqCodegenTargetDirectory.value, jooqCodegenConfig.value))
+          if (fs.isEmpty)
+            Def.task(jooqCodegen.value)
+          else
+            Def.task(fs)
+        }
     }
   }
 
@@ -95,7 +117,7 @@ object JooqCodegen extends AutoPlugin {
     val p = config \ "generator" \ "target" \ "packageName"
     val r = """^\w+(\.\w+)*$""".r
     p.text.trim match {
-      case t@r(_)  => t.split('.').foldLeft(target)(_ / _)
+      case t@r(_) => t.split('.').foldLeft(target)(_ / _)
       case invalid => sys.error(s"invalid packageName format: $invalid")
     }
   }
