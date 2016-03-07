@@ -10,7 +10,7 @@
             <inputSchema>PUBLIC</inputSchema>
             <includes>.*</includes>
             <excludes>schema_version</excludes>
-            <schemaVersionProvider>SELECT :schema_name || '_' || "version" FROM "schema_version" ORDER BY "installed_rank" DESC LIMIT 1</schemaVersionProvider>
+            <schemaVersionProvider>SELECT :schema_name || '_' || MAX("installed_rank") || '_' || SUM("checksum") FROM "schema_version"</schemaVersionProvider>
         </database>
         <generate>
             <deprecated>false</deprecated>
