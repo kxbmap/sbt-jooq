@@ -11,8 +11,8 @@ libraryDependencies ++= Seq("runtime", "jooq").map { conf =>
 }
 
 lazy val migration = project.settings(
-  flywaySettings,
   flywayUrl := "jdbc:h2:./test",
   flywaySchemas := Seq("PUBLIC"),
-  libraryDependencies += "com.h2database" % "h2" % "1.4.191"
+  flywayLocations := Seq("classpath:db/migration"),
+  libraryDependencies += "com.h2database" % "h2" % "1.4.191" % "runtime"
 )

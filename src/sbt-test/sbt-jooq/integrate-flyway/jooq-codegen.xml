@@ -7,8 +7,9 @@
     <generator>
         <database>
             <name>org.jooq.util.h2.H2Database</name>
-            <includes>.*</includes>
             <inputSchema>PUBLIC</inputSchema>
+            <includes>.*</includes>
+            <excludes>schema_version</excludes>
         </database>
         <generate>
             <deprecated>false</deprecated>
