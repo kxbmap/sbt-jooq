@@ -1,7 +1,7 @@
 sbtPlugin := true
 
 name := "sbt-jooq"
-version := "0.2.0-SNAPSHOT"
+version := "0.2.0"
 description := "jOOQ plugin for SBT 0.13.5+"
 organization := "com.github.kxbmap"
 
