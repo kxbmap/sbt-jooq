@@ -10,19 +10,9 @@ Installation
 
 Add the following to your `project/plugins.sbt`:
 
-* Stable version
-
-  ```scala
-  addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.1.0")
-  ```
-
-* Snapshot version
-
-  ```scala
-  addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.2.0-SNAPSHOT")
-
-  resolvers += Opts.resolver.sonatypeSnapshots
-  ```
+```scala
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.2.0")
+```
 
 Configuration
 -------------
@@ -37,8 +27,8 @@ enablePlugins(JooqCodegen)
 libraryDependencies += "com.h2database" % "h2" % "1.4.191" % "jooq"
 
 // jOOQ library version
-// default: 3.7.0
-jooqVersion := "3.7.0"
+// default: 3.7.3
+jooqVersion := "3.7.3"
 
 // jOOQ codegen configuration file path
 // required this or jooqCodegenConfig
@@ -47,23 +37,29 @@ jooqCodegenConfigFile := Some(file("path") / "to" / "jooq-codegen.xml")
 
 // generator target directory
 // default: sourceManaged in Compile
-jooqCodegenTargetDirectory := file("path") / "to" / "target" / "directory"
+// jooqCodegenTargetDirectory := file("path") / "to" / "target" / "directory"
 
 // configuration file rewrite rules
 // default: replace target directory
-jooqCodegenConfigRewriteRules += /* scala.xml.transform.RewriteRule */
+// jooqCodegenConfigRewriteRules += /* scala.xml.transform.RewriteRule */
 
 // jOOQ codegen configuration
 // required this or jooqCodegenConfigFile
 // If setting, jooqCodegenConfigFile, jooqCodegenTargetDirectory and jooqCodegenConfigRewriteRules are ignored
-jooqCodegenConfig :=
-  <configuration>
-    <!-- configurations... -->
-  </configuration>
+// jooqCodegenConfig :=
+//   <configuration>
+//     <!-- configurations... -->
+//   </configuration>
+
+// codegen execution strategy
+// default: CodegenStrategy.IfAbsent
+// jooqCodegenStrategy := CodegenStrategy.Always
 
 ```
 
 License
 -------
+
+Copyright 2015-2016 Tsukasa Kitachi
 
 Apache License, Version 2.0
