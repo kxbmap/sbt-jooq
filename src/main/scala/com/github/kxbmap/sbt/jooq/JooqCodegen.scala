@@ -43,7 +43,7 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegenConfigRewriteRules := configRewriteRules.value,
     jooqCodegenConfig := codegenConfigTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
-    sourceGenerators in Compile <+= autoCodegenTask,
+    sourceGenerators in Compile += autoCodegenTask.taskValue,
     ivyConfigurations += jooq,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
