@@ -50,11 +50,10 @@ object JooqCodegen extends AutoPlugin {
       "org.jooq" % "jooq-codegen" % jooqVersion.value % jooq,
       "org.slf4j" % "slf4j-simple" % "1.7.25" % jooq
     )
-  ) ++ inConfig(jooq)(Seq(
-    managedClasspath := Classpaths.managedJars(jooq, classpathTypes.value, update.value),
+  ) ++ inConfig(jooq)(Defaults.configSettings ++ Seq(
     mainClass := Some("org.jooq.util.GenerationTool"),
     javaOptions ++= Seq(
-      "-classpath", Path.makeString(data(managedClasspath.value)),
+      "-classpath", Path.makeString(data(fullClasspath.value)),
       "-Dorg.slf4j.simpleLogger.logFile=System.out",
       "-Dorg.slf4j.simpleLogger.showLogName=false",
       "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
