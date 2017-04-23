@@ -37,11 +37,11 @@ object JooqCodegen extends AutoPlugin {
 
   private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
-    jooqCodegen <<= codegenTask,
+    jooqCodegen := codegenTask.value,
     jooqCodegenConfigFile := None,
-    jooqCodegenTargetDirectory <<= sourceManaged in Compile,
-    jooqCodegenConfigRewriteRules <<= configRewriteRules,
-    jooqCodegenConfig <<= codegenConfigTask,
+    jooqCodegenTargetDirectory := (sourceManaged in Compile).value,
+    jooqCodegenConfigRewriteRules := configRewriteRules.value,
+    jooqCodegenConfig := codegenConfigTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
     sourceGenerators in Compile <+= autoCodegenTask,
     ivyConfigurations += jooq,
@@ -59,7 +59,7 @@ object JooqCodegen extends AutoPlugin {
       "-Dorg.slf4j.simpleLogger.showLogName=false",
       "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
     ),
-    forkOptions <<= forkOptionsTask
+    forkOptions := forkOptionsTask.value
   ))
 
 
