@@ -11,7 +11,7 @@ lazy val app = project
   .enablePlugins(JooqCodegen)
   .settings(
     libraryDependencies ++= Seq("runtime", "jooq").map { conf =>
-      "com.h2database" % "h2" % "1.4.191" % conf
+      "com.h2database" % "h2" % "1.4.194" % conf
     },
     jooqCodegenConfig :=
       <configuration>
