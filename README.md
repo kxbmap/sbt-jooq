@@ -11,7 +11,7 @@ Installation
 Add the following to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.2.0")
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.3.0")
 ```
 
 Configuration
@@ -24,11 +24,11 @@ In your `build.sbt`:
 enablePlugins(JooqCodegen)
 
 // Add your database driver dependency to `jooq` scope
-libraryDependencies += "com.h2database" % "h2" % "1.4.191" % "jooq"
+libraryDependencies += "com.h2database" % "h2" % "1.4.194" % "jooq"
 
 // jOOQ library version
-// default: 3.7.3
-jooqVersion := "3.7.3"
+// default: 3.9.2
+jooqVersion := "3.9.2"
 
 // jOOQ codegen configuration file path
 // required this or jooqCodegenConfig
