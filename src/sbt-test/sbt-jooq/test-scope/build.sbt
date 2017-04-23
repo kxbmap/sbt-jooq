@@ -1,4 +1,4 @@
-scalaVersion in ThisBuild := "2.11.7"
+scalaVersion in ThisBuild := "2.12.2"
 
 libraryDependencies += "com.h2database" % "h2" % "1.4.191" % "test"
 

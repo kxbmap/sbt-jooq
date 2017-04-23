@@ -1,4 +1,4 @@
-scalaVersion := "2.11.7"
+scalaVersion in ThisBuild := "2.12.2"
 
 enablePlugins(JooqCodegen)
 
