@@ -9,7 +9,7 @@ import scala.xml.{Elem, XML}
 
 object JooqCodegen extends AutoPlugin {
 
-  val DefaultJooqVersion = "3.9.1"
+  val DefaultJooqVersion = "3.9.2"
 
   override def requires: Plugins = JvmPlugin
 
