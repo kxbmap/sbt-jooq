@@ -2,7 +2,7 @@ scalaVersion in ThisBuild := "2.12.3"
 
 enablePlugins(JooqCodegen)
 
-jooqCodegen <<= jooqCodegen.dependsOn(flywayMigrate in migration)
+jooqCodegen := jooqCodegen.dependsOn(flywayMigrate in migration).value
 
 jooqCodegenConfigFile := Some(file("jooq-codegen.xml"))
 
