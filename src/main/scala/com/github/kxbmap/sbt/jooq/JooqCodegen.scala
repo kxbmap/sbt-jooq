@@ -17,7 +17,7 @@ object JooqCodegen extends AutoPlugin {
 
   object autoImport {
 
-    val jooq = config("jooq").hide
+    val Jooq = config("jooq").hide
 
     val jooqVersion = settingKey[String]("jOOQ version")
     val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
@@ -44,13 +44,13 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegenConfig := codegenConfigTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
     sourceGenerators in Compile += autoCodegenTask.taskValue,
-    ivyConfigurations += jooq,
+    ivyConfigurations += Jooq,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
-      "org.jooq" % "jooq-codegen" % jooqVersion.value % jooq,
-      "org.slf4j" % "slf4j-simple" % "1.7.25" % jooq
+      "org.jooq" % "jooq-codegen" % jooqVersion.value % Jooq,
+      "org.slf4j" % "slf4j-simple" % "1.7.25" % Jooq
     )
-  ) ++ inConfig(jooq)(Defaults.configSettings ++ Seq(
+  ) ++ inConfig(Jooq)(Defaults.configSettings ++ Seq(
     mainClass := Some("org.jooq.util.GenerationTool"),
     javaOptions ++= Seq(
       "-classpath", Path.makeString(data(fullClasspath.value)),
@@ -86,10 +86,11 @@ object JooqCodegen extends AutoPlugin {
 
   private def codegenTask = Def.task {
     val config = jooqCodegenConfig.value
+    val main = (mainClass in Jooq).value.getOrElse(sys.error("required: mainClass in jooq"))
+    val forkOpts = (forkOptions in Jooq).value
     IO.withTemporaryFile("jooq-codegen-", ".xml") { file =>
-      val main = (mainClass in jooq).value.getOrElse(sys.error("required: mainClass in jooq"))
       XML.save(file.getAbsolutePath, config, "UTF-8", xmlDecl = true)
-      runCodegen(main, file, (forkOptions in jooq).value)
+      runCodegen(main, file, forkOpts)
     } match {
       case 0 => sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
       case e => sys.error(s"jOOQ codegen failure: $e")
@@ -125,9 +126,9 @@ object JooqCodegen extends AutoPlugin {
     ForkOptions(
       javaHome = javaHome.value,
       outputStrategy = outputStrategy.value,
-      bootJars = Nil,
+      bootJars = Vector.empty,
       workingDirectory = Some(baseDirectory.value),
-      runJVMOptions = javaOptions.value,
+      runJVMOptions = javaOptions.value.toVector,
       connectInput = connectInput.value,
       envVars = envVars.value
     )
