@@ -24,11 +24,11 @@ In your `build.sbt`:
 enablePlugins(JooqCodegen)
 
 // Add your database driver dependency to `jooq` scope
-libraryDependencies += "com.h2database" % "h2" % "1.4.194" % "jooq"
+libraryDependencies += "com.h2database" % "h2" % "1.4.196" % "jooq"
 
 // jOOQ library version
-// default: 3.9.2
-jooqVersion := "3.9.2"
+// default: 3.9.5
+jooqVersion := "3.9.5"
 
 // jOOQ codegen configuration file path
 // required this or jooqCodegenConfig
