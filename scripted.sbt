@@ -1,4 +1,3 @@
-scriptedSettings
 scriptedBufferLog := false
 scriptedLaunchOpts ++= Seq(
   "-Xmx1024M",
