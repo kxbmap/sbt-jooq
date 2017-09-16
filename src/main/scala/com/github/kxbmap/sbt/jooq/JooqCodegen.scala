@@ -71,7 +71,7 @@ object JooqCodegen extends AutoPlugin {
     def directory = <directory>{jooqCodegenTargetDirectory.value}</directory>
     Seq(
       rewriteRule("replaceTargetDirectory") {
-        case Elem(_, "directory", _, _, _) => directory
+        case Elem(_, "directory", _, _, _*) => directory
         case e: Elem if e.label == "target" && e.child.forall(_.label != "directory") => e.copy(child = e.child :+ directory)
       }
     )
