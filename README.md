@@ -2,7 +2,7 @@ sbt-jooq
 ========
 [![Build Status](https://travis-ci.org/kxbmap/sbt-jooq.svg?branch=master)](https://travis-ci.org/kxbmap/sbt-jooq)
 
-jOOQ plugin for SBT 0.13.5+
+jOOQ plugin for SBT 1.0 and 0.13
 
 
 Installation
@@ -11,7 +11,7 @@ Installation
 Add the following to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.3.0")
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.3.1")
 ```
 
 Configuration
