@@ -34,6 +34,7 @@ object JooqCodegen extends AutoPlugin {
   import autoImport.{CodegenStrategy => _, _}
 
   private val forkOptions = taskKey[ForkOptions]("fork options")
+  private val forkJavaVersion = taskKey[String]("fork Java version")
 
   private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
@@ -49,17 +50,43 @@ object JooqCodegen extends AutoPlugin {
       "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
       "org.jooq" % "jooq-codegen" % jooqVersion.value % Jooq,
       "org.slf4j" % "slf4j-simple" % "1.7.25" % Jooq
-    )
+    ),
+    javacOptions in Compile ++= {
+      if (isJigsawEnabled(sys.props("java.version")))
+        Seq("--add-modules", "java.xml.ws.annotation")
+      else
+        Nil
+    }
   ) ++ inConfig(Jooq)(Defaults.configSettings ++ Seq(
     mainClass := Some("org.jooq.util.GenerationTool"),
+    javaOptions ++= {
+      if (isJigsawEnabled(forkJavaVersion.value))
+        Seq("--add-modules", "java.xml.bind")
+      else
+        Nil
+    },
     javaOptions ++= Seq(
       "-classpath", Path.makeString(data(fullClasspath.value)),
       "-Dorg.slf4j.simpleLogger.logFile=System.out",
       "-Dorg.slf4j.simpleLogger.showLogName=false",
       "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
     ),
+    forkJavaVersion := {
+      javaHome.value.fold(sys.props("java.version")) { home =>
+        val releaseFile = home / "release"
+        val versionLine = """JAVA_VERSION="(.+)"""".r
+        IO.readLines(releaseFile).collectFirst {
+          case versionLine(ver) => ver
+        }.getOrElse {
+          sys.error(s"Cannot detect JAVA_VERSION in $home")
+        }
+      }
+    },
     forkOptions := forkOptionsTask.value
   ))
+
+  private def isJigsawEnabled(javaVersion: String): Boolean =
+    javaVersion.takeWhile(_.isDigit).toInt >= 9
 
 
   def rewriteRule(name0: String)(f: PartialFunction[xml.Node, Seq[xml.Node]]): RewriteRule = new RewriteRule {
