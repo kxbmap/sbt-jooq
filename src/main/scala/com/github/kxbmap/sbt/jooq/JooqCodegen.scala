@@ -27,6 +27,8 @@ object JooqCodegen extends AutoPlugin {
     val jooqCodegenConfig = taskKey[xml.Node]("jOOQ codegen configuration")
     val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
 
+    val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
+
     val CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
 
   }
@@ -46,10 +48,16 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
     sourceGenerators in Compile += autoCodegenTask.taskValue,
     ivyConfigurations += Jooq,
+    autoJooqLibrary := true,
+    libraryDependencies ++= {
+      if (autoJooqLibrary.value) Seq(
+        "org.jooq" % "jooq" % jooqVersion.value, // Add to compile scope
+        "org.jooq" % "jooq-codegen" % jooqVersion.value % "jooq"
+      )
+      else Nil
+    },
     libraryDependencies ++= Seq(
-      "org.jooq" % "jooq" % jooqVersion.value, // add to compile scope
-      "org.jooq" % "jooq-codegen" % jooqVersion.value % Jooq,
-      "org.slf4j" % "slf4j-simple" % "1.7.25" % Jooq
+      "org.slf4j" % "slf4j-simple" % "1.7.25" % "jooq"
     ),
     javacOptions in Compile ++= {
       if (isJigsawEnabled(sys.props("java.version")))
