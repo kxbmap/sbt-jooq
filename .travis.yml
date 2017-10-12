@@ -19,7 +19,8 @@ script:
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" -delete
-  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -delete
+  - find $HOME/.ivy2/cache -name "*-SNAPSHOT*" -delete
 
 cache:
   directories:
