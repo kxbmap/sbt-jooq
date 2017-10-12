@@ -1,5 +1,6 @@
 package com.github.kxbmap.sbt.jooq
 
+import java.nio.file.Files
 import sbt.Attributed.data
 import sbt.Keys._
 import sbt._
@@ -35,7 +36,6 @@ object JooqCodegen extends AutoPlugin {
 
   import autoImport.{CodegenStrategy => _, _}
 
-  private val forkOptions = taskKey[ForkOptions]("fork options")
   private val forkJavaVersion = taskKey[String]("fork Java version")
 
   private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
@@ -67,6 +67,7 @@ object JooqCodegen extends AutoPlugin {
     }
   ) ++ inConfig(Jooq)(Defaults.configSettings ++ Seq(
     mainClass := Some("org.jooq.util.GenerationTool"),
+    fork in run := true,
     javaOptions ++= {
       if (isJigsawEnabled(forkJavaVersion.value))
         Seq("--add-modules", "java.xml.bind")
@@ -89,8 +90,7 @@ object JooqCodegen extends AutoPlugin {
           sys.error(s"Cannot detect JAVA_VERSION in $home")
         }
       }
-    },
-    forkOptions := forkOptionsTask.value
+    }
   ))
 
   private def isJigsawEnabled(javaVersion: String): Boolean =
@@ -119,16 +119,19 @@ object JooqCodegen extends AutoPlugin {
     transformer(IO.reader(IO.resolve(base, file))(XML.load))
   }
 
-  private def codegenTask = Def.task {
+  private def codegenTask = Def.taskDyn {
     val config = jooqCodegenConfig.value
-    val main = (mainClass in Jooq).value.getOrElse(sys.error("required: mainClass in jooq"))
-    val forkOpts = (forkOptions in Jooq).value
-    IO.withTemporaryFile("jooq-codegen-", ".xml") { file =>
-      XML.save(file.getAbsolutePath, config, "UTF-8", xmlDecl = true)
-      runCodegen(main, file, forkOpts)
-    } match {
-      case 0 => sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
-      case e => sys.error(s"jOOQ codegen failure: $e")
+    val file = Def.task(Files.createTempFile("jooq-codegen-", ".xml")).value
+    Def.sequential(
+      Def.task {
+        XML.save(file.toString, config, "UTF-8", xmlDecl = true)
+      },
+      (run in Jooq).toTask(s" $file"),
+      Def.task {
+        sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
+      }
+    ).andFinally {
+      Files.delete(file)
     }
   }
 
@@ -154,29 +157,6 @@ object JooqCodegen extends AutoPlugin {
     p.text.trim match {
       case t@r(_) => t.split('.').foldLeft(target)(_ / _)
       case invalid => sys.error(s"invalid packageName format: $invalid")
-    }
-  }
-
-  private def forkOptionsTask = Def.task {
-    ForkOptions(
-      javaHome = javaHome.value,
-      outputStrategy = outputStrategy.value,
-      bootJars = Vector.empty,
-      workingDirectory = Some(baseDirectory.value),
-      runJVMOptions = javaOptions.value.toVector,
-      connectInput = connectInput.value,
-      envVars = envVars.value
-    )
-  }
-
-  private def runCodegen(mainClass: String, config: File, forkOptions: ForkOptions): Int = {
-    val process = Fork.java.fork(forkOptions, Seq(mainClass, config.getAbsolutePath))
-    try
-      process.exitValue()
-    catch {
-      case _: InterruptedException =>
-        process.destroy()
-        1
     }
   }
 
