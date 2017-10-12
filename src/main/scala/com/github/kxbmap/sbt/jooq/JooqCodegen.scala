@@ -123,13 +123,9 @@ object JooqCodegen extends AutoPlugin {
     val config = jooqCodegenConfig.value
     val file = Def.task(Files.createTempFile("jooq-codegen-", ".xml")).value
     Def.sequential(
-      Def.task {
-        XML.save(file.toString, config, "UTF-8", xmlDecl = true)
-      },
+      Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
       (run in Jooq).toTask(s" $file"),
-      Def.task {
-        sourcesIn(packageDir(jooqCodegenTargetDirectory.value, config))
-      }
+      generatedSources
     ).andFinally {
       Files.delete(file)
     }
@@ -137,27 +133,26 @@ object JooqCodegen extends AutoPlugin {
 
   private def autoCodegenTask = Def.taskDyn {
     jooqCodegenStrategy.value match {
-      case CodegenStrategy.Always => Def.task(jooqCodegen.value)
-      case CodegenStrategy.IfAbsent =>
-        Def.taskDyn {
-          val fs = sourcesIn(packageDir(jooqCodegenTargetDirectory.value, jooqCodegenConfig.value))
-          if (fs.isEmpty)
-            Def.task(jooqCodegen.value)
-          else
-            Def.task(fs)
-        }
+      case CodegenStrategy.Always => codegenTask
+      case CodegenStrategy.IfAbsent => Def.taskDyn {
+        val files = generatedSources.value
+        if (files.isEmpty) codegenTask else Def.task(files)
+      }
     }
   }
 
-  private def sourcesIn(dir: File): Seq[File] = (dir ** ("*.java" || "*.scala")).get
-
-  private def packageDir(target: File, config: xml.Node): File = {
-    val p = config \ "generator" \ "target" \ "packageName"
-    val r = """^\w+(\.\w+)*$""".r
-    p.text.trim match {
-      case t@r(_) => t.split('.').foldLeft(target)(_ / _)
-      case invalid => sys.error(s"invalid packageName format: $invalid")
+  private def generatedSources = Def.task {
+    val target = jooqCodegenTargetDirectory.value
+    val config = jooqCodegenConfig.value
+    val packageDir = {
+      val p = config \ "generator" \ "target" \ "packageName"
+      val r = """^\w+(\.\w+)*$""".r
+      p.text.trim match {
+        case t@r(_) => t.split('.').foldLeft(target)(_ / _)
+        case invalid => sys.error(s"invalid packageName format: $invalid")
+      }
     }
+    (packageDir ** ("*.java" || "*.scala")).get
   }
 
 }
