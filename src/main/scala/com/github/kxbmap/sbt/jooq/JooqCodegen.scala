@@ -21,6 +21,8 @@ object JooqCodegen extends AutoPlugin {
     val Jooq = config("jooq").hide
 
     val jooqVersion = settingKey[String]("jOOQ version")
+    val jooqGroupId = settingKey[String]("jOOQ groupId")
+
     val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
     val jooqCodegenConfigFile = settingKey[Option[File]]("jOOQ codegen configuration file")
     val jooqCodegenTargetDirectory = settingKey[File]("jOOQ codegen target directory")
@@ -40,6 +42,7 @@ object JooqCodegen extends AutoPlugin {
 
   private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
+    jooqGroupId := "org.jooq",
     jooqCodegen := codegenTask.value,
     jooqCodegenConfigFile := None,
     jooqCodegenTargetDirectory := (sourceManaged in Compile).value,
@@ -51,8 +54,8 @@ object JooqCodegen extends AutoPlugin {
     autoJooqLibrary := true,
     libraryDependencies ++= {
       if (autoJooqLibrary.value) Seq(
-        "org.jooq" % "jooq" % jooqVersion.value, // Add to compile scope
-        "org.jooq" % "jooq-codegen" % jooqVersion.value % "jooq"
+        jooqGroupId.value % "jooq" % jooqVersion.value, // Add to compile scope
+        jooqGroupId.value % "jooq-codegen" % jooqVersion.value % "jooq"
       )
       else Nil
     },
