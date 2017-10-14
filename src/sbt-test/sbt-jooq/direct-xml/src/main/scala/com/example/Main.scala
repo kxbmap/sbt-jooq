@@ -2,7 +2,6 @@ package com.example
 
 import com.example.db.Tables
 import java.sql.DriverManager
-import org.jooq.Record
 import org.jooq.impl.DSL
 
 object Main extends App {
@@ -10,16 +9,18 @@ object Main extends App {
 
   val conn = DriverManager.getConnection("jdbc:h2:./test")
   try {
-    val dsl = DSL.using(conn)
-    val t = Tables.TEST.as("t")
-    val q = dsl.selectFrom(t).where(t.ID.eq(1))
+    val e = Tables.EMPLOYEE.as("e")
 
-    println(s"query : ${q.getSQL}")
-    println(s"params: ${q.getParams}")
+    val query = DSL.using(conn)
+      .selectFrom(e)
+      .limit(2).offset(1)
 
-    val r = q.fetchOne()
+    println(s"query:\n${query.getSQL}")
+    println(s"params:\n${query.getParams}")
 
-    println(s"result:\n$r")
+    val result = query.fetch()
+
+    println(s"result:\n$result")
   } finally {
     conn.close()
   }

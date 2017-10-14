@@ -1,14 +1,3 @@
-> codegen/jooqCodegen
-$ exists codegen/target/scala-2.12/src_managed/main/com/example/db/Tables.java
-$ exists codegen/target/scala-2.12/src_managed/main/com/example/db/Keys.java
-$ exists codegen/target/scala-2.12/src_managed/main/com/example/db/Public.java
-$ exists codegen/target/scala-2.12/src_managed/main/com/example/db/tables/Test.java
-$ exists codegen/target/scala-2.12/src_managed/main/com/example/db/tables/records/TestRecord.java
-
-> codegen/clean
-> compile
-$ absent codegen/target/scala-2.12/src_managed/main/com/example/db/Tables.java
-
-> clean
-> test:compile
+> setup
+> show codegen/jooqCodegen
 > test:runMain com.example.Main
