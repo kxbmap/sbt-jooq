@@ -15,7 +15,7 @@ matrix:
       env: SBT_VERSION=0.13.16
 
 script:
-  - sbt ^^$SBT_VERSION scripted
+  - sbt ^^$SBT_VERSION "scripted sbt-jooq/*"
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" -delete
