@@ -17,12 +17,13 @@ matrix:
 script:
   - sbt ^^$SBT_VERSION "scripted sbt-jooq/*"
 
-  # Tricks to avoid unnecessary cache updates
-  - find $HOME/.sbt -name "*.lock" -delete
-  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -delete
-  - find $HOME/.ivy2/cache -name "*-SNAPSHOT*" -delete
-
 cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot
+
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.sbt -name "*.lock" -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -delete
+  - find $HOME/.ivy2/cache -name "*-SNAPSHOT*" -delete
