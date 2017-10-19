@@ -24,7 +24,7 @@ object JooqCodegen extends AutoPlugin {
     val jooqGroupId = settingKey[String]("jOOQ groupId")
 
     val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
-    val jooqCodegenConfigFile = settingKey[Option[File]]("jOOQ codegen configuration file")
+    val jooqCodegenConfigFile = settingKey[File]("jOOQ codegen configuration file")
     val jooqCodegenTargetDirectory = settingKey[File]("jOOQ codegen target directory")
     val jooqCodegenConfigRewriteRules = settingKey[Seq[RewriteRule]]("jOOQ codegen configuration rewrite rules")
     val jooqCodegenConfig = taskKey[xml.Node]("jOOQ codegen configuration")
@@ -45,7 +45,6 @@ object JooqCodegen extends AutoPlugin {
     jooqVersion := DefaultJooqVersion,
     jooqGroupId := "org.jooq",
     jooqCodegen := codegenTask.value,
-    jooqCodegenConfigFile := None,
     jooqCodegenTargetDirectory := (sourceManaged in Compile).value,
     jooqCodegenConfigRewriteRules := configRewriteRules.value,
     jooqCodegenConfig := codegenConfigTask.value,
@@ -109,7 +108,7 @@ object JooqCodegen extends AutoPlugin {
 
   private def codegenConfigTask = Def.task {
     val base = baseDirectory.value
-    val file = jooqCodegenConfigFile.value.getOrElse(sys.error("required: jooqCodegenConfigFile or jooqCodegenConfig"))
+    val file = (jooqCodegenConfigFile ?? sys.error("required: jooqCodegenConfigFile or jooqCodegenConfig")).value
     val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
     transformer(IO.reader(IO.resolve(base, file))(XML.load))
   }

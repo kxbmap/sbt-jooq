@@ -4,7 +4,7 @@ enablePlugins(JooqCodegen)
 
 jooqCodegen := jooqCodegen.dependsOn(flywayMigrate in migration).value
 
-jooqCodegenConfigFile := Some(file("jooq-codegen.xml"))
+jooqCodegenConfigFile := file("jooq-codegen.xml")
 
 jooqCodegenStrategy := CodegenStrategy.Always
 
