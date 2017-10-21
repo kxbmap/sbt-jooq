@@ -1,11 +1,11 @@
 package com.github.kxbmap.sbt.jooq
 
+import com.github.kxbmap.sbt.jooq.PluginCompat._
 import com.github.kxbmap.sbt.jooq.internal.ClasspathLoader
 import java.nio.file.Files
 import sbt.Attributed.data
 import sbt.Keys._
 import sbt._
-import sbt.io.Using
 import sbt.plugins.JvmPlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Elem, XML}
