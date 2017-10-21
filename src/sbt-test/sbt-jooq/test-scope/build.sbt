@@ -8,6 +8,6 @@ lazy val root = project.in(file("."))
 lazy val codegen = project
   .enablePlugins(JooqCodegen)
   .settings(
-    jooqCodegenConfigFile := file("jooq-codegen.xml"),
+    jooqCodegenConfigLocation := file("jooq-codegen.xml"),
     libraryDependencies += "com.h2database" % "h2" % "1.4.196" % "jooq"
   )
