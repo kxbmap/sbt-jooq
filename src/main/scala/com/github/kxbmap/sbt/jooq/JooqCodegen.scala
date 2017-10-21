@@ -127,13 +127,10 @@ object JooqCodegen extends AutoPlugin {
 
   private def autoCodegenTask = Def.taskDyn {
     jooqCodegenStrategy.value match {
-      case CodegenStrategy.Always => Def.task(jooqCodegen.value)
+      case CodegenStrategy.Always => jooqCodegen
       case CodegenStrategy.IfAbsent => Def.taskDyn {
         val files = generatedSources.value
-        if (files.isEmpty)
-          Def.task(jooqCodegen.value)
-        else
-          Def.task(files)
+        if (files.isEmpty) jooqCodegen else Def.task(files)
       }
     }
   }
