@@ -97,10 +97,14 @@ object JooqCodegen extends AutoPlugin {
     }
   ))
 
+  @deprecated("Use CodegenUtil.rewriteRule()", "0.3.3")
+  def rewriteRule(name0: String)(f: PartialFunction[xml.Node, Seq[xml.Node]]): RewriteRule =
+    CodegenUtil.rewriteRule(name0)(f)
+
   private def configRewriteRules = Def.setting {
     def directory = <directory>{jooqCodegenTargetDirectory.value}</directory>
     Seq(
-      rewriteRule("replaceTargetDirectory") {
+      CodegenUtil.rewriteRule("replaceTargetDirectory") {
         case Elem(_, "directory", _, _, _*) => directory
         case e: Elem if e.label == "target" && e.child.forall(_.label != "directory") => e.copy(child = e.child :+ directory)
       }
