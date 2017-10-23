@@ -1,3 +1,5 @@
 > setup
 > show jooqCodegen
+> clean
+> compile
 > runMain com.example.Main
