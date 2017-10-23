@@ -29,6 +29,7 @@ object JooqCodegen extends AutoPlugin {
     val jooqCodegenConfigRewriteRules = settingKey[Seq[RewriteRule]]("jOOQ codegen configuration rewrite rules")
     val jooqCodegenConfig = taskKey[xml.Node]("jOOQ codegen configuration")
     val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
+    val jooqCodegenGeneratedDirectories = taskKey[Seq[File]]("Generated directories by jOOQ codegen")
 
     val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
 
@@ -51,6 +52,7 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegenConfig := codegenConfigTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
     sourceGenerators in Compile += autoCodegenTask.taskValue,
+    jooqCodegenGeneratedDirectories := generatedDirectoriesTask.value,
     ivyConfigurations += Jooq,
     autoJooqLibrary := true,
     libraryDependencies ++= {
@@ -124,7 +126,7 @@ object JooqCodegen extends AutoPlugin {
     Def.sequential(
       Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
       (run in Jooq).toTask(s" $file"),
-      generatedSources
+      Def.task(listSourcesIn(jooqCodegenGeneratedDirectories.value))
     ).andFinally {
       Files.delete(file)
     }
@@ -134,13 +136,13 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegenStrategy.value match {
       case CodegenStrategy.Always => jooqCodegen
       case CodegenStrategy.IfAbsent => Def.taskDyn {
-        val files = generatedSources.value
+        val files = listSourcesIn(jooqCodegenGeneratedDirectories.value)
         if (files.isEmpty) jooqCodegen else Def.task(files)
       }
     }
   }
 
-  private def generatedSources = Def.task {
+  private def generatedDirectoriesTask = Def.task {
     val target = jooqCodegenTargetDirectory.value
     val config = jooqCodegenConfig.value
     val packageDir = {
@@ -151,7 +153,7 @@ object JooqCodegen extends AutoPlugin {
         case invalid => sys.error(s"invalid packageName format: $invalid")
       }
     }
-    (packageDir ** ("*.java" || "*.scala")).get
+    Seq(packageDir)
   }
 
 }
