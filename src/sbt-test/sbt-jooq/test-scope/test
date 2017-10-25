@@ -1,5 +1,5 @@
 > setup
-> show codegen/jooqCodegen
+> show test:jooqCodegen
 > clean
 > test:compile
 > test:runMain com.example.Main

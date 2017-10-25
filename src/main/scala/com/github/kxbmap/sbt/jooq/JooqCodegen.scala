@@ -16,26 +16,26 @@ object JooqCodegen extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
-  override def projectSettings: Seq[Setting[_]] = jooqCodegenSettings
-
   object autoImport extends ConfigLocation.Implicits {
 
     val Jooq = config("jooq").hide
 
     val jooqVersion = settingKey[String]("jOOQ version")
     val jooqGroupId = settingKey[String]("jOOQ groupId")
+    val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
 
     val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
     val jooqCodegenConfigLocation = settingKey[ConfigLocation]("Location of jOOQ codegen configuration")
     val jooqCodegenTargetDirectory = settingKey[File]("jOOQ codegen target directory")
     val jooqCodegenConfigRewriteRules = settingKey[Seq[RewriteRule]]("jOOQ codegen configuration rewrite rules")
-    val jooqCodegenConfig = taskKey[xml.Node]("jOOQ codegen configuration")
+    val jooqCodegenConfig = taskKey[Option[xml.Node]]("jOOQ codegen configuration")
     val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
     val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")
 
-    val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
-
     val CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
+
+    def jooqCodegenSettingsIn(config: Configuration): Seq[Setting[_]] =
+      JooqCodegen.jooqCodegenSettingsIn(config)
 
   }
 
@@ -44,34 +44,49 @@ object JooqCodegen extends AutoPlugin {
 
   private val forkJavaVersion = taskKey[String]("fork Java version")
 
-  private lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
+  override lazy val projectSettings: Seq[Setting[_]] =
+    jooqCodegenCoreSettings ++ jooqCodegenSettingsIn(Compile) ++ jooqCodegenRunnerSettings
+
+  private def jooqCodegenCoreSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
     jooqGroupId := "org.jooq",
+    autoJooqLibrary := true
+  )
+
+  private def jooqCodegenSettingsIn(config: Configuration): Seq[Setting[_]] = Seq(
+    libraryDependencies ++= {
+      if (autoJooqLibrary.value)
+        Seq(jooqGroupId.value % "jooq" % jooqVersion.value % config)
+      else
+        Nil
+    }
+  ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
-    jooqCodegenTargetDirectory := (sourceManaged in Compile).value,
+    jooqCodegenTargetDirectory := sourceManaged.value,
     jooqCodegenConfigRewriteRules := configRewriteRules.value,
     jooqCodegenConfig := codegenConfigTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
-    sourceGenerators in Compile += autoCodegenTask.taskValue,
+    sourceGenerators += autoCodegenTask.taskValue,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
-    ivyConfigurations += Jooq,
-    autoJooqLibrary := true,
-    libraryDependencies ++= {
-      if (autoJooqLibrary.value) Seq(
-        jooqGroupId.value % "jooq" % jooqVersion.value, // Add to compile scope
-        jooqGroupId.value % "jooq-codegen" % jooqVersion.value % "jooq"
-      )
-      else Nil
-    },
-    libraryDependencies ++= Seq(
-      "org.slf4j" % "slf4j-simple" % "1.7.25" % "jooq"
-    ),
-    javacOptions in Compile ++= {
+    javacOptions ++= {
       if (isJigsawEnabled(sys.props("java.version")))
         Seq("--add-modules", "java.xml.ws.annotation")
       else
         Nil
     }
+  ))
+
+  private def jooqCodegenRunnerSettings: Seq[Setting[_]] = Seq(
+    ivyConfigurations += Jooq,
+    libraryDependencies ++= {
+      if (autoJooqLibrary.value)
+        Seq(jooqGroupId.value % "jooq-codegen" % jooqVersion.value % "jooq")
+      else
+        Nil
+    },
+    libraryDependencies ++= Seq(
+      "org.slf4j" % "slf4j-simple" % "1.7.25" % "jooq"
+    )
   ) ++ inConfig(Jooq)(Defaults.configSettings ++ Seq(
     mainClass := Some("org.jooq.util.GenerationTool"),
     fork in run := true,
@@ -112,9 +127,9 @@ object JooqCodegen extends AutoPlugin {
 
   private def codegenConfigTask = Def.taskDyn {
     val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
-    (jooqCodegenConfigLocation ?? sys.error("required: jooqCodegenConfigLocation or jooqCodegenConfig")).value match {
+    jooqCodegenConfigLocation.?.value.fold(Def.task(none[xml.Node])) {
       case ConfigLocation.File(file) => Def.task {
-        transformer(IO.reader(IO.resolve(baseDirectory.value, file))(XML.load))
+        transformer(IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)).some
       }
       case ConfigLocation.Classpath(resource) => Def.task {
         ClasspathLoader.using((fullClasspath in Jooq).value) { loader =>
@@ -123,21 +138,24 @@ object JooqCodegen extends AutoPlugin {
             case null => sys.error(s"resource $resource not found in classpath")
             case in => Using.bufferedInputStream(in)(XML.load)
           }
-          transformer(xml)
+          transformer(xml).some
         }
       }
     }
   }
 
   private def codegenTask = Def.taskDyn {
-    val config = jooqCodegenConfig.value
-    val file = Def.task(Files.createTempFile("jooq-codegen-", ".xml")).value
-    Def.sequential(
-      Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
-      (run in Jooq).toTask(s" $file"),
-      Def.task(jooqCodegenGeneratedSourcesFinder.value.get)
-    ).andFinally {
-      Files.delete(file)
+    jooqCodegenConfig.value.fold(Def.task(Seq.empty[File])) { config =>
+      Def.taskDyn {
+        val file = Def.task(Files.createTempFile("jooq-codegen-", ".xml")).value
+        Def.sequential(
+          Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
+          (run in Jooq).toTask(s" $file"),
+          Def.task(jooqCodegenGeneratedSourcesFinder.value.get)
+        ).andFinally {
+          Files.delete(file)
+        }
+      }
     }
   }
 
@@ -151,18 +169,21 @@ object JooqCodegen extends AutoPlugin {
     }
   }
 
-  private def generatedSourcesFinderTask = Def.task {
-    val target = jooqCodegenTargetDirectory.value
-    val config = jooqCodegenConfig.value
-    val packageDir = {
-      val p = config \ "generator" \ "target" \ "packageName"
-      val r = """^\w+(\.\w+)*$""".r
-      p.text.trim match {
-        case t@r(_) => t.split('.').foldLeft(target)(_ / _)
-        case invalid => sys.error(s"invalid packageName format: $invalid")
+  private def generatedSourcesFinderTask = Def.taskDyn {
+    jooqCodegenConfig.value.fold(Def.task(PathFinder.empty)) { config =>
+      Def.task {
+        val target = jooqCodegenTargetDirectory.value
+        val packageDir = {
+          val p = config \ "generator" \ "target" \ "packageName"
+          val r = """^\w+(\.\w+)*$""".r
+          p.text.trim match {
+            case t@r(_) => t.split('.').foldLeft(target)(_ / _)
+            case invalid => sys.error(s"invalid packageName format: $invalid")
+          }
+        }
+        packageDir ** ("*.java" || "*.scala")
       }
     }
-    packageDir ** ("*.java" || "*.scala")
   }
 
 }

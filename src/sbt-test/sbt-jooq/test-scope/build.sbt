@@ -1,13 +1,11 @@
 scalaVersion in ThisBuild := "2.12.4"
 
-libraryDependencies += "com.h2database" % "h2" % "1.4.196" % "test"
+enablePlugins(JooqCodegen)
 
-lazy val root = project.in(file("."))
-  .dependsOn(codegen % "test")
+jooqCodegenSettingsIn(Test)
 
-lazy val codegen = project
-  .enablePlugins(JooqCodegen)
-  .settings(
-    jooqCodegenConfigLocation := file("jooq-codegen.xml"),
-    libraryDependencies += "com.h2database" % "h2" % "1.4.196" % "jooq"
-  )
+jooqCodegenConfigLocation in Test := file("jooq-codegen.xml")
+
+libraryDependencies ++= Seq("test", "jooq").map { conf =>
+  "com.h2database" % "h2" % "1.4.196" % conf
+}
