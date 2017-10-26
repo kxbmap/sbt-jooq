@@ -62,6 +62,7 @@ object JooqCodegen extends AutoPlugin {
     }
   ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
+    skip in jooqCodegen := false,
     jooqCodegenTargetDirectory := sourceManaged.value,
     jooqCodegenConfigRewriteRules := configRewriteRules.value,
     jooqCodegenConfig := codegenConfigTask.value,
@@ -160,11 +161,14 @@ object JooqCodegen extends AutoPlugin {
   }
 
   private def autoCodegenTask = Def.taskDyn {
-    jooqCodegenStrategy.value match {
-      case CodegenStrategy.Always => jooqCodegen
-      case CodegenStrategy.IfAbsent => Def.taskDyn {
-        val files = jooqCodegenGeneratedSourcesFinder.value.get
-        if (files.isEmpty) jooqCodegen else Def.task(files)
+    if ((skip in jooqCodegen).value) Def.task(Seq.empty[File])
+    else Def.taskDyn {
+      jooqCodegenStrategy.value match {
+        case CodegenStrategy.Always => jooqCodegen
+        case CodegenStrategy.IfAbsent => Def.taskDyn {
+          val files = jooqCodegenGeneratedSourcesFinder.value.get
+          if (files.isEmpty) jooqCodegen else Def.task(files)
+        }
       }
     }
   }
