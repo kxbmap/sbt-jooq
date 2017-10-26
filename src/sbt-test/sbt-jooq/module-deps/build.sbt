@@ -14,7 +14,7 @@ lazy val app = project
       "com.h2database" % "h2" % "1.4.196" % conf
     },
     inConfig(Compile)(Seq(
-      jooqCodegenConfig := Some(
+      jooqCodegenConfig :=
         <configuration>
           <jdbc>
             <driver>org.h2.Driver</driver>
@@ -38,7 +38,6 @@ lazy val app = project
             </target>
           </generator>
         </configuration>
-      )
     ))
   )
   .dependsOn(upstream % "jooq")

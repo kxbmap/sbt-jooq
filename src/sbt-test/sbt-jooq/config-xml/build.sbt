@@ -3,7 +3,7 @@ scalaVersion in ThisBuild := "2.12.4"
 enablePlugins(JooqCodegen)
 
 inConfig(Compile)(Seq(
-  jooqCodegenConfig := Some(
+  jooqCodegenConfig :=
     <configuration>
       <jdbc>
         <driver>org.h2.Driver</driver>
@@ -24,7 +24,6 @@ inConfig(Compile)(Seq(
         </target>
       </generator>
     </configuration>
-  )
 ))
 
 libraryDependencies ++= Seq("runtime", "jooq").map { conf =>
