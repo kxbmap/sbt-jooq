@@ -42,8 +42,6 @@ object JooqCodegen extends AutoPlugin {
   import CodegenUtil._
   import autoImport.{CodegenStrategy => _, _}
 
-  private val forkJavaVersion = taskKey[String]("fork Java version")
-
   override lazy val projectSettings: Seq[Setting[_]] =
     jooqCodegenCoreSettings ++ jooqCodegenSettingsIn(Compile) ++ jooqCodegenRunnerSettings
 
@@ -92,7 +90,7 @@ object JooqCodegen extends AutoPlugin {
     mainClass := Some("org.jooq.util.GenerationTool"),
     fork in run := true,
     javaOptions ++= {
-      if (isJigsawEnabled(forkJavaVersion.value))
+      if (isJigsawEnabled(javaHome.value.fold(sys.props("java.version"))(parseJavaVersion)))
         Seq("--add-modules", "java.xml.bind")
       else
         Nil
@@ -102,18 +100,7 @@ object JooqCodegen extends AutoPlugin {
       "-Dorg.slf4j.simpleLogger.logFile=System.out",
       "-Dorg.slf4j.simpleLogger.showLogName=false",
       "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
-    ),
-    forkJavaVersion := {
-      javaHome.value.fold(sys.props("java.version")) { home =>
-        val releaseFile = home / "release"
-        val versionLine = """JAVA_VERSION="(.+)"""".r
-        IO.readLines(releaseFile).collectFirst {
-          case versionLine(ver) => ver
-        }.getOrElse {
-          sys.error(s"Cannot detect JAVA_VERSION in $home")
-        }
-      }
-    }
+    )
   ))
 
   private def configRewriteRules = Def.setting {
