@@ -60,7 +60,7 @@ object JooqCodegen extends AutoPlugin {
     }
   ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
-    skip in jooqCodegen := false,
+    skip in jooqCodegen := jooqCodegenConfig.?.value.isEmpty,
     jooqCodegenConfigSubstitutions := configSubstitutions.value,
     jooqCodegenConfigTransformer := configTransformer.value,
     jooqCodegenTransformedConfig := configTransformTask.value,
