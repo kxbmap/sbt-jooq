@@ -8,7 +8,7 @@ import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Text, XML}
+import scala.xml.{Node, Text, XML}
 
 object JooqCodegen extends AutoPlugin {
 
@@ -27,8 +27,8 @@ object JooqCodegen extends AutoPlugin {
     val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
     val jooqCodegenConfigLocation = settingKey[ConfigLocation]("Location of jOOQ codegen configuration")
     val jooqCodegenConfigSubstitutions = settingKey[Map[String, String]]("jOOQ codegen configuration text substitutions")
-    val jooqCodegenConfigRewriteRules = settingKey[Seq[RewriteRule]]("jOOQ codegen configuration rewrite rules")
-    val jooqCodegenConfig = taskKey[xml.Node]("jOOQ codegen configuration")
+    val jooqCodegenConfigTransformer = settingKey[Node => Node]("jOOQ codegen configuration transform function")
+    val jooqCodegenConfig = taskKey[Node]("jOOQ codegen configuration")
     val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
     val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")
 
@@ -62,7 +62,7 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegen := codegenTask.value,
     skip in jooqCodegen := false,
     jooqCodegenConfigSubstitutions := configSubstitutions.value,
-    jooqCodegenConfigRewriteRules := configRewriteRules.value,
+    jooqCodegenConfigTransformer := configTransformer.value,
     jooqCodegenConfig := codegenConfigTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
     sourceGenerators += autoCodegenTask.taskValue,
@@ -114,37 +114,39 @@ object JooqCodegen extends AutoPlugin {
     sys.env ++ kvs
   }
 
-  private def configRewriteRules = Def.setting {
+  private def configTransformer = Def.setting {
     val substitutions = jooqCodegenConfigSubstitutions.value
     val parser = new SubstitutionParser(substitutions)
-    Seq(
-      rewriteRule("text substitution") {
+    new RuleTransformer(new RewriteRule {
+      override def transform(n: Node): Seq[Node] = n match {
         case Text(data) =>
           parser.parse(data).fold(
             e => sys.error(s"Substitution failure: $e"),
             s => Text(s)
           )
+        case otherwise => otherwise
       }
-    )
+    })
   }
 
   private def codegenConfigTask = Def.taskDyn(Def.taskDyn { // To avoid evaluate ?? on project loading
-    val transformer = new RuleTransformer(jooqCodegenConfigRewriteRules.value: _*)
-    (jooqCodegenConfigLocation ?? sys.error("required: jooqCodegenConfigLocation or jooqCodegenConfig")).value match {
-      case ConfigLocation.File(file) => Def.task {
-        transformer(IO.reader(IO.resolve(baseDirectory.value, file))(XML.load))
-      }
-      case ConfigLocation.Classpath(resource) => Def.task {
-        ClasspathLoader.using((fullClasspath in Jooq).value) { loader =>
-          val res = if (resource.startsWith("/")) resource.substring(1) else resource
-          val xml = loader.getResourceAsStream(res) match {
-            case null => sys.error(s"resource $resource not found in classpath")
-            case in => Using.bufferedInputStream(in)(XML.load)
+    val transformer = jooqCodegenConfigTransformer.value
+    val xml =
+      (jooqCodegenConfigLocation ?? sys.error("required: jooqCodegenConfigLocation or jooqCodegenConfig")).value match {
+        case ConfigLocation.File(file) => Def.task {
+          IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
+        }
+        case ConfigLocation.Classpath(resource) => Def.task {
+          ClasspathLoader.using((fullClasspath in Jooq).value) { loader =>
+            val res = if (resource.startsWith("/")) resource.substring(1) else resource
+            loader.getResourceAsStream(res) match {
+              case null => sys.error(s"resource $resource not found in classpath")
+              case in => Using.bufferedInputStream(in)(XML.load)
+            }
           }
-          transformer(xml)
         }
       }
-    }
+    xml.map(transformer)
   })
 
   private def codegenTask = Def.taskDyn {
