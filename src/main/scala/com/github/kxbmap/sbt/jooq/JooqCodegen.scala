@@ -16,7 +16,7 @@ object JooqCodegen extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
-  object autoImport extends ConfigLocation.Implicits {
+  object autoImport extends CodegenConfig.Implicits {
 
     val Jooq = config("jooq").hide
 
@@ -25,10 +25,10 @@ object JooqCodegen extends AutoPlugin {
     val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
 
     val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
-    val jooqCodegenConfigLocation = settingKey[ConfigLocation]("Location of jOOQ codegen configuration")
+    val jooqCodegenConfig = settingKey[CodegenConfig]("jOOQ codegen configuration")
     val jooqCodegenConfigSubstitutions = settingKey[Map[String, String]]("jOOQ codegen configuration text substitutions")
     val jooqCodegenConfigTransformer = settingKey[Node => Node]("jOOQ codegen configuration transform function")
-    val jooqCodegenConfig = taskKey[Node]("jOOQ codegen configuration")
+    val jooqCodegenTransformedConfig = taskKey[Node]("transformed jOOQ codegen configuration")
     val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
     val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")
 
@@ -63,7 +63,7 @@ object JooqCodegen extends AutoPlugin {
     skip in jooqCodegen := false,
     jooqCodegenConfigSubstitutions := configSubstitutions.value,
     jooqCodegenConfigTransformer := configTransformer.value,
-    jooqCodegenConfig := codegenConfigTask.value,
+    jooqCodegenTransformedConfig := configTransformTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
     sourceGenerators += autoCodegenTask.taskValue,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
@@ -129,28 +129,28 @@ object JooqCodegen extends AutoPlugin {
     })
   }
 
-  private def codegenConfigTask = Def.taskDyn(Def.taskDyn { // To avoid evaluate ?? on project loading
+  private def configTransformTask = Def.taskDyn(Def.taskDyn { // To avoid evaluate ?? on project loading
     val transformer = jooqCodegenConfigTransformer.value
-    val xml =
-      (jooqCodegenConfigLocation ?? sys.error("required: jooqCodegenConfigLocation or jooqCodegenConfig")).value match {
-        case ConfigLocation.File(file) => Def.task {
-          IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
-        }
-        case ConfigLocation.Classpath(resource) => Def.task {
-          ClasspathLoader.using((fullClasspath in Jooq).value) { loader =>
-            val res = if (resource.startsWith("/")) resource.substring(1) else resource
-            loader.getResourceAsStream(res) match {
-              case null => sys.error(s"resource $resource not found in classpath")
-              case in => Using.bufferedInputStream(in)(XML.load)
-            }
+    val xml = (jooqCodegenConfig ?? sys.error("required: jooqCodegenConfig")).value match {
+      case CodegenConfig.File(file) => Def.task[Node] {
+        IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
+      }
+      case CodegenConfig.Resource(resource) => Def.task[Node] {
+        ClasspathLoader.using((fullClasspath in Jooq).value) { loader =>
+          val res = if (resource.startsWith("/")) resource.substring(1) else resource
+          loader.getResourceAsStream(res) match {
+            case null => sys.error(s"resource $resource not found in classpath")
+            case in => Using.bufferedInputStream(in)(XML.load)
           }
         }
       }
+      case CodegenConfig.XML(xml) => Def.task(xml)
+    }
     xml.map(transformer)
   })
 
   private def codegenTask = Def.taskDyn {
-    val config = jooqCodegenConfig.value
+    val config = jooqCodegenTransformedConfig.value
     val file = Def.task(Files.createTempFile("jooq-codegen-", ".xml")).value
     Def.sequential(
       Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
@@ -175,7 +175,7 @@ object JooqCodegen extends AutoPlugin {
   }
 
   private def generatedSourcesFinderTask = Def.task {
-    val config = jooqCodegenConfig.value
+    val config = jooqCodegenTransformedConfig.value
     val target = config \ "generator" \ "target"
     val targetDir = file((target \ "directory").text.trim)
     val packageDir = {
