@@ -15,7 +15,7 @@
         </generate>
         <target>
             <packageName>com.example.db</packageName>
-            <directory>src/test/java</directory>
+            <directory>${sourceManaged}</directory>
         </target>
     </generator>
 </configuration>

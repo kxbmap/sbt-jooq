@@ -34,7 +34,7 @@ lazy val app = project
             </generate>
             <target>
               <packageName>com.example.db</packageName>
-              <directory>{jooqCodegenTargetDirectory.value}</directory>
+              <directory>{sourceManaged.value}</directory>
             </target>
           </generator>
         </configuration>

@@ -1,14 +1,14 @@
 package com.github.kxbmap.sbt.jooq
 
 import com.github.kxbmap.sbt.jooq.PluginCompat._
-import com.github.kxbmap.sbt.jooq.internal.ClasspathLoader
+import com.github.kxbmap.sbt.jooq.internal.{ClasspathLoader, SubstitutionParser}
 import java.nio.file.Files
 import sbt.Attributed.data
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Elem, XML}
+import scala.xml.{Text, XML}
 
 object JooqCodegen extends AutoPlugin {
 
@@ -26,7 +26,7 @@ object JooqCodegen extends AutoPlugin {
 
     val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
     val jooqCodegenConfigLocation = settingKey[ConfigLocation]("Location of jOOQ codegen configuration")
-    val jooqCodegenTargetDirectory = settingKey[File]("jOOQ codegen target directory")
+    val jooqCodegenConfigSubstitutions = settingKey[Map[String, String]]("jOOQ codegen configuration text substitutions")
     val jooqCodegenConfigRewriteRules = settingKey[Seq[RewriteRule]]("jOOQ codegen configuration rewrite rules")
     val jooqCodegenConfig = taskKey[xml.Node]("jOOQ codegen configuration")
     val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
@@ -61,7 +61,7 @@ object JooqCodegen extends AutoPlugin {
   ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
     skip in jooqCodegen := false,
-    jooqCodegenTargetDirectory := sourceManaged.value,
+    jooqCodegenConfigSubstitutions := configSubstitutions.value,
     jooqCodegenConfigRewriteRules := configRewriteRules.value,
     jooqCodegenConfig := codegenConfigTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
@@ -103,12 +103,27 @@ object JooqCodegen extends AutoPlugin {
     )
   ))
 
+
+  private def configSubstitutions = Def.setting {
+    def kv[T](k: SettingKey[T], v: T) = (k.key.label, v.toString)
+    val kvs = Map(
+      kv(baseDirectory, baseDirectory.value),
+      kv(sourceDirectory, sourceDirectory.value),
+      kv(sourceManaged, sourceManaged.value)
+    )
+    sys.env ++ kvs
+  }
+
   private def configRewriteRules = Def.setting {
-    def directory = <directory>{jooqCodegenTargetDirectory.value}</directory>
+    val substitutions = jooqCodegenConfigSubstitutions.value
+    val parser = new SubstitutionParser(substitutions)
     Seq(
-      rewriteRule("replaceTargetDirectory") {
-        case Elem(_, "directory", _, _, _*) => directory
-        case e: Elem if e.label == "target" && e.child.forall(_.label != "directory") => e.copy(child = e.child :+ directory)
+      rewriteRule("text substitution") {
+        case Text(data) =>
+          parser.parse(data).fold(
+            e => sys.error(s"Substitution failure: $e"),
+            s => Text(s)
+          )
       }
     )
   }
@@ -158,13 +173,14 @@ object JooqCodegen extends AutoPlugin {
   }
 
   private def generatedSourcesFinderTask = Def.task {
-    val target = jooqCodegenTargetDirectory.value
     val config = jooqCodegenConfig.value
+    val target = config \ "generator" \ "target"
+    val targetDir = file((target \ "directory").text.trim)
     val packageDir = {
-      val p = config \ "generator" \ "target" \ "packageName"
+      val p = target \ "packageName"
       val r = """^\w+(\.\w+)*$""".r
       p.text.trim match {
-        case t@r(_) => t.split('.').foldLeft(target)(_ / _)
+        case t@r(_) => t.split('.').foldLeft(targetDir)(_ / _)
         case invalid => sys.error(s"invalid packageName format: $invalid")
       }
     }
