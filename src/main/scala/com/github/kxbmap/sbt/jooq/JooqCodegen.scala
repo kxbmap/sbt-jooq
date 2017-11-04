@@ -98,6 +98,8 @@ object JooqCodegen extends AutoPlugin {
     javaOptions ++= Seq(
       "-classpath", Path.makeString(data(fullClasspath.value)),
       "-Dorg.slf4j.simpleLogger.logFile=System.out",
+      "-Dorg.slf4j.simpleLogger.cacheOutputStream=true",
+      "-Dorg.slf4j.simpleLogger.showThreadName=false",
       "-Dorg.slf4j.simpleLogger.showLogName=false",
       "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
     )
