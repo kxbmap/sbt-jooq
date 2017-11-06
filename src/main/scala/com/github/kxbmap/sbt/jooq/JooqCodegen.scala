@@ -3,7 +3,6 @@ package com.github.kxbmap.sbt.jooq
 import com.github.kxbmap.sbt.jooq.PluginCompat._
 import com.github.kxbmap.sbt.jooq.internal.{ClasspathLoader, SubstitutionParser}
 import java.nio.file.Files
-import sbt.Attributed.data
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
@@ -96,7 +95,6 @@ object JooqCodegen extends AutoPlugin {
         Nil
     },
     javaOptions ++= Seq(
-      "-classpath", Path.makeString(data(fullClasspath.value)),
       "-Dorg.slf4j.simpleLogger.logFile=System.out",
       "-Dorg.slf4j.simpleLogger.cacheOutputStream=true",
       "-Dorg.slf4j.simpleLogger.showThreadName=false",
