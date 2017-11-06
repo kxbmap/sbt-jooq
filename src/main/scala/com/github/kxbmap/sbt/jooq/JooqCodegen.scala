@@ -31,6 +31,8 @@ object JooqCodegen extends AutoPlugin {
     val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
     val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")
 
+    val jooqCodegenConfigureSlf4J = settingKey[Boolean]("Configure slf4j for codegen logging")
+
     val CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
 
     def jooqCodegenSettingsIn(config: Configuration): Seq[Setting[_]] =
@@ -82,9 +84,13 @@ object JooqCodegen extends AutoPlugin {
       else
         Nil
     },
-    libraryDependencies ++= Seq(
-      "org.slf4j" % "slf4j-simple" % "1.7.25" % "jooq"
-    )
+    jooqCodegenConfigureSlf4J := true,
+    libraryDependencies ++= {
+      if (jooqCodegenConfigureSlf4J.value)
+        Seq("org.slf4j" % "slf4j-simple" % "1.7.25" % "jooq")
+      else
+        Nil
+    }
   ) ++ inConfig(Jooq)(Defaults.configSettings ++ Seq(
     mainClass := Some("org.jooq.util.GenerationTool"),
     fork in run := true,
@@ -94,13 +100,16 @@ object JooqCodegen extends AutoPlugin {
       else
         Nil
     },
-    javaOptions ++= Seq(
-      "-Dorg.slf4j.simpleLogger.logFile=System.out",
-      "-Dorg.slf4j.simpleLogger.cacheOutputStream=true",
-      "-Dorg.slf4j.simpleLogger.showThreadName=false",
-      "-Dorg.slf4j.simpleLogger.showLogName=false",
-      "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
-    )
+    javaOptions ++= {
+      if (jooqCodegenConfigureSlf4J.value) Seq(
+        "-Dorg.slf4j.simpleLogger.logFile=System.out",
+        "-Dorg.slf4j.simpleLogger.cacheOutputStream=true",
+        "-Dorg.slf4j.simpleLogger.showThreadName=false",
+        "-Dorg.slf4j.simpleLogger.showLogName=false",
+        "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
+      )
+      else Nil
+    }
   ))
 
 
