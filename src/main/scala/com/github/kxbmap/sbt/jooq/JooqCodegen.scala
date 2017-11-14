@@ -91,9 +91,9 @@ object JooqCodegen extends AutoPlugin {
       else
         Nil
     }
-  ) ++ inConfig(Jooq)(Defaults.configSettings ++ Seq(
+  ) ++ inConfig(Jooq)(Defaults.configSettings ++ inTask(run)(Seq(
     mainClass := Some("org.jooq.util.GenerationTool"),
-    fork in run := true,
+    fork := true,
     javaOptions ++= {
       if (isJigsawEnabled(javaHome.value.fold(sys.props("java.version"))(parseJavaVersion)))
         Seq("--add-modules", "java.xml.bind")
@@ -110,7 +110,7 @@ object JooqCodegen extends AutoPlugin {
       )
       else Nil
     }
-  ))
+  )))
 
 
   private def configSubstitutions = Def.setting {
