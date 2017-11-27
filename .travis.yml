@@ -6,7 +6,7 @@ jdk:
   - oraclejdk9
 
 env:
-  - SBT_VERSION=1.0.2
+  - SBT_VERSION=1.0.4
   - SBT_VERSION=0.13.16
 
 matrix:
