@@ -94,7 +94,6 @@ object JooqCodegen extends AutoPlugin {
   ) ++ inConfig(Jooq)(Defaults.configSettings ++ inTask(run)(Seq(
     mainClass := Some("org.jooq.util.GenerationTool"),
     fork := true,
-    outputStrategy := Some(OutputStrategy.StdoutOutput),
     javaOptions ++= {
       if (isJigsawEnabled(javaHome.value.fold(sys.props("java.version"))(parseJavaVersion)))
         Seq("--add-modules", "java.xml.bind")
