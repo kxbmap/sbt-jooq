@@ -16,22 +16,9 @@ object JooqCodegen extends AutoPlugin {
 
   override def requires: Plugins = Slf4jSimplePlugin
 
-  object autoImport extends CodegenConfig.Implicits {
+  object autoImport extends JooqCodegenKeys with CodegenConfig.Implicits {
 
-    val Jooq = config("jooq").hide
-
-    val jooqVersion = settingKey[String]("jOOQ version")
-    val jooqGroupId = settingKey[String]("jOOQ groupId")
-    val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
-
-    val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
-    val jooqCodegenConfig = settingKey[CodegenConfig]("jOOQ codegen configuration")
-    val jooqCodegenConfigSubstitutions = settingKey[Map[String, String]]("jOOQ codegen configuration text substitutions")
-    val jooqCodegenConfigTransformer = settingKey[Node => Node]("jOOQ codegen configuration transform function")
-    val jooqCodegenTransformedConfig = taskKey[Node]("transformed jOOQ codegen configuration")
-    val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
-    val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")
-
+    type CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
     val CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
 
     def jooqCodegenSettingsIn(config: Configuration): Seq[Setting[_]] =
@@ -40,7 +27,7 @@ object JooqCodegen extends AutoPlugin {
   }
 
   import CodegenUtil._
-  import autoImport.{CodegenStrategy => _, _}
+  import JooqCodegenKeys._
 
   override lazy val projectSettings: Seq[Setting[_]] =
     jooqCodegenCoreSettings ++ jooqCodegenSettingsIn(Compile) ++ jooqCodegenRunnerSettings
