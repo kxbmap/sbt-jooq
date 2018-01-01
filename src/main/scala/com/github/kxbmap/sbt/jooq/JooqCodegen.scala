@@ -5,7 +5,8 @@ import com.github.kxbmap.sbt.jooq.internal.{ClasspathLoader, SubstitutionParser}
 import java.nio.file.Files
 import sbt.Keys._
 import sbt._
-import sbt.plugins.JvmPlugin
+import sbtslf4jsimple.Slf4jSimplePlugin
+import sbtslf4jsimple.Slf4jSimplePlugin.autoImport._
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Node, Text, XML}
 
@@ -13,7 +14,7 @@ object JooqCodegen extends AutoPlugin {
 
   val DefaultJooqVersion = "3.10.1"
 
-  override def requires: Plugins = JvmPlugin
+  override def requires: Plugins = Slf4jSimplePlugin
 
   object autoImport extends CodegenConfig.Implicits {
 
@@ -30,8 +31,6 @@ object JooqCodegen extends AutoPlugin {
     val jooqCodegenTransformedConfig = taskKey[Node]("transformed jOOQ codegen configuration")
     val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
     val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")
-
-    val jooqCodegenConfigureSlf4J = settingKey[Boolean]("Configure slf4j for codegen logging")
 
     val CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
 
@@ -83,34 +82,24 @@ object JooqCodegen extends AutoPlugin {
         Seq(jooqGroupId.value % "jooq-codegen" % jooqVersion.value % "jooq")
       else
         Nil
-    },
-    jooqCodegenConfigureSlf4J := true,
-    libraryDependencies ++= {
-      if (jooqCodegenConfigureSlf4J.value)
-        Seq("org.slf4j" % "slf4j-simple" % "1.7.25" % "jooq")
-      else
-        Nil
     }
   ) ++ inConfig(Jooq)(Defaults.configSettings ++ inTask(run)(Seq(
-    mainClass := Some("org.jooq.util.GenerationTool"),
     fork := true,
+    mainClass := Some("org.jooq.util.GenerationTool"),
     javaOptions ++= {
       if (isJigsawEnabled(javaHome.value.fold(sys.props("java.version"))(parseJavaVersion)))
         Seq("--add-modules", "java.xml.bind")
       else
         Nil
-    },
-    javaOptions ++= {
-      if (jooqCodegenConfigureSlf4J.value) Seq(
-        "-Dorg.slf4j.simpleLogger.logFile=System.out",
-        "-Dorg.slf4j.simpleLogger.cacheOutputStream=true",
-        "-Dorg.slf4j.simpleLogger.showThreadName=false",
-        "-Dorg.slf4j.simpleLogger.showLogName=false",
-        "-Dorg.slf4j.simpleLogger.levelInBrackets=true"
-      )
-      else Nil
     }
-  )))
+  ))) ++ slf4jSimpleScopedSettings(Jooq) ++ inConfig(Jooq)(Seq(
+    slf4jSimplePropertiesType := Slf4jSimplePropertiesType.JavaOptions,
+    slf4jSimpleLogFile := "System.out",
+    slf4jSimpleCacheOutputStream := true,
+    slf4jSimpleShowThreadName := false,
+    slf4jSimpleShowLogName := false,
+    slf4jSimpleLevelInBrackets := true
+  ))
 
 
   private def configSubstitutions = Def.setting {

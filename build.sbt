@@ -13,6 +13,8 @@ scalacOptions ++= Seq(
   "-Xlint"
 )
 
+addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % "0.1.0")
+
 libraryDependencies ++= {
   (sbtBinaryVersion in pluginCrossBuild).value match {
     case "0.13" => Seq(
