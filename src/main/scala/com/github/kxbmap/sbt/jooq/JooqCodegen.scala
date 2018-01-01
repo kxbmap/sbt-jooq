@@ -1,6 +1,6 @@
 package com.github.kxbmap.sbt.jooq
 
-import com.github.kxbmap.sbt.jooq.PluginCompat._
+import com.github.kxbmap.sbt.jooq.internal.PluginCompat._
 import com.github.kxbmap.sbt.jooq.internal.{ClasspathLoader, SubstitutionParser}
 import java.nio.file.Files
 import sbt.Keys._
