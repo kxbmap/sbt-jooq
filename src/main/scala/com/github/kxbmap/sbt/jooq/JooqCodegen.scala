@@ -131,14 +131,17 @@ object JooqCodegen extends AutoPlugin {
   })
 
   private def codegenTask = Def.taskDyn {
-    val config = jooqCodegenTransformedConfig.value
-    val file = Def.task(Files.createTempFile("jooq-codegen-", ".xml")).value
-    Def.sequential(
-      Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
-      (run in Jooq).toTask(s" $file"),
-      Def.task(jooqCodegenGeneratedSourcesFinder.value.get)
-    ).andFinally {
-      Files.delete(file)
+    if ((skip in jooqCodegen).value) Def.task(Seq.empty[File])
+    else Def.taskDyn {
+      val config = jooqCodegenTransformedConfig.value
+      val file = Files.createTempFile("jooq-codegen-", ".xml")
+      Def.sequential(
+        Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
+        (run in Jooq).toTask(s" $file"),
+        Def.task(jooqCodegenGeneratedSourcesFinder.value.get)
+      ).andFinally {
+        Files.delete(file)
+      }
     }
   }
 
