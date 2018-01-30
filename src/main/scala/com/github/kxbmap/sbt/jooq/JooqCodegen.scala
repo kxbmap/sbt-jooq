@@ -151,6 +151,7 @@ object JooqCodegen extends AutoPlugin {
           val files = jooqCodegenGeneratedSourcesFinder.value.get
           if (files.isEmpty) jooqCodegen else Def.task(files)
         }
+        case CodegenStrategy.Never => Def.task(Seq.empty[File])
       }
     }
   }

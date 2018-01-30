@@ -8,4 +8,6 @@ object CodegenStrategy {
 
   case object IfAbsent extends CodegenStrategy
 
+  case object Never extends CodegenStrategy
+
 }
