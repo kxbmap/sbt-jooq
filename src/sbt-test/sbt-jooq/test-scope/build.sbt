@@ -2,7 +2,7 @@ scalaVersion in ThisBuild := "2.12.4"
 
 enablePlugins(JooqCodegen)
 
-jooqCodegenSettingsIn(Test)
+addJooqCodegenSettingsTo(Test)
 
 jooqCodegenConfig in Test := file("jooq-codegen.xml")
 

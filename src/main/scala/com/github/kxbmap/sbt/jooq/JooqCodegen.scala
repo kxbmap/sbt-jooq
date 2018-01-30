@@ -1,5 +1,7 @@
 package com.github.kxbmap.sbt.jooq
 
+import com.github.kxbmap.sbt.jooq.CodegenUtil._
+import com.github.kxbmap.sbt.jooq.JooqCodegenKeys._
 import com.github.kxbmap.sbt.jooq.internal.PluginCompat._
 import com.github.kxbmap.sbt.jooq.internal.{ClasspathLoader, SubstitutionParser}
 import java.nio.file.Files
@@ -21,48 +23,18 @@ object JooqCodegen extends AutoPlugin {
     type CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
     val CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
 
-    def jooqCodegenSettingsIn(config: Configuration): Seq[Setting[_]] =
-      JooqCodegen.jooqCodegenSettingsIn(config)
+    def addJooqCodegenSettingsTo(config: Configuration): Seq[Setting[_]] =
+      JooqCodegen.jooqCodegenScopedSettings(config)
 
   }
 
-  import CodegenUtil._
-  import JooqCodegenKeys._
+  override def projectSettings: Seq[Setting[_]] =
+    jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
 
-  override lazy val projectSettings: Seq[Setting[_]] =
-    jooqCodegenCoreSettings ++ jooqCodegenSettingsIn(Compile) ++ jooqCodegenRunnerSettings
-
-  private def jooqCodegenCoreSettings: Seq[Setting[_]] = Seq(
+  def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
     jooqGroupId := "org.jooq",
-    autoJooqLibrary := true
-  )
-
-  private def jooqCodegenSettingsIn(config: Configuration): Seq[Setting[_]] = Seq(
-    libraryDependencies ++= {
-      if (autoJooqLibrary.value)
-        Seq(jooqGroupId.value % "jooq" % jooqVersion.value % config)
-      else
-        Nil
-    }
-  ) ++ inConfig(config)(Seq(
-    jooqCodegen := codegenTask.value,
-    skip in jooqCodegen := jooqCodegenConfig.?.value.isEmpty,
-    jooqCodegenConfigSubstitutions := configSubstitutions.value,
-    jooqCodegenConfigTransformer := configTransformer.value,
-    jooqCodegenTransformedConfig := configTransformTask.value,
-    jooqCodegenStrategy := CodegenStrategy.IfAbsent,
-    sourceGenerators += autoCodegenTask.taskValue,
-    jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
-    javacOptions ++= {
-      if (isJigsawEnabled(sys.props("java.version")))
-        Seq("--add-modules", "java.xml.ws.annotation")
-      else
-        Nil
-    }
-  ))
-
-  private def jooqCodegenRunnerSettings: Seq[Setting[_]] = Seq(
+    autoJooqLibrary := true,
     ivyConfigurations += Jooq,
     libraryDependencies ++= {
       if (autoJooqLibrary.value)
@@ -86,6 +58,30 @@ object JooqCodegen extends AutoPlugin {
     slf4jSimpleShowThreadName := false,
     slf4jSimpleShowLogName := false,
     slf4jSimpleLevelInBrackets := true
+  ))
+
+  def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
+    libraryDependencies ++= {
+      if (autoJooqLibrary.value)
+        Seq(jooqGroupId.value % "jooq" % jooqVersion.value % config)
+      else
+        Nil
+    }
+  ) ++ inConfig(config)(Seq(
+    jooqCodegen := codegenTask.value,
+    skip in jooqCodegen := jooqCodegenConfig.?.value.isEmpty,
+    jooqCodegenConfigSubstitutions := configSubstitutions.value,
+    jooqCodegenConfigTransformer := configTransformer.value,
+    jooqCodegenTransformedConfig := configTransformTask.value,
+    jooqCodegenStrategy := CodegenStrategy.IfAbsent,
+    sourceGenerators += autoCodegenTask.taskValue,
+    jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
+    javacOptions ++= {
+      if (isJigsawEnabled(sys.props("java.version")))
+        Seq("--add-modules", "java.xml.ws.annotation")
+      else
+        Nil
+    }
   ))
 
 
