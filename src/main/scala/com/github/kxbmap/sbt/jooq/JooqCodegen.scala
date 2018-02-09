@@ -14,7 +14,7 @@ import scala.xml.{Node, Text, XML}
 
 object JooqCodegen extends AutoPlugin {
 
-  val DefaultJooqVersion = "3.10.1"
+  val DefaultJooqVersion = "3.10.4"
 
   override def requires: Plugins = Slf4jSimplePlugin
 
