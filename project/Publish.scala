@@ -1,31 +1,23 @@
 import sbt.Keys._
 import sbt._
+import xerial.sbt.Sonatype
+import xerial.sbt.Sonatype.GitHubHosting
+import xerial.sbt.Sonatype.SonatypeKeys._
 
 object Publish extends AutoPlugin {
+
+  override def requires: Plugins = Sonatype
 
   override def trigger: PluginTrigger = allRequirements
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
     publishMavenStyle := true,
-    publishTo := {
-      if (isSnapshot.value)
-        Some(Opts.resolver.sonatypeSnapshots)
-      else
-        Some(Opts.resolver.sonatypeStaging)
-    },
+    publishTo := sonatypePublishTo.value,
     licenses := Seq(
       "Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")
     ),
-    scmInfo := Some(ScmInfo(
-      browseUrl = url(s"https://github.com/kxbmap/${(name in LocalRootProject).value}"),
-      connection = s"scm:git:git@github.com:kxbmap/${(name in LocalRootProject).value}.git"
-    )),
-    homepage := Some(url(s"https://github.com/kxbmap/${(name in LocalRootProject).value}")),
-    organizationHomepage := Some(url("https://github.com/kxbmap")),
-    pomIncludeRepository := { _ => false },
-    developers := List(
-      Developer("kxbmap", "Tsukasa Kitachi", "kxbmap@gmail.com", url("https://github.com/kxbmap"))
-    )
+    sonatypeProjectHosting := Some(GitHubHosting("kxbmap", "configs", "Tsukasa Kitachi", "kxbmap@gmail.com")),
+    pomIncludeRepository := { _ => false }
   )
 
 }
