@@ -25,7 +25,7 @@ lazy val app = project
               <name>com.example.CustomStrategy</name>
             </strategy>
             <database>
-              <name>org.jooq.util.h2.H2Database</name>
+              <name>org.jooq.meta.h2.H2Database</name>
               <includes>.*</includes>
               <inputSchema>PUBLIC</inputSchema>
             </database>

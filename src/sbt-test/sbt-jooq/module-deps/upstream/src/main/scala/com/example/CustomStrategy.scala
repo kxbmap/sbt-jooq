@@ -1,5 +1,5 @@
 package com.example
 
-import org.jooq.util.DefaultGeneratorStrategy
+import org.jooq.codegen.DefaultGeneratorStrategy
 
 class CustomStrategy extends DefaultGeneratorStrategy

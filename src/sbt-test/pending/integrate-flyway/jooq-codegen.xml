@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.10.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
     <jdbc>
         <driver>org.h2.Driver</driver>
         <url>jdbc:h2:./test</url>
     </jdbc>
     <generator>
         <database>
-            <name>org.jooq.util.h2.H2Database</name>
+            <name>org.jooq.meta.h2.H2Database</name>
             <inputSchema>PUBLIC</inputSchema>
             <includes>.*</includes>
             <excludes>schema_version</excludes>

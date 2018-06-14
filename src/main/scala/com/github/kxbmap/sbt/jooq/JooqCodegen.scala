@@ -14,7 +14,7 @@ import scala.xml.{Node, Text, XML}
 
 object JooqCodegen extends AutoPlugin {
 
-  val DefaultJooqVersion = "3.10.7"
+  val DefaultJooqVersion = "3.11.0"
 
   override def requires: Plugins = Slf4jSimplePlugin
 
@@ -44,7 +44,10 @@ object JooqCodegen extends AutoPlugin {
     }
   ) ++ inConfig(Jooq)(Defaults.configSettings ++ inTask(run)(Seq(
     fork := true,
-    mainClass := Some("org.jooq.util.GenerationTool"),
+    mainClass := Some(CrossVersion.partialVersion(jooqVersion.value) match {
+      case Some((x, y)) if x < 3 || x == 3 && y < 11 => "org.jooq.util.GenerationTool"
+      case _ => "org.jooq.codegen.GenerationTool"
+    }),
     javaOptions ++= {
       if (isJigsawEnabled(javaHome.value.fold(sys.props("java.version"))(parseJavaVersion)))
         Seq("--add-modules", "java.xml.bind")
