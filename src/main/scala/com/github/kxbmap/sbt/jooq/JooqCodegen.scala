@@ -33,12 +33,12 @@ object JooqCodegen extends AutoPlugin {
 
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
-    jooqGroupId := "org.jooq",
+    jooqOrganization := "org.jooq",
     autoJooqLibrary := true,
     ivyConfigurations += Jooq,
     libraryDependencies ++= {
       if (autoJooqLibrary.value)
-        Seq(jooqGroupId.value % "jooq-codegen" % jooqVersion.value % "jooq")
+        Seq(jooqOrganization.value % "jooq-codegen" % jooqVersion.value % "jooq")
       else
         Nil
     }
@@ -66,7 +66,7 @@ object JooqCodegen extends AutoPlugin {
   def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++= {
       if (autoJooqLibrary.value)
-        Seq(jooqGroupId.value % "jooq" % jooqVersion.value % config)
+        Seq(jooqOrganization.value % "jooq" % jooqVersion.value % config)
       else
         Nil
     }

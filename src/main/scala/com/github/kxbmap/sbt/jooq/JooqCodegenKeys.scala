@@ -8,7 +8,7 @@ trait JooqCodegenKeys {
   val Jooq = config("jooq").hide
 
   val jooqVersion = settingKey[String]("jOOQ version")
-  val jooqGroupId = settingKey[String]("jOOQ groupId")
+  val jooqOrganization = settingKey[String]("jOOQ organization/group ID")
   val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
 
   val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
@@ -18,6 +18,9 @@ trait JooqCodegenKeys {
   val jooqCodegenTransformedConfig = taskKey[Node]("transformed jOOQ codegen configuration")
   val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
   val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")
+
+  @deprecated("Use jooqOrganization", "0.4.0")
+  val jooqGroupId = jooqOrganization
 
 }
 
