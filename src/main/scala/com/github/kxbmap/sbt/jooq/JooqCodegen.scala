@@ -78,6 +78,8 @@ object JooqCodegen extends AutoPlugin {
     jooqCodegenTransformedConfig := configTransformTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
     sourceGenerators += autoCodegenTask.taskValue,
+    includeFilter in jooqCodegenGeneratedSources := "*.java" | "*.scala",
+    jooqCodegenGeneratedSources := jooqCodegenGeneratedSourcesFinder.value.get,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
     javacOptions ++= {
       if (isJigsawEnabled(sys.props("java.version")))
@@ -174,7 +176,9 @@ object JooqCodegen extends AutoPlugin {
         case invalid => sys.error(s"invalid packageName format: $invalid")
       }
     }
-    packageDir ** ("*.java" || "*.scala")
+    packageDir.descendantsExcept(
+      (includeFilter in jooqCodegenGeneratedSources).value,
+      (excludeFilter in jooqCodegenGeneratedSources).value)
   }
 
 }
