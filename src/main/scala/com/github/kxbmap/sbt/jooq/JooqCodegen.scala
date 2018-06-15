@@ -115,9 +115,9 @@ object JooqCodegen extends AutoPlugin {
     })
   }
 
-  private def configTransformTask = Def.taskDyn(Def.taskDyn { // To avoid evaluate ?? on project loading
+  private def configTransformTask = Def.taskDyn {
     val transformer = jooqCodegenConfigTransformer.value
-    val xml = (jooqCodegenConfig ?? sys.error("required: jooqCodegenConfig")).value match {
+    val xml = jooqCodegenConfig.?.value.fold(sys.error("required: jooqCodegenConfig")) {
       case CodegenConfig.File(file) => Def.task[Node] {
         IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
       }
@@ -133,7 +133,7 @@ object JooqCodegen extends AutoPlugin {
       case CodegenConfig.XML(xml) => Def.task(xml)
     }
     xml.map(transformer)
-  })
+  }
 
   private def codegenTask = Def.taskDyn {
     if ((skip in jooqCodegen).value) Def.task(Seq.empty[File])
