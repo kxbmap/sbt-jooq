@@ -9,9 +9,19 @@ object CodegenConfig {
 
   case class File(file: sbt.File) extends CodegenConfig
 
-  case class Resource(resource: String) extends CodegenConfig
+  case class Classpath(resource: String) extends CodegenConfig
 
   case class XML(xml: Node) extends CodegenConfig
+
+
+  def fromURI(uri: sbt.URI): CodegenConfig =
+    uri.getScheme match {
+      case "classpath" => Classpath(uri.getSchemeSpecificPart)
+      case "file" => File(new sbt.File(uri))
+      case _ => throw new IllegalArgumentException(s"Unknown scheme: $uri")
+    }
+
+  def fromURIString(uri: String): CodegenConfig = fromURI(sbt.uri(uri))
 
 
   trait Implicits {
@@ -20,13 +30,9 @@ object CodegenConfig {
 
     implicit def xmlNodeToCodegenConfig(xml: Node): XML = XML(xml)
 
-    implicit class ConfigLocationInterpolation(sc: StringContext) {
+    implicit def uriToCodegenConfig(uri: sbt.URI): CodegenConfig = fromURI(uri)
 
-      def file(args: Any*): File = File(sbt.file(sc.s(args: _*)))
-
-      def resource(args: Any*): Resource = Resource(sc.s(args: _*))
-
-    }
+    implicit def stringToCodegenConfig(s: String): CodegenConfig = fromURIString(s)
 
   }
 

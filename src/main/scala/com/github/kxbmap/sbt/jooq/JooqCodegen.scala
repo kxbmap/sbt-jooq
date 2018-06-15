@@ -121,10 +121,9 @@ object JooqCodegen extends AutoPlugin {
       case CodegenConfig.File(file) => Def.task[Node] {
         IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
       }
-      case CodegenConfig.Resource(resource) => Def.task[Node] {
+      case CodegenConfig.Classpath(resource) => Def.task[Node] {
         ClasspathLoader.using((fullClasspath in Jooq).value) { loader =>
-          val res = if (resource.startsWith("/")) resource.substring(1) else resource
-          loader.getResourceAsStream(res) match {
+          loader.getResourceAsStream(resource) match {
             case null => sys.error(s"resource $resource not found in classpath")
             case in => Using.bufferedInputStream(in)(XML.load)
           }
