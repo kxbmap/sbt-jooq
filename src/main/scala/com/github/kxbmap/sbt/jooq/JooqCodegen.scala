@@ -28,6 +28,8 @@ object JooqCodegen extends AutoPlugin {
 
   }
 
+  override def projectConfigurations: Seq[Configuration] = Seq(Jooq)
+
   override def projectSettings: Seq[Setting[_]] =
     jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
 
@@ -35,7 +37,6 @@ object JooqCodegen extends AutoPlugin {
     jooqVersion := DefaultJooqVersion,
     jooqOrganization := "org.jooq",
     autoJooqLibrary := true,
-    ivyConfigurations += Jooq,
     libraryDependencies ++= {
       if (autoJooqLibrary.value)
         Seq(jooqOrganization.value % "jooq-codegen" % jooqVersion.value % "jooq")
