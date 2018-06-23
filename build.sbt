@@ -13,7 +13,7 @@ scalacOptions ++= Seq(
   "-Xlint"
 )
 
-addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % "0.1.0")
+addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % "0.2.0")
 
 libraryDependencies ++= {
   (sbtBinaryVersion in pluginCrossBuild).value match {

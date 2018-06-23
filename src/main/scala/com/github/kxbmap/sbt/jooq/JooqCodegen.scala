@@ -7,8 +7,8 @@ import com.github.kxbmap.sbt.jooq.internal.{ClasspathLoader, SubstitutionParser}
 import java.nio.file.Files
 import sbt.Keys._
 import sbt._
+import sbtslf4jsimple.Slf4jSimpleKeys._
 import sbtslf4jsimple.Slf4jSimplePlugin
-import sbtslf4jsimple.Slf4jSimplePlugin.autoImport._
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Node, Text, XML}
 
@@ -55,8 +55,7 @@ object JooqCodegen extends AutoPlugin {
       else
         Nil
     }
-  ))) ++ slf4jSimpleScopedSettings(Jooq) ++ inConfig(Jooq)(Seq(
-    slf4jSimplePropertiesType := Slf4jSimplePropertiesType.JavaOptions,
+  ))) ++ Slf4jSimplePlugin.slf4jSimpleScopedSettings(Jooq) ++ inConfig(Jooq)(Seq(
     slf4jSimpleLogFile := "System.out",
     slf4jSimpleCacheOutputStream := true,
     slf4jSimpleShowThreadName := false,
