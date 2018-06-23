@@ -1,4 +1,3 @@
-> setup
 > show app/jooqCodegen
 > clean
 > compile

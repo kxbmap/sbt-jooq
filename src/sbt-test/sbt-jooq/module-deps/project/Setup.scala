@@ -14,7 +14,8 @@ object Setup extends AutoPlugin {
   import autoImport._
 
   override def globalSettings: Seq[Setting[_]] = Seq(
-    setup := setupTask.value
+    setup := setupTask.value,
+    onLoad ~= { _.andThen("setup" :: _) }
   )
 
   private def setupTask = Def.task {
