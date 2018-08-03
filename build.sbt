@@ -1,10 +1,10 @@
-sbtPlugin := true
-
 name := "sbt-jooq"
 description := "jOOQ plugin for SBT 0.13.5+"
 organization := "com.github.kxbmap"
 
-crossSbtVersions := Seq("1.1.6", "0.13.17")
+enablePlugins(SbtPlugin)
+
+crossSbtVersions := Seq("1.2.0", "0.13.17")
 
 scalacOptions ++= Seq(
   "-deprecation",
