@@ -4,7 +4,7 @@ organization := "com.github.kxbmap"
 
 enablePlugins(SbtPlugin)
 
-crossSbtVersions := Seq("1.2.0", "0.13.17")
+crossSbtVersions := Seq("1.2.3", "0.13.17")
 
 scalacOptions ++= Seq(
   "-deprecation",

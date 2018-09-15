@@ -6,7 +6,7 @@ jdk:
   - oraclejdk9
 
 env:
-  - SBT_VERSION=1.2.0
+  - SBT_VERSION=1.2.3
   - SBT_VERSION=0.13.17
 
 script:
