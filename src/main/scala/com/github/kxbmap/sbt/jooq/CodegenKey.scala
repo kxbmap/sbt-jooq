@@ -46,15 +46,13 @@ object CodegenKey {
   implicit def constantToConfigKey[A](kv: (String, A)): CodegenKey = Constant(kv._1, kv._2)
 
 
-  object MacroImpl {
+  def taskValue[A](task: sbt.Task[A]): Entry[A] = Task(task)
 
-    def task[A](task: sbt.Task[A]): Entry[A] = Task(task)
+  class MacroImpl(val c: blackbox.Context) {
+    import c.universe._
 
-    def taskKeyToCodegenKey[A: c.WeakTypeTag](c: blackbox.Context)(key: c.Tree): c.Tree = {
-      import c.universe._
-      q"_root_.com.github.kxbmap.sbt.jooq.CodegenKey.MacroImpl.task[${weakTypeOf[A]}]($key.taskValue)"
-    }
-
+    def taskKeyToCodegenKey[A: WeakTypeTag](key: Tree): Tree =
+      q"_root_.com.github.kxbmap.sbt.jooq.CodegenKey.taskValue[${weakTypeOf[A]}]($key.taskValue)"
   }
 
 
