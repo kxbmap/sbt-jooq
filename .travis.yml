@@ -6,7 +6,7 @@ jdk:
   - openjdk10
 
 script:
-  - sbt "scripted sbt-jooq/*"
+  - sbt "scripted jooq-codegen/*"
 
 cache:
   directories:
