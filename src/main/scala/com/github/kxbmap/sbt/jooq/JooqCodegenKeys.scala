@@ -21,9 +21,6 @@ trait JooqCodegenKeys {
   val jooqCodegenGeneratedSources = taskKey[Seq[File]]("jOOQ codegen generated sources")
   val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")
 
-  @deprecated("Use jooqOrganization", "0.4.0")
-  val jooqGroupId = jooqOrganization
-
 }
 
 object JooqCodegenKeys extends JooqCodegenKeys
