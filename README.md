@@ -1,12 +1,11 @@
-sbt-jooq
-========
+# sbt-jooq
+
 [![Build Status](https://travis-ci.org/kxbmap/sbt-jooq.svg?branch=master)](https://travis-ci.org/kxbmap/sbt-jooq)
 
-jOOQ plugin for SBT 1.0 and 0.13
+jOOQ plugin for sbt 1.0+
 
 
-Installation
-------------
+## Installation
 
 Add the following to your `project/plugins.sbt`:
 
@@ -14,63 +13,156 @@ Add the following to your `project/plugins.sbt`:
 addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.3.3")
 ```
 
-Configuration
--------------
-
-In your `build.sbt`:
+Then in your `build.sbt`:
 
 ```scala
 // Enable the plugin
 enablePlugins(JooqCodegen)
 
 // Add your database driver dependency to `jooq` scope
-libraryDependencies += "com.h2database" % "h2" % "1.4.196" % "jooq"
-
-// jOOQ library version
-// default: 3.10.1
-jooqVersion := "3.10.1"
-
-// jOOQ maven group ID
-// If you want to use commercial version of jOOQ, set appropriate group ID
-// For details, please refer to the jOOQ manual
-// default: org.jooq
-jooqGroupId := "org.jooq"
-
-// Add jOOQ dependencies automatically if true
-// If you want to manage jOOQ dependencies manually, set this flag to false
-// default: true
-autoJooqLibrary := true
-
-// jOOQ codegen configuration file path
-// required this or jooqCodegenConfig
-// target directory will replace by jooqCodegenTargetDirectory
-jooqCodegenConfigFile := Some(file("path") / "to" / "jooq-codegen.xml")
-
-// generator target directory
-// default: sourceManaged in Compile
-// jooqCodegenTargetDirectory := file("path") / "to" / "target" / "directory"
-
-// configuration file rewrite rules
-// default: replace target directory
-// jooqCodegenConfigRewriteRules += /* scala.xml.transform.RewriteRule */
-
-// jOOQ codegen configuration
-// required this or jooqCodegenConfigFile
-// If setting, jooqCodegenConfigFile, jooqCodegenTargetDirectory and jooqCodegenConfigRewriteRules are ignored
-// jooqCodegenConfig :=
-//   <configuration>
-//     <!-- configurations... -->
-//   </configuration>
-
-// codegen execution strategy
-// default: CodegenStrategy.IfAbsent
-// jooqCodegenStrategy := CodegenStrategy.Always
-
+libraryDependencies += "com.h2database" % "h2" % "1.4.197" % "jooq"
 ```
 
-License
--------
+### Configuration
 
-Copyright 2015-2016 Tsukasa Kitachi
+#### jooqVersion
+Version of jOOQ library.
+
+Default: `"3.11.5"`
+
+```scala
+jooqVersion := "3.11.5"
+```
+
+#### jooqOrganization
+jOOQ organization/group ID.
+
+If you want to use commercial version of jOOQ, set appropriate one.
+For details, please refer to the [jOOQ manual](https://www.jooq.org/doc/3.11/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
+
+Default: `"org.jooq"`
+
+```scala
+jooqOrganization := "org.jooq"
+```
+
+#### autoJooqLibrary
+Add jOOQ dependencies automatically if true.
+
+If you want to manage jOOQ dependencies manually, set this flag to false.
+
+Default: `true`
+
+```scala
+autoJooqLibrary := true
+```
+
+#### jooqCodegenConfig
+jOOQ-codegen configuration. Set file or classpath resource or XML directly.
+
+```scala
+// Set file path
+jooqCodegenConfig := baseDirectory.value / "jooq-codegen.xml"
+```
+
+```scala
+// Set classpath resource using String prefixed by `classpath:`
+jooqCodegenConfig := "classpath:jooq-codegen.xml" 
+```
+
+```scala
+// Set XML configuration
+jooqCodegenConfig :=
+  <configuration>
+    <!-- Your configurations -->
+  </configuration>
+```
+
+#### jooqCodegenStrategy
+jOOQ-codegen auto execution strategy.
+
+|Value      |Description                                              |
+|-----------|---------------------------------------------------------|
+|`IfAbsent` |Execute if absent files in jOOQ-codegen target directory |
+|`Always`   |Always execute                                           |
+|`Never`    |Never execute                                            |
+
+Default: `CodegenStrategy.IfAbsent`
+
+```scala
+jooqCodegenStrategy := CodegenStrategy.IfAbsent
+```
+
+#### jooqCodegenKeys
+Keys for jOOQ-codegen configuration text substitution.
+
+For details, please refer the below section.
+
+Default: `sys.env ++ Seq(baseDirectory, sourceManaged in Compile)`
+
+```scala
+jooqCodegenKeys ++= Seq[CodegenKey](
+  scalaVersion,     // Setting key
+  skip in publish,  // Task key
+  "Answer" -> 42    // constant  
+)
+```
+
+You can confirm substitution values using `jooqCodegenSubstitutions`.
+```
+> show jooqCodegenSubstitutions
+* ...Env vars...
+* (baseDirectory, /path/to/base-directory)
+* (compile:sourceManaged, /path/to/source-managed)
+* (sourceManaged, /path/to/source-managed)
+* (scalaVersion, 2.12.6)
+* (publish::skip, false)
+* (Answer, 42)
+```
+
+### jOOQ-codegen configuration text substitution
+You can substitute text using placeholder(`${KEY}`) in configuration file.
+
+e.g. Configuration file contains some placeholders:
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+    <jdbc>
+        <!-- ...snip... -->
+        <user>${DB_USER}</user>
+        <password>${DB_PASSWORD}</password>
+    </jdbc>
+    <generator>
+        <!-- ...snip... -->
+        <target>
+            <packageName>com.example</packageName>
+            <directory>${sourceManaged}</directory>
+        </target>
+    </generator>
+</configuration>
+```
+
+Plugin replace placeholders to substitution values:
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+    <jdbc>
+        <!-- ...snip... -->
+        <user>your-user</user>
+        <password>your-password</password>
+    </jdbc>
+    <generator>
+        <!-- ...snip... -->
+        <target>
+            <packageName>com.example</packageName>
+            <directory>/path/to/source-managed</directory>
+        </target>
+    </generator>
+</configuration>
+```
+
+## License
+
+Copyright 2015-2018 Tsukasa Kitachi
 
 Apache License, Version 2.0
