@@ -1,4 +1,4 @@
-package com.github.kxbmap.sbt.jooq
+package sbtjooq.codegen
 
 import scala.language.implicitConversions
 import scala.xml.Node

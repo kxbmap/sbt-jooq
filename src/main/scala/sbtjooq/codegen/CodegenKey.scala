@@ -1,4 +1,4 @@
-package com.github.kxbmap.sbt.jooq
+package sbtjooq.codegen
 
 import sbt._
 import scala.language.experimental.macros
@@ -21,15 +21,15 @@ object CodegenKey {
 
   }
 
-  private[jooq] case class Setting[A](key: SettingKey[A]) extends Entry[A]
+  private[sbtjooq] case class Setting[A](key: SettingKey[A]) extends Entry[A]
 
-  private[jooq] case class Task[A](task: sbt.Task[A]) extends Entry[A]
+  private[sbtjooq] case class Task[A](task: sbt.Task[A]) extends Entry[A]
 
-  private[jooq] case class Constant[A](key: String, value: A) extends Entry[A]
+  private[sbtjooq] case class Constant[A](key: String, value: A) extends Entry[A]
 
-  private[jooq] case class Mapped[A, B](entry: Entry[A], f: A => B) extends Entry[B]
+  private[sbtjooq] case class Mapped[A, B](entry: Entry[A], f: A => B) extends Entry[B]
 
-  private[jooq] case class Named[A](entry: Entry[A], key: String) extends Entry[A]
+  private[sbtjooq] case class Named[A](entry: Entry[A], key: String) extends Entry[A]
 
 
   def apply[A](key: SettingKey[A]): Entry[A] = Setting(key)
@@ -52,7 +52,7 @@ object CodegenKey {
     import c.universe._
 
     def taskKeyToCodegenKey[A: WeakTypeTag](key: Tree): Tree =
-      q"_root_.com.github.kxbmap.sbt.jooq.CodegenKey.taskValue[${weakTypeOf[A]}]($key.taskValue)"
+      q"_root_.sbtjooq.codegen.CodegenKey.taskValue[${weakTypeOf[A]}]($key.taskValue)"
   }
 
 

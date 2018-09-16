@@ -1,4 +1,4 @@
-package com.github.kxbmap.sbt.jooq.internal
+package sbtjooq.codegen.internal
 
 import fastparse.all._
 import sbt.Command

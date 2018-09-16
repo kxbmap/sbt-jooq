@@ -1,12 +1,12 @@
-package com.github.kxbmap.sbt.jooq
+package sbtjooq.codegen
 
-import com.github.kxbmap.sbt.jooq.CodegenUtil._
-import com.github.kxbmap.sbt.jooq.JooqCodegenKeys._
-import com.github.kxbmap.sbt.jooq.internal.{ClasspathLoader, SubstitutionParser}
 import java.nio.file.Files
 import sbt.Keys._
 import sbt._
 import sbt.io.Using
+import sbtjooq.codegen.CodegenUtil._
+import sbtjooq.codegen.JooqCodegenKeys._
+import sbtjooq.codegen.internal.{ClasspathLoader, SubstitutionParser}
 import sbtslf4jsimple.Slf4jSimpleKeys._
 import sbtslf4jsimple.Slf4jSimplePlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
@@ -20,11 +20,11 @@ object JooqCodegen extends AutoPlugin {
 
   object autoImport extends JooqCodegenKeys with CodegenConfig.Implicits {
 
-    type CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
-    val CodegenStrategy = com.github.kxbmap.sbt.jooq.CodegenStrategy
+    type CodegenStrategy = sbtjooq.codegen.CodegenStrategy
+    val CodegenStrategy = sbtjooq.codegen.CodegenStrategy
 
-    type CodegenKey = com.github.kxbmap.sbt.jooq.CodegenKey
-    val CodegenKey = com.github.kxbmap.sbt.jooq.CodegenKey
+    type CodegenKey = sbtjooq.codegen.CodegenKey
+    val CodegenKey = sbtjooq.codegen.CodegenKey
 
     def addJooqCodegenSettingsTo(config: Configuration): Seq[Setting[_]] =
       JooqCodegen.jooqCodegenScopedSettings(config)

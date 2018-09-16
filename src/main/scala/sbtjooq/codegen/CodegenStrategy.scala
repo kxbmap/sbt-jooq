@@ -1,4 +1,4 @@
-package com.github.kxbmap.sbt.jooq
+package sbtjooq.codegen
 
 sealed trait CodegenStrategy
 
