@@ -31,7 +31,7 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   }
 
-  override def projectConfigurations: Seq[Configuration] = Seq(Jooq)
+  override def projectConfigurations: Seq[Configuration] = Seq(JooqCodegen)
 
   override def projectSettings: Seq[Setting[_]] =
     jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
@@ -42,11 +42,11 @@ object JooqCodegenPlugin extends AutoPlugin {
     autoJooqLibrary := true,
     libraryDependencies ++= {
       if (autoJooqLibrary.value)
-        Seq(jooqOrganization.value % "jooq-codegen" % jooqVersion.value % "jooq")
+        Seq(jooqOrganization.value % "jooq-codegen" % jooqVersion.value % "jooq-codegen")
       else
         Nil
     }
-  ) ++ inConfig(Jooq)(Defaults.configSettings ++ inTask(run)(Seq(
+  ) ++ inConfig(JooqCodegen)(Defaults.configSettings ++ inTask(run)(Seq(
     fork := true,
     mainClass := Some(CrossVersion.partialVersion(jooqVersion.value) match {
       case Some((x, y)) if x < 3 || x == 3 && y < 11 => "org.jooq.util.GenerationTool"
@@ -58,7 +58,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       else
         Nil
     }
-  ))) ++ Slf4jSimplePlugin.slf4jSimpleScopedSettings(Jooq) ++ inConfig(Jooq)(Seq(
+  ))) ++ Slf4jSimplePlugin.slf4jSimpleScopedSettings(JooqCodegen) ++ inConfig(JooqCodegen)(Seq(
     slf4jSimpleLogFile := "System.out",
     slf4jSimpleCacheOutputStream := true,
     slf4jSimpleShowThreadName := false,
@@ -162,7 +162,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
       }
       case CodegenConfig.Classpath(resource) => Def.task[Node] {
-        ClasspathLoader.using((fullClasspath in Jooq).value) { loader =>
+        ClasspathLoader.using((fullClasspath in JooqCodegen).value) { loader =>
           loader.getResourceAsStream(resource) match {
             case null => sys.error(s"resource $resource not found in classpath")
             case in => Using.bufferedInputStream(in)(XML.load)
@@ -181,7 +181,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       val file = Files.createTempFile("jooq-codegen-", ".xml")
       Def.sequential(
         Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
-        (run in Jooq).toTask(s" $file"),
+        (run in JooqCodegen).toTask(s" $file"),
         Def.task(jooqCodegenGeneratedSourcesFinder.value.get)
       ).andFinally {
         Files.delete(file)

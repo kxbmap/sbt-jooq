@@ -10,7 +10,7 @@ lazy val upstream = project
 lazy val app = project
   .enablePlugins(JooqCodegenPlugin)
   .settings(
-    libraryDependencies ++= Seq("runtime", "jooq").map { conf =>
+    libraryDependencies ++= Seq("runtime", "jooq-codegen").map { conf =>
       "com.h2database" % "h2" % "1.4.196" % conf
     },
     inConfig(Compile)(Seq(
@@ -40,4 +40,4 @@ lazy val app = project
         </configuration>
     ))
   )
-  .dependsOn(upstream % "jooq")
+  .dependsOn(upstream % "jooq-codegen")

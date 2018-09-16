@@ -5,7 +5,7 @@ import scala.xml.Node
 
 trait JooqCodegenKeys {
 
-  val Jooq = config("jooq").hide
+  val JooqCodegen = config("jooq-codegen").hide
 
   val jooqVersion = settingKey[String]("jOOQ version")
   val jooqOrganization = settingKey[String]("jOOQ organization/group ID")

@@ -26,6 +26,6 @@ inConfig(Compile)(Seq(
     </configuration>
 ))
 
-libraryDependencies ++= Seq("runtime", "jooq").map { conf =>
+libraryDependencies ++= Seq("runtime", "jooq-codegen").map { conf =>
   "com.h2database" % "h2" % "1.4.196" % conf
 }
