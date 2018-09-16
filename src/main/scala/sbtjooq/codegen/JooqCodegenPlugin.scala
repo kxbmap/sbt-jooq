@@ -12,7 +12,7 @@ import sbtslf4jsimple.Slf4jSimplePlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Node, Text, XML}
 
-object JooqCodegen extends AutoPlugin {
+object JooqCodegenPlugin extends AutoPlugin {
 
   val DefaultJooqVersion = "3.11.5"
 
@@ -27,7 +27,7 @@ object JooqCodegen extends AutoPlugin {
     val CodegenKey = sbtjooq.codegen.CodegenKey
 
     def addJooqCodegenSettingsTo(config: Configuration): Seq[Setting[_]] =
-      JooqCodegen.jooqCodegenScopedSettings(config)
+      JooqCodegenPlugin.jooqCodegenScopedSettings(config)
 
   }
 

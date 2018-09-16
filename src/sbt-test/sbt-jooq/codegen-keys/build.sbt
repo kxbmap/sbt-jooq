@@ -1,6 +1,6 @@
 scalaVersion in ThisBuild := "2.12.6"
 
-enablePlugins(JooqCodegen)
+enablePlugins(JooqCodegenPlugin)
 
 description in (Compile, run) := "Compile/run"
 description in (Test, run) := "Test/run"

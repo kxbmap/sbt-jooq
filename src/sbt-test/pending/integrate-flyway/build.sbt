@@ -1,6 +1,6 @@
 scalaVersion in ThisBuild := "2.12.6"
 
-enablePlugins(JooqCodegen)
+enablePlugins(JooqCodegenPlugin)
 
 jooqCodegen := jooqCodegen.dependsOn(flywayMigrate in migration).value
 

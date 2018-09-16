@@ -3,12 +3,12 @@ scalaVersion in ThisBuild := "2.12.6"
 lazy val upstream = project
   .settings(
     libraryDependencies ++= Seq(
-      "org.jooq" % "jooq-codegen" % JooqCodegen.DefaultJooqVersion
+      "org.jooq" % "jooq-codegen" % JooqCodegenPlugin.DefaultJooqVersion
     )
   )
 
 lazy val app = project
-  .enablePlugins(JooqCodegen)
+  .enablePlugins(JooqCodegenPlugin)
   .settings(
     libraryDependencies ++= Seq("runtime", "jooq").map { conf =>
       "com.h2database" % "h2" % "1.4.196" % conf
