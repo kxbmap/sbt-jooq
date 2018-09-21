@@ -1,11 +1,11 @@
 package com.github.kxbmap.sbt.jooq.internal
 
-import com.github.kxbmap.sbt.jooq.internal.PluginCompat._
 import java.io.InputStream
 import java.net.{URL, URLClassLoader}
 import java.util.Collections
 import sbt.Def.Classpath
 import sbt._
+import sbt.io.Using
 
 class ClasspathLoader(classpath: Classpath) extends URLClassLoader(
   classpath.map(_.data.asURL).toArray,
