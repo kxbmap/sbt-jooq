@@ -2,11 +2,11 @@ package com.github.kxbmap.sbt.jooq
 
 import com.github.kxbmap.sbt.jooq.CodegenUtil._
 import com.github.kxbmap.sbt.jooq.JooqCodegenKeys._
-import com.github.kxbmap.sbt.jooq.internal.PluginCompat._
 import com.github.kxbmap.sbt.jooq.internal.{ClasspathLoader, SubstitutionParser}
 import java.nio.file.Files
 import sbt.Keys._
 import sbt._
+import sbt.io.Using
 import sbtslf4jsimple.Slf4jSimpleKeys._
 import sbtslf4jsimple.Slf4jSimplePlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
