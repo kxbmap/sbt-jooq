@@ -3,7 +3,7 @@ sudo: false
 language: scala
 jdk:
   - oraclejdk8
-  - openjdk11
+  - openjdk10
 
 script:
   - sbt "scripted sbt-jooq/*"
