@@ -1,4 +1,4 @@
-package sbtjooq.codegen.internal
+package sbtjooq.internal
 
 import fastparse.all._
 import sbt.Command

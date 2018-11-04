@@ -1,9 +1,10 @@
 scalaVersion in ThisBuild := "2.12.7"
 
 lazy val upstream = project
+  .enablePlugins(JooqPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "org.jooq" % "jooq-codegen" % JooqCodegenPlugin.DefaultJooqVersion
+      "org.jooq" % "jooq-codegen" % jooqVersion.value
     )
   )
 

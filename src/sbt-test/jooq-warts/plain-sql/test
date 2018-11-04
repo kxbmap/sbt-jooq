@@ -1,0 +1,4 @@
+-> compile
+
+$ copy-file changes/AllowPlainSQL.scala src/main/scala/com/example/PlainSQLWartTest.scala
+> compile

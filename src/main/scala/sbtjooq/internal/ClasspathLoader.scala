@@ -1,4 +1,4 @@
-package sbtjooq.codegen.internal
+package sbtjooq.internal
 
 import java.io.InputStream
 import java.net.{URL, URLClassLoader}
@@ -8,7 +8,7 @@ import sbt._
 import sbt.io.Using
 
 class ClasspathLoader(classpath: Classpath) extends URLClassLoader(
-  classpath.map(_.data.asURL).toArray,
+  classpath.files.map(_.asURL).toArray,
   ClasspathLoader.EmptyLoader)
 
 object ClasspathLoader {

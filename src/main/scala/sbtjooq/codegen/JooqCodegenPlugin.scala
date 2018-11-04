@@ -4,9 +4,11 @@ import java.nio.file.Files
 import sbt.Keys._
 import sbt._
 import sbt.io.Using
-import sbtjooq.codegen.CodegenUtil._
+import sbtjooq.JooqKeys._
+import sbtjooq.JooqPlugin
 import sbtjooq.codegen.JooqCodegenKeys._
-import sbtjooq.codegen.internal.{ClasspathLoader, SubstitutionParser}
+import sbtjooq.internal.JavaUtil._
+import sbtjooq.internal.{ClasspathLoader, SubstitutionParser}
 import sbtslf4jsimple.Slf4jSimpleKeys._
 import sbtslf4jsimple.Slf4jSimplePlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
@@ -14,9 +16,7 @@ import scala.xml.{Node, Text, XML}
 
 object JooqCodegenPlugin extends AutoPlugin {
 
-  val DefaultJooqVersion = "3.11.5"
-
-  override def requires: Plugins = Slf4jSimplePlugin
+  override def requires: Plugins = JooqPlugin && Slf4jSimplePlugin
 
   object autoImport extends JooqCodegenKeys with CodegenConfig.Implicits {
 
@@ -27,7 +27,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     val CodegenKey = sbtjooq.codegen.CodegenKey
 
     def addJooqCodegenSettingsTo(config: Configuration): Seq[Setting[_]] =
-      JooqCodegenPlugin.jooqCodegenScopedSettings(config)
+      jooqCodegenScopedSettings(config)
 
   }
 
@@ -37,23 +37,21 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
 
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
-    jooqVersion := DefaultJooqVersion,
-    jooqOrganization := "org.jooq",
-    autoJooqLibrary := true,
     libraryDependencies ++= {
-      if (autoJooqLibrary.value)
-        Seq(jooqOrganization.value % "jooq-codegen" % jooqVersion.value % "jooq-codegen")
+      if ((JooqCodegen / autoJooqLibrary).value)
+        Seq((JooqCodegen / jooqOrganization).value % "jooq-codegen" % (JooqCodegen / jooqVersion).value % JooqCodegen)
       else
         Nil
     }
   ) ++ inConfig(JooqCodegen)(Defaults.configSettings ++ inTask(run)(Seq(
     fork := true,
-    mainClass := Some(CrossVersion.partialVersion(jooqVersion.value) match {
+    mainClass := Some(CrossVersion.partialVersion((JooqCodegen / jooqVersion).value) match {
       case Some((x, y)) if x < 3 || x == 3 && y < 11 => "org.jooq.util.GenerationTool"
       case _ => "org.jooq.codegen.GenerationTool"
     }),
     javaOptions ++= {
-      if (isJigsawEnabled(javaHome.value.fold(sys.props("java.version"))(parseJavaVersion)))
+      val javaVersion = javaHome.value.map(parseJavaVersion).orElse(sys.props.get("java.version"))
+      if (javaVersion.exists(isJigsawEnabled))
         Seq("--add-modules", "java.xml.bind")
       else
         Nil
@@ -66,28 +64,21 @@ object JooqCodegenPlugin extends AutoPlugin {
     slf4jSimpleLevelInBrackets := true
   ))
 
-  def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
-    libraryDependencies ++= {
-      if (autoJooqLibrary.value)
-        Seq(jooqOrganization.value % "jooq" % jooqVersion.value % config)
-      else
-        Nil
-    }
-  ) ++ inConfig(config)(Seq(
+  def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
-    skip in jooqCodegen := jooqCodegenConfig.?.value.isEmpty,
+    jooqCodegen / skip := jooqCodegenConfig.?.value.isEmpty,
     jooqCodegenKeys := sys.env,
-    jooqCodegenKeys ++= Seq(baseDirectory, sourceManaged in config),
+    jooqCodegenKeys ++= Seq(baseDirectory, config / sourceManaged),
     jooqCodegenSubstitutions := substitutionsTask(config).value,
     jooqCodegenConfigTransformer := configTransformerTask.value,
     jooqCodegenTransformedConfig := configTransformTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
     sourceGenerators += autoCodegenTask.taskValue,
-    includeFilter in jooqCodegenGeneratedSources := "*.java" | "*.scala",
+    jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
     jooqCodegenGeneratedSources := jooqCodegenGeneratedSourcesFinder.value.get,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
     javacOptions ++= {
-      if (isJigsawEnabled(sys.props("java.version")))
+      if (sys.props.get("java.version").exists(isJigsawEnabled))
         Seq("--add-modules", "java.xml.ws.annotation")
       else
         Nil
@@ -104,7 +95,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       if (scope0.project == This) scope0 in project else scope0
     }
     def entry(key: CodegenKey): Seq[Task[(String, Any)]] = key match {
-      case CodegenKey.Setting(s) => keys(s, config).map(k => task(k -> (extracted.get(s in scope(s)): Any)))
+      case CodegenKey.Setting(s) => keys(s, config).map(k => task(k -> (extracted.get(scope(s) / s): Any)))
       case CodegenKey.Task(t) => keys(t, config).map(k => t.map(v => k -> (v: Any)))
       case CodegenKey.Constant(k, v) => Seq(task(k -> v))
       case CodegenKey.Mapped(e, f) => entry(e).map(_.map { case (k, v) => k -> (f(v): Any) })
@@ -162,7 +153,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
       }
       case CodegenConfig.Classpath(resource) => Def.task[Node] {
-        ClasspathLoader.using((fullClasspath in JooqCodegen).value) { loader =>
+        ClasspathLoader.using((JooqCodegen / fullClasspath).value) { loader =>
           loader.getResourceAsStream(resource) match {
             case null => sys.error(s"resource $resource not found in classpath")
             case in => Using.bufferedInputStream(in)(XML.load)
@@ -175,13 +166,13 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def codegenTask = Def.taskDyn {
-    if ((skip in jooqCodegen).value) Def.task(Seq.empty[File])
+    if ((jooqCodegen / skip).value) Def.task(Seq.empty[File])
     else Def.taskDyn {
       val config = jooqCodegenTransformedConfig.value
       val file = Files.createTempFile("jooq-codegen-", ".xml")
       Def.sequential(
         Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
-        (run in JooqCodegen).toTask(s" $file"),
+        (JooqCodegen / run).toTask(s" $file"),
         Def.task(jooqCodegenGeneratedSourcesFinder.value.get)
       ).andFinally {
         Files.delete(file)
@@ -190,7 +181,7 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def autoCodegenTask = Def.taskDyn {
-    if ((skip in jooqCodegen).value) Def.task(Seq.empty[File])
+    if ((jooqCodegen / skip).value) Def.task(Seq.empty[File])
     else Def.taskDyn {
       jooqCodegenStrategy.value match {
         case CodegenStrategy.Always => jooqCodegen
@@ -216,8 +207,8 @@ object JooqCodegenPlugin extends AutoPlugin {
       }
     }
     packageDir.descendantsExcept(
-      (includeFilter in jooqCodegenGeneratedSources).value,
-      (excludeFilter in jooqCodegenGeneratedSources).value)
+      (jooqCodegenGeneratedSources / includeFilter).value,
+      (jooqCodegenGeneratedSources / excludeFilter).value)
   }
 
 }

@@ -1,0 +1,4 @@
+-> compile
+
+$ copy-file changes/AllowAllDialects.scala src/main/scala/com/example/SQLDialectWartTest.scala
+> compile

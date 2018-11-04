@@ -7,10 +7,6 @@ trait JooqCodegenKeys {
 
   val JooqCodegen = config("jooq-codegen").hide
 
-  val jooqVersion = settingKey[String]("jOOQ version")
-  val jooqOrganization = settingKey[String]("jOOQ organization/group ID")
-  val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
-
   val jooqCodegen = taskKey[Seq[File]]("Run jOOQ codegen")
   val jooqCodegenConfig = settingKey[CodegenConfig]("jOOQ codegen configuration")
   val jooqCodegenKeys = settingKey[Seq[CodegenKey]]("jOOQ codegen keys for substitution")

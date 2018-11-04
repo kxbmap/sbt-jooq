@@ -1,8 +1,8 @@
-package sbtjooq.codegen
+package sbtjooq.internal
 
 import sbt._
 
-object CodegenUtil {
+object JavaUtil {
 
   def parseJavaVersion(javaHome: File): String = {
     val releaseFile = javaHome / "release"
