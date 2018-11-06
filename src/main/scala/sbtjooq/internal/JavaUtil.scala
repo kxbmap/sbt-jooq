@@ -14,7 +14,16 @@ object JavaUtil {
     }
   }
 
+  private def major(javaVersion: String): Int =
+    javaVersion.takeWhile(_.isDigit).toInt
+
   def isJigsawEnabled(javaVersion: String): Boolean =
-    javaVersion.takeWhile(_.isDigit).toInt >= 9
+    major(javaVersion) >= 9
+
+  def isJAXBBundled(javaVersion: String): Boolean =
+    major(javaVersion) <= 10
+
+  def isJavaxAnnotationBundled(javaVersion: String): Boolean =
+    major(javaVersion) <= 10
 
 }

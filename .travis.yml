@@ -4,6 +4,7 @@ language: scala
 jdk:
   - oraclejdk8
   - openjdk10
+  - openjdk11
 
 script:
   - sbt "scripted jooq-codegen/* jooq-warts/*"

@@ -42,6 +42,15 @@ object JooqCodegenPlugin extends AutoPlugin {
         Seq((JooqCodegen / jooqOrganization).value % "jooq-codegen" % (JooqCodegen / jooqVersion).value % JooqCodegen)
       else
         Nil
+    },
+    libraryDependencies ++= {
+      val javaVersion = javaHome.value.map(parseJavaVersion).orElse(sys.props.get("java.version"))
+      if (!javaVersion.forall(isJAXBBundled)) Seq(
+        "javax.activation" % "activation" % "1.1.1" % JooqCodegen,
+        "com.sun.xml.bind" % "jaxb-core" % "2.3.0.1" % JooqCodegen,
+        "com.sun.xml.bind" % "jaxb-impl" % "2.3.1" % JooqCodegen
+      )
+      else Nil
     }
   ) ++ inConfig(JooqCodegen)(Defaults.configSettings ++ inTask(run)(Seq(
     fork := true,
@@ -51,7 +60,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     }),
     javaOptions ++= {
       val javaVersion = javaHome.value.map(parseJavaVersion).orElse(sys.props.get("java.version"))
-      if (javaVersion.exists(isJigsawEnabled))
+      if (javaVersion.exists(jv => isJigsawEnabled(jv) && isJAXBBundled(jv)))
         Seq("--add-modules", "java.xml.bind")
       else
         Nil
@@ -64,7 +73,14 @@ object JooqCodegenPlugin extends AutoPlugin {
     slf4jSimpleLevelInBrackets := true
   ))
 
-  def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = inConfig(config)(Seq(
+  def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
+    libraryDependencies ++= {
+      if (!sys.props.get("java.version").forall(isJavaxAnnotationBundled))
+        Seq("javax.annotation" % "javax.annotation-api" % "1.3.2" % config)
+      else
+        Nil
+    }
+  ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := jooqCodegenConfig.?.value.isEmpty,
     jooqCodegenKeys := sys.env,
@@ -78,13 +94,12 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenGeneratedSources := jooqCodegenGeneratedSourcesFinder.value.get,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
     javacOptions ++= {
-      if (sys.props.get("java.version").exists(isJigsawEnabled))
+      if (sys.props.get("java.version").exists(jv => isJigsawEnabled(jv) && isJavaxAnnotationBundled(jv)))
         Seq("--add-modules", "java.xml.ws.annotation")
       else
         Nil
     }
   ))
-
 
   private def substitutionsTask(config: Configuration) = Def.taskDyn {
     val configKeys = jooqCodegenKeys.value
