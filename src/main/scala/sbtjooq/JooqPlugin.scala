@@ -18,6 +18,7 @@ object JooqPlugin extends AutoPlugin {
   override def globalSettings: Seq[Setting[_]] = Seq(
     jooqVersion := DefaultJooqVersion,
     jooqOrganization := "org.jooq",
+    jooqModules := Seq("jooq"),
     autoJooqLibrary := true
   )
 
@@ -26,7 +27,7 @@ object JooqPlugin extends AutoPlugin {
   def jooqScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++= {
       if ((config / autoJooqLibrary).value)
-        Seq((config / jooqOrganization).value % "jooq" % (config / jooqVersion).value % config)
+        (config / jooqModules).value.map((config / jooqOrganization).value % _ % (config / jooqVersion).value % config)
       else
         Nil
     }

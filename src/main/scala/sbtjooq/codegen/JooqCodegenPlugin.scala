@@ -38,12 +38,6 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
     libraryDependencies ++= {
-      if ((JooqCodegen / autoJooqLibrary).value)
-        Seq((JooqCodegen / jooqOrganization).value % "jooq-codegen" % (JooqCodegen / jooqVersion).value % JooqCodegen)
-      else
-        Nil
-    },
-    libraryDependencies ++= {
       val javaVersion = javaHome.value.map(parseJavaVersion).orElse(sys.props.get("java.version"))
       if (!javaVersion.forall(isJAXBBundled)) Seq(
         "javax.activation" % "activation" % "1.1.1" % JooqCodegen,
@@ -52,26 +46,34 @@ object JooqCodegenPlugin extends AutoPlugin {
       )
       else Nil
     }
-  ) ++ inConfig(JooqCodegen)(Defaults.configSettings ++ inTask(run)(Seq(
-    fork := true,
-    mainClass := Some(CrossVersion.partialVersion((JooqCodegen / jooqVersion).value) match {
-      case Some((x, y)) if x < 3 || x == 3 && y < 11 => "org.jooq.util.GenerationTool"
-      case _ => "org.jooq.codegen.GenerationTool"
-    }),
-    javaOptions ++= {
-      val javaVersion = javaHome.value.map(parseJavaVersion).orElse(sys.props.get("java.version"))
-      if (javaVersion.exists(jv => isJigsawEnabled(jv) && isJAXBBundled(jv)))
-        Seq("--add-modules", "java.xml.bind")
-      else
-        Nil
-    }
-  ))) ++ Slf4jSimplePlugin.slf4jSimpleScopedSettings(JooqCodegen) ++ inConfig(JooqCodegen)(Seq(
-    slf4jSimpleLogFile := "System.out",
-    slf4jSimpleCacheOutputStream := true,
-    slf4jSimpleShowThreadName := false,
-    slf4jSimpleShowLogName := false,
-    slf4jSimpleLevelInBrackets := true
-  ))
+  ) ++
+    JooqPlugin.jooqScopedSettings(JooqCodegen) ++
+    inConfig(JooqCodegen)(Defaults.configSettings ++
+      Seq(
+        jooqModules := Seq("jooq-codegen")
+      ) ++
+      inTask(run)(Seq(
+        fork := true,
+        mainClass := Some(CrossVersion.partialVersion((JooqCodegen / jooqVersion).value) match {
+          case Some((x, y)) if x < 3 || x == 3 && y < 11 => "org.jooq.util.GenerationTool"
+          case _ => "org.jooq.codegen.GenerationTool"
+        }),
+        javaOptions ++= {
+          val javaVersion = javaHome.value.map(parseJavaVersion).orElse(sys.props.get("java.version"))
+          if (javaVersion.exists(jv => isJigsawEnabled(jv) && isJAXBBundled(jv)))
+            Seq("--add-modules", "java.xml.bind")
+          else
+            Nil
+        }
+      ))) ++
+    Slf4jSimplePlugin.slf4jSimpleScopedSettings(JooqCodegen) ++
+    inConfig(JooqCodegen)(Seq(
+      slf4jSimpleLogFile := "System.out",
+      slf4jSimpleCacheOutputStream := true,
+      slf4jSimpleShowThreadName := false,
+      slf4jSimpleShowLogName := false,
+      slf4jSimpleLevelInBrackets := true
+    ))
 
   def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++= {

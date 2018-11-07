@@ -2,7 +2,6 @@ package sbtjooq.warts
 
 import sbt.Keys._
 import sbt._
-import sbtjooq.JooqKeys._
 import sbtjooq.JooqPlugin
 import sbtjooq.warts.JooqWartsKeys._
 import wartremover._
@@ -28,15 +27,11 @@ object JooqWartsPlugin extends AutoPlugin {
   def jooqWartsDefaultSettings: Seq[Setting[_]] = Seq(
     jooqWartsVersion := DefaultJooqWartsVersion,
     libraryDependencies += ("com.github.kxbmap" %% "jooq-warts" % jooqWartsVersion.value % JooqWarts).intransitive(),
-    libraryDependencies ++= {
-      if ((JooqWarts / autoJooqLibrary).value)
-        Seq((JooqWarts / jooqOrganization).value % "jooq" % (JooqWarts / jooqVersion).value % JooqWarts)
-      else
-        Nil
-    }
-  ) ++ inConfig(JooqWarts)(Seq(
-    managedClasspath := Classpaths.managedJars(JooqWarts, classpathTypes.value, update.value)
-  ))
+  ) ++
+    JooqPlugin.jooqScopedSettings(JooqWarts) ++
+    inConfig(JooqWarts)(Seq(
+      managedClasspath := Classpaths.managedJars(JooqWarts, classpathTypes.value, update.value)
+    ))
 
   def jooqWartsScopedSettings(config: Configuration): Seq[Setting[_]] =
     inConfig(config)(Seq(
