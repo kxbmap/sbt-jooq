@@ -206,7 +206,7 @@ object JooqCodegen extends AutoPlugin {
   private def generatedSourcesFinderTask = Def.task {
     val config = jooqCodegenTransformedConfig.value
     val target = config \ "generator" \ "target"
-    val targetDir = file((target \ "directory").text.trim)
+    val targetDir = file((target \ "directory").text.trim).getAbsoluteFile
     val packageDir = {
       val p = target \ "packageName"
       val r = """^\w+(\.\w+)*$""".r
