@@ -10,7 +10,7 @@ jOOQ plugin for sbt 1.0+
 Add the following to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.4.0")
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.4.1")
 ```
 
 Then in your `build.sbt`:
