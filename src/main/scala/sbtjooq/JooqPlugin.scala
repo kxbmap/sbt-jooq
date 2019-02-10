@@ -6,7 +6,7 @@ import sbtjooq.JooqKeys._
 
 object JooqPlugin extends AutoPlugin {
 
-  val DefaultJooqVersion = "3.11.7"
+  val DefaultJooqVersion = "3.11.9"
 
   object autoImport extends JooqKeys {
 
