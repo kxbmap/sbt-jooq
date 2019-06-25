@@ -2,9 +2,9 @@ sudo: false
 
 language: scala
 jdk:
-  - oraclejdk8
-  - openjdk10
+  - openjdk8
   - openjdk11
+  - openjdk12
 
 script:
   - sbt "scripted jooq-codegen/* jooq-warts/*"
