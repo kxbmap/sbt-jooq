@@ -7,8 +7,8 @@ import sbt.io.Using
 import sbtjooq.JooqKeys._
 import sbtjooq.JooqPlugin
 import sbtjooq.codegen.JooqCodegenKeys._
-import sbtjooq.internal.JavaUtil._
-import sbtjooq.internal.{ClasspathLoader, SubstitutionParser}
+import sbtjooq.codegen.internal.JavaUtil._
+import sbtjooq.codegen.internal.{ClasspathLoader, SubstitutionParser}
 import sbtslf4jsimple.Slf4jSimpleKeys._
 import sbtslf4jsimple.Slf4jSimplePlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}

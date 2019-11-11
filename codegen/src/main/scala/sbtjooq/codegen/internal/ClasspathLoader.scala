@@ -1,4 +1,4 @@
-package sbtjooq.internal
+package sbtjooq.codegen.internal
 
 import java.io.InputStream
 import java.net.{URL, URLClassLoader}
