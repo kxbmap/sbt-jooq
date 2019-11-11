@@ -1,3 +1,3 @@
-scalaVersion in ThisBuild := "2.12.7"
+scalaVersion in ThisBuild := "2.13.1"
 
 enablePlugins(JooqWartsPlugin)

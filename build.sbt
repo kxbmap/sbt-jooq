@@ -13,4 +13,4 @@ scalacOptions ++= Seq(
 scalacOptions in (Compile, console) += "-Xlint:-unused"
 
 addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % "0.2.0")
-addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.3.7")
+addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.3")

@@ -8,7 +8,7 @@ import wartremover._
 
 object JooqWartsPlugin extends AutoPlugin {
 
-  val DefaultJooqWartsVersion = "0.1.0"
+  val DefaultJooqWartsVersion = "0.1.1"
 
   override def requires: Plugins = JooqPlugin && WartRemover
 
