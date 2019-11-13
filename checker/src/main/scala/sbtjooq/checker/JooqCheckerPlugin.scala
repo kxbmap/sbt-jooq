@@ -17,12 +17,15 @@ object JooqCheckerPlugin extends AutoPlugin {
     def addJooqCheckerSettingsTo(config: Configuration): Seq[Setting[_]] =
       jooqCheckerScopedSettings(config)
 
+    def addJooqCheckerSettingsTo(config: Configuration, task: Scoped): Seq[Setting[_]] =
+      jooqCheckerScopedSettings(config, task)
+
   }
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)
 
   override def projectSettings: Seq[Setting[_]] =
-    jooqCheckerDefaultSettings ++ jooqCheckerScopedSettings(Compile)
+    jooqCheckerDefaultSettings ++ jooqCheckerScopedSettings(Compile, compile)
 
   def jooqCheckerDefaultSettings: Seq[Setting[_]] = Seq(
     jooqCheckerLevels := CheckerLevels.default,
@@ -35,10 +38,13 @@ object JooqCheckerPlugin extends AutoPlugin {
     ))
 
   def jooqCheckerScopedSettings(config: Configuration): Seq[Setting[_]] =
-    inConfig(config)(inTask(compile)(Seq(
+    inConfig(config)(Seq(
       wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
       wartremoverErrors ++= jooqCheckerLevels.value.errors,
       wartremoverWarnings ++= jooqCheckerLevels.value.warnings
-    )))
+    ))
+
+  def jooqCheckerScopedSettings(config: Configuration, task: Scoped): Seq[Setting[_]] =
+    inTask(task)(jooqCheckerScopedSettings(config))
 
 }
