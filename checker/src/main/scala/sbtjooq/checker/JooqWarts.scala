@@ -2,7 +2,7 @@ package sbtjooq.checker
 
 import wartremover.Wart
 
-private[checker] object JooqWarts {
+private[sbtjooq] object JooqWarts {
 
   val DefaultVersion = "0.1.1"
 

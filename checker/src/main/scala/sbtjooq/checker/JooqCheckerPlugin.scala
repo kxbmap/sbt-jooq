@@ -12,6 +12,8 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   object autoImport extends JooqCheckerKeys {
 
+    val CheckerLevel = sbtjooq.checker.CheckerLevel
+
     def addJooqCheckerSettingsTo(config: Configuration): Seq[Setting[_]] =
       jooqCheckerScopedSettings(config)
 
@@ -23,6 +25,7 @@ object JooqCheckerPlugin extends AutoPlugin {
     jooqCheckerDefaultSettings ++ jooqCheckerScopedSettings(Compile)
 
   def jooqCheckerDefaultSettings: Seq[Setting[_]] = Seq(
+    jooqCheckerLevels := CheckerLevels.default,
     jooqCheckerJooqWartsVersion := JooqWarts.DefaultVersion,
     libraryDependencies += ("com.github.kxbmap" %% "jooq-warts" % jooqCheckerJooqWartsVersion.value % JooqChecker).intransitive(),
   ) ++
@@ -32,9 +35,10 @@ object JooqCheckerPlugin extends AutoPlugin {
     ))
 
   def jooqCheckerScopedSettings(config: Configuration): Seq[Setting[_]] =
-    inConfig(config)(Seq(
-      wartremoverClasspaths in compile ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
-      wartremoverErrors in compile ++= Seq(JooqWarts.PlainSQL, JooqWarts.SQLDialect)
-    ))
+    inConfig(config)(inTask(compile)(Seq(
+      wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
+      wartremoverErrors ++= jooqCheckerLevels.value.errors,
+      wartremoverWarnings ++= jooqCheckerLevels.value.warnings
+    )))
 
 }
