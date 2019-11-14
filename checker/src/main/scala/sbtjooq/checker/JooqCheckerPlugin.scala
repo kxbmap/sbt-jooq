@@ -22,14 +22,17 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   }
 
+  override def globalSettings: Seq[Setting[_]] = Seq(
+    jooqCheckerLevels := CheckerLevels.default,
+    jooqCheckerJooqWartsVersion := JooqWarts.DefaultVersion
+  )
+
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)
 
   override def projectSettings: Seq[Setting[_]] =
     jooqCheckerDefaultSettings ++ jooqCheckerScopedSettings(Compile, compile)
 
   def jooqCheckerDefaultSettings: Seq[Setting[_]] = Seq(
-    jooqCheckerLevels := CheckerLevels.default,
-    jooqCheckerJooqWartsVersion := JooqWarts.DefaultVersion,
     libraryDependencies += ("com.github.kxbmap" %% "jooq-warts" % jooqCheckerJooqWartsVersion.value % JooqChecker).intransitive(),
   ) ++
     JooqPlugin.jooqScopedSettings(JooqChecker) ++
