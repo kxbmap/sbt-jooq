@@ -1,10 +1,13 @@
 > set jooqCheckerLevels ~= (_.withPlainSQL(CheckerLevel.Disabled))
+> show Compile / compile / scalacOptions
 > compile
 
 > set jooqCheckerLevels ~= (_.withPlainSQL(CheckerLevel.Warning))
+> show Compile / compile / scalacOptions
 > compile
 
 > set jooqCheckerLevels ~= (_.withPlainSQL(CheckerLevel.Error))
+> show Compile / compile / scalacOptions
 -> compile
 
 $ copy-file changes/AllowPlainSQL.scala src/main/scala/com/example/PlainSQLWartTest.scala

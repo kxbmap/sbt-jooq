@@ -40,8 +40,8 @@ object JooqCheckerPlugin extends AutoPlugin {
   def jooqCheckerScopedSettings(config: Configuration): Seq[Setting[_]] =
     inConfig(config)(Seq(
       wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
-      wartremoverErrors ++= jooqCheckerLevels.value.errors,
-      wartremoverWarnings ++= jooqCheckerLevels.value.warnings
+      wartremoverErrors := wartremoverErrors.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.errors,
+      wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings
     ))
 
   def jooqCheckerScopedSettings(config: Configuration, task: Scoped): Seq[Setting[_]] =

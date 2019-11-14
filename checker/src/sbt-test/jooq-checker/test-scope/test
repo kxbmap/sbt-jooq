@@ -1,0 +1,14 @@
+> set Test / jooqCheckerLevels ~= (_.withSQLDialect(CheckerLevel.Disabled))
+> show Test / compile / scalacOptions
+> Test / compile
+
+> set Test / jooqCheckerLevels ~= (_.withSQLDialect(CheckerLevel.Warning))
+> show Test / compile / scalacOptions
+> Test / compile
+
+> set Test / jooqCheckerLevels ~= (_.withSQLDialect(CheckerLevel.Error))
+> show Test / compile / scalacOptions
+-> Test / compile
+
+$ copy-file changes/AllowAllDialects.scala src/test/scala/com/example/SQLDialectWartTest.scala
+> Test / compile

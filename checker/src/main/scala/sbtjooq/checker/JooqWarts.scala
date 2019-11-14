@@ -10,4 +10,6 @@ private[sbtjooq] object JooqWarts {
 
   val SQLDialect: Wart = Wart.custom("jooqwarts.SQLDialect")
 
+  val all: Set[Wart] = Set(PlainSQL, SQLDialect)
+
 }
