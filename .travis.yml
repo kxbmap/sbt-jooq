@@ -5,9 +5,10 @@ jdk:
   - openjdk8
   - openjdk11
   - openjdk12
+  - openjdk13
 
 script:
-  - sbt "scripted jooq-codegen/* jooq-warts/*"
+  - sbt "scripted jooq-codegen/* jooq-checker/*"
 
 cache:
   directories:
