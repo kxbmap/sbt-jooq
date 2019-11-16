@@ -87,7 +87,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegen / skip := jooqCodegenConfig.?.value.isEmpty,
     jooqCodegenKeys := sys.env,
     jooqCodegenKeys ++= Seq(baseDirectory, config / sourceManaged),
-    jooqCodegenSubstitutions := substitutionsTask(config).value,
+    jooqCodegenConfigVariables := codegenVariablesTask(config).value,
     jooqCodegenConfigTransformer := configTransformerTask.value,
     jooqCodegenTransformedConfig := configTransformTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
@@ -103,7 +103,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     }
   ))
 
-  private def substitutionsTask(config: Configuration) = Def.taskDyn {
+  private def codegenVariablesTask(config: Configuration) = Def.taskDyn {
     val keys = jooqCodegenKeys.value
     val s = state.value
     val p = thisProjectRef.value
@@ -113,8 +113,8 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def configTransformerTask =
-    jooqCodegenSubstitutions.map { substitutions =>
-      val parser = new SubstitutionParser(substitutions.toMap)
+    jooqCodegenConfigVariables.map { vars =>
+      val parser = new SubstitutionParser(vars.toMap)
       new RuleTransformer(new RewriteRule {
         override def transform(n: Node): Seq[Node] = n match {
           case Text(data) =>
