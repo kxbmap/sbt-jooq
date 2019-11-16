@@ -85,9 +85,9 @@ object JooqCodegenPlugin extends AutoPlugin {
   ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := jooqCodegenConfig.?.value.isEmpty,
-    jooqCodegenKeys := sys.env,
-    jooqCodegenKeys ++= Seq(baseDirectory, config / sourceManaged),
+    jooqCodegenKeys := Seq(baseDirectory, config / sourceManaged),
     jooqCodegenConfigVariables := codegenVariablesTask(config).value,
+    jooqCodegenConfigVariables ++= sys.env,
     jooqCodegenConfigTransformer := configTransformerTask.value,
     jooqCodegenTransformedConfig := configTransformTask.value,
     jooqCodegenStrategy := CodegenStrategy.IfAbsent,
