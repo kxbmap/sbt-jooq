@@ -2,6 +2,8 @@ name := "sbt-jooq"
 description in ThisBuild := "jOOQ plugin for sbt 1.0+"
 organization in ThisBuild := "com.github.kxbmap"
 
+publish / skip := true
+
 scalacOptions in ThisBuild ++= Seq(
   "-deprecation",
   "-unchecked",
