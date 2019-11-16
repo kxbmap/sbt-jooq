@@ -1,5 +1,6 @@
 package sbtjooq.checker
 
+import sbtjooq.checker.internal.JooqWarts
 import wartremover.Wart
 
 sealed trait CheckerLevel

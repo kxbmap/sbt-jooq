@@ -1,8 +1,8 @@
-package sbtjooq.checker
+package sbtjooq.checker.internal
 
 import wartremover.Wart
 
-private[sbtjooq] object JooqWarts {
+object JooqWarts {
 
   val DefaultVersion = "0.1.1"
 
