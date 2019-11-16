@@ -119,7 +119,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         override def transform(n: Node): Seq[Node] = n match {
           case Text(data) =>
             parser.parse(data).fold(
-              e => sys.error(s"Substitution failure: $e"),
+              e => throw new MessageOnlyException(s"Substitution failure: $e"),
               s => Text(s)
             )
           case otherwise => otherwise
@@ -129,19 +129,22 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   private def configTransformTask = Def.taskDyn {
     val transformer = jooqCodegenConfigTransformer.value
-    val xml = jooqCodegenConfig.?.value.fold(sys.error("required: jooqCodegenConfig")) {
-      case CodegenConfig.File(file) => Def.task[Node] {
-        IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
-      }
-      case CodegenConfig.Classpath(resource) => Def.task[Node] {
-        ClasspathLoader.using((JooqCodegen / fullClasspath).value) { loader =>
-          loader.getResourceAsStream(resource) match {
-            case null => sys.error(s"resource $resource not found in classpath")
-            case in => Using.bufferedInputStream(in)(XML.load)
+    val xml = jooqCodegenConfig.?.value match {
+      case None => throw new MessageOnlyException("required: jooqCodegenConfig")
+      case Some(CodegenConfig.File(file)) =>
+        Def.task[Node] {
+          IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
+        }
+      case Some(CodegenConfig.Classpath(resource)) =>
+        Def.task[Node] {
+          ClasspathLoader.using((JooqCodegen / fullClasspath).value) { loader =>
+            loader.getResourceAsStream(resource) match {
+              case null => throw new MessageOnlyException(s"resource $resource not found in classpath")
+              case in => Using.bufferedInputStream(in)(XML.load)
+            }
           }
         }
-      }
-      case CodegenConfig.XML(xml) => Def.task(xml)
+      case Some(CodegenConfig.XML(xml)) => Def.task(xml)
     }
     xml.map(transformer)
   }
@@ -184,7 +187,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       val r = """^\w+(\.\w+)*$""".r
       p.text.trim match {
         case t@r(_) => t.split('.').foldLeft(targetDir)(_ / _)
-        case invalid => sys.error(s"invalid packageName format: $invalid")
+        case invalid => throw new MessageOnlyException(s"invalid packageName format: $invalid")
       }
     }
     packageDir.descendantsExcept(

@@ -103,7 +103,7 @@ object CodegenKey {
   private def keys(task: Task[_], config: Configuration): Seq[String] =
     task.info.name.map(Seq(_))
       .orElse(task.info.attributes.get(taskDefinitionKey).map(keys(_, config)))
-      .getOrElse(sys.error("anonymous task"))
+      .getOrElse(throw new MessageOnlyException("anonymous task"))
 
   private def keys(scope: Scope, attrKey: AttributeKey[_], config: Configuration): Seq[String] = {
     val prj = scope.project.toOption.collect {
