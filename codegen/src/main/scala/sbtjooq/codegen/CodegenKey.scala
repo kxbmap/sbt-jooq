@@ -1,5 +1,6 @@
 package sbtjooq.codegen
 
+import sbt.Keys._
 import sbt._
 import scala.language.experimental.macros
 import scala.language.implicitConversions
@@ -21,15 +22,15 @@ object CodegenKey {
 
   }
 
-  private[sbtjooq] case class Setting[A](key: SettingKey[A]) extends Entry[A]
+  private case class Setting[A](key: SettingKey[A]) extends Entry[A]
 
-  private[sbtjooq] case class Task[A](task: sbt.Task[A]) extends Entry[A]
+  private case class Task[A](task: sbt.Task[A]) extends Entry[A]
 
-  private[sbtjooq] case class Constant[A](key: String, value: A) extends Entry[A]
+  private case class Constant[A](key: String, value: A) extends Entry[A]
 
-  private[sbtjooq] case class Mapped[A, B](entry: Entry[A], f: A => B) extends Entry[B]
+  private case class Mapped[A, B](entry: Entry[A], f: A => B) extends Entry[B]
 
-  private[sbtjooq] case class Named[A](entry: Entry[A], key: String) extends Entry[A]
+  private case class Named[A](entry: Entry[A], key: String) extends Entry[A]
 
 
   def apply[A](key: SettingKey[A]): Entry[A] = Setting(key)
@@ -65,5 +66,55 @@ object CodegenKey {
 
   implicit def appendMapValues[A]: Append.Values[Seq[CodegenKey], Map[String, A]] =
     _ ++ _.map(constantToConfigKey)
+
+
+
+  def build(
+      codegenKeys: Seq[CodegenKey],
+      config: Configuration,
+      state: State,
+      thisProject: ProjectRef): sbt.Task[Seq[(String, String)]] = {
+
+    val extracted = Project.extract(state)
+
+    def scope(scoped: Scoped): Scope = {
+      val scope0 = scoped.scope
+      if (scope0.project == This) scope0 in thisProject else scope0
+    }
+
+    def entry(key: CodegenKey): Seq[sbt.Task[(String, Any)]] = key match {
+      case CodegenKey.Setting(s) => keys(s, config).map(k => task(k -> (extracted.get(scope(s) / s): Any)))
+      case CodegenKey.Task(t) => keys(t, config).map(k => t.map(v => k -> (v: Any)))
+      case CodegenKey.Constant(k, v) => Seq(task(k -> v))
+      case CodegenKey.Mapped(e, f) => entry(e).map(_.map { case (k, v) => k -> (f(v): Any) })
+      case CodegenKey.Named(e, k) => entry(e).map(_.map { case (_, v) => k -> v })
+    }
+
+    codegenKeys.distinct.flatMap(entry).map(_.map {
+      case (k, v) => k -> v.toString
+    }).join
+  }
+
+  private def keys(scoped: Scoped, config: Configuration): Seq[String] = keys(scoped.scope, scoped.key, config)
+
+  private def keys(scoped: ScopedKey[_], config: Configuration): Seq[String] = keys(scoped.scope, scoped.key, config)
+
+  private def keys(task: sbt.Task[_], config: Configuration): Seq[String] =
+    task.info.name.map(Seq(_))
+      .orElse(task.info.attributes.get(taskDefinitionKey).map(keys(_, config)))
+      .getOrElse(sys.error("anonymous task"))
+
+  private def keys(scope: Scope, attrKey: AttributeKey[_], config: Configuration): Seq[String] = {
+    val prj = scope.project.toOption.collect {
+      case LocalProject(id) => id + "/"
+      case LocalRootProject => "LocalRootProject/"
+    }
+    val conf = scope.config.toOption.fold(Seq(none[String])) { c =>
+      Some(c.name + ":") :: (if (c.name == config.name) None :: Nil else Nil)
+    }
+    val task = scope.task.toOption.map(_.label + "::")
+
+    conf.map(Seq(prj, _, task).flatten.mkString + attrKey.label)
+  }
 
 }
