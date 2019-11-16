@@ -24,7 +24,7 @@ object CodegenKey {
 
   private case class Setting[A](key: SettingKey[A]) extends Entry[A]
 
-  private case class Task[A](task: sbt.Task[A]) extends Entry[A]
+  private case class TaskValue[A](task: Task[A]) extends Entry[A]
 
   private case class Constant[A](key: String, value: A) extends Entry[A]
 
@@ -47,7 +47,7 @@ object CodegenKey {
   implicit def constantToConfigKey[A](kv: (String, A)): CodegenKey = Constant(kv._1, kv._2)
 
 
-  def taskValue[A](task: sbt.Task[A]): Entry[A] = Task(task)
+  def taskValue[A](task: Task[A]): Entry[A] = TaskValue(task)
 
   class MacroImpl(val c: blackbox.Context) {
     import c.universe._
@@ -73,7 +73,7 @@ object CodegenKey {
       codegenKeys: Seq[CodegenKey],
       config: Configuration,
       state: State,
-      thisProject: ProjectRef): sbt.Task[Seq[(String, String)]] = {
+      thisProject: ProjectRef): Task[Seq[(String, String)]] = {
 
     val extracted = Project.extract(state)
 
@@ -82,9 +82,9 @@ object CodegenKey {
       if (scope0.project == This) scope0 in thisProject else scope0
     }
 
-    def entry(key: CodegenKey): Seq[sbt.Task[(String, Any)]] = key match {
+    def entry(key: CodegenKey): Seq[Task[(String, Any)]] = key match {
       case CodegenKey.Setting(s) => keys(s, config).map(k => task(k -> (extracted.get(scope(s) / s): Any)))
-      case CodegenKey.Task(t) => keys(t, config).map(k => t.map(v => k -> (v: Any)))
+      case CodegenKey.TaskValue(t) => keys(t, config).map(k => t.map(v => k -> (v: Any)))
       case CodegenKey.Constant(k, v) => Seq(task(k -> v))
       case CodegenKey.Mapped(e, f) => entry(e).map(_.map { case (k, v) => k -> (f(v): Any) })
       case CodegenKey.Named(e, k) => entry(e).map(_.map { case (_, v) => k -> v })
@@ -99,7 +99,7 @@ object CodegenKey {
 
   private def keys(scoped: ScopedKey[_], config: Configuration): Seq[String] = keys(scoped.scope, scoped.key, config)
 
-  private def keys(task: sbt.Task[_], config: Configuration): Seq[String] =
+  private def keys(task: Task[_], config: Configuration): Seq[String] =
     task.info.name.map(Seq(_))
       .orElse(task.info.attributes.get(taskDefinitionKey).map(keys(_, config)))
       .getOrElse(sys.error("anonymous task"))
