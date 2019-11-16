@@ -114,7 +114,7 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   private def configTransformerTask =
     jooqCodegenConfigVariables.map { vars =>
-      val parser = new SubstitutionParser(vars.toMap)
+      val parser = new SubstitutionParser(vars)
       new RuleTransformer(new RewriteRule {
         override def transform(n: Node): Seq[Node] = n match {
           case Text(data) =>

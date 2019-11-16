@@ -11,7 +11,7 @@ trait JooqCodegenKeys {
 
   val jooqCodegenConfig = settingKey[CodegenConfig]("jOOQ codegen configuration")
   val jooqCodegenKeys = settingKey[Seq[CodegenKey]]("jOOQ codegen keys for substitution")
-  val jooqCodegenConfigVariables = taskKey[Seq[(String, String)]]("Variables to substitute configuration text")
+  val jooqCodegenConfigVariables = taskKey[Map[String, String]]("Variables to substitute configuration text")
   val jooqCodegenConfigTransformer = taskKey[Node => Node]("jOOQ codegen configuration transform function")
   val jooqCodegenTransformedConfig = taskKey[Node]("transformed jOOQ codegen configuration")
 

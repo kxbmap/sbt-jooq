@@ -73,7 +73,7 @@ object CodegenKey {
       codegenKeys: Seq[CodegenKey],
       config: Configuration,
       state: State,
-      thisProject: ProjectRef): Task[Seq[(String, String)]] = {
+      thisProject: ProjectRef): Task[Map[String, String]] = {
 
     val extracted = Project.extract(state)
 
@@ -90,9 +90,10 @@ object CodegenKey {
       case CodegenKey.Named(e, k) => entry(e).map(_.map { case (_, v) => k -> v })
     }
 
-    codegenKeys.distinct.flatMap(entry).map(_.map {
-      case (k, v) => k -> v.toString
-    }).join
+    codegenKeys.distinct.flatMap(entry)
+      .map(_.map { case (k, v) => k -> v.toString })
+      .join
+      .map(_.toMap)
   }
 
   private def keys(scoped: Scoped, config: Configuration): Seq[String] = keys(scoped.scope, scoped.key, config)
