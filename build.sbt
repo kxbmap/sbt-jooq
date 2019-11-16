@@ -33,6 +33,7 @@ lazy val codegen = project
   .settings(
     name := "sbt-jooq-codegen",
     scriptedSettings,
+    scripted := scripted.dependsOn(core / publishLocal).evaluated,
     addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % "0.2.0")
   )
 
@@ -42,5 +43,6 @@ lazy val checker = project
   .settings(
     name := "sbt-jooq-checker",
     scriptedSettings,
+    scripted := scripted.dependsOn(core / publishLocal).evaluated,
     addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.3")
   )
