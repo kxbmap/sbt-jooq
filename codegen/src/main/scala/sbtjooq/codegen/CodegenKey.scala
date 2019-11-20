@@ -90,7 +90,7 @@ object CodegenKey {
       case CodegenKey.Named(e, k) => entry(e).map(_.map { case (_, v) => k -> v })
     }
 
-    codegenKeys.distinct.flatMap(entry)
+    codegenKeys.flatMap(entry)
       .map(_.map { case (k, v) => k -> v.toString })
       .join
       .map(_.toMap)
