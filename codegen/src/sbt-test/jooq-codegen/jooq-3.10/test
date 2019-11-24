@@ -1,0 +1,7 @@
+> show libraryDependencies
+
+> show JooqCodegen / run / javaOptions
+> show jooqCodegen
+
+> show Compile / compile / javacOptions
+> runMain com.example.Main

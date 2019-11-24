@@ -7,8 +7,7 @@ import sbt.io.Using
 import sbtjooq.JooqKeys._
 import sbtjooq.JooqPlugin
 import sbtjooq.codegen.JooqCodegenKeys._
-import sbtjooq.codegen.internal.JavaUtil._
-import sbtjooq.codegen.internal.{ClasspathLoader, SubstitutionParser}
+import sbtjooq.codegen.internal.{ClasspathLoader, Codegen, SubstitutionParser}
 import sbtslf4jsimple.Slf4jSimpleKeys._
 import sbtslf4jsimple.Slf4jSimplePlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
@@ -37,15 +36,9 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
 
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
-    libraryDependencies ++= {
-      val javaVersion = javaHome.value.map(parseJavaVersion).orElse(sys.props.get("java.version"))
-      if (!javaVersion.forall(isJAXBBundled)) Seq(
-        "javax.activation" % "activation" % "1.1.1" % JooqCodegen,
-        "com.sun.xml.bind" % "jaxb-core" % "2.3.0.1" % JooqCodegen,
-        "com.sun.xml.bind" % "jaxb-impl" % "2.3.1" % JooqCodegen
-      )
-      else Nil
-    }
+    libraryDependencies ++= Codegen
+      .jaxbDependencies((JooqCodegen / jooqVersion).value, Codegen.runtimeJavaVersion((JooqCodegen / javaHome).value))
+      .map(_ % JooqCodegen)
   ) ++
     JooqPlugin.jooqScopedSettings(JooqCodegen) ++
     inConfig(JooqCodegen)(Defaults.configSettings ++
@@ -54,17 +47,8 @@ object JooqCodegenPlugin extends AutoPlugin {
       ) ++
       inTask(run)(Seq(
         fork := true,
-        mainClass := Some(CrossVersion.partialVersion((JooqCodegen / jooqVersion).value) match {
-          case Some((x, y)) if x < 3 || x == 3 && y < 11 => "org.jooq.util.GenerationTool"
-          case _ => "org.jooq.codegen.GenerationTool"
-        }),
-        javaOptions ++= {
-          val javaVersion = javaHome.value.map(parseJavaVersion).orElse(sys.props.get("java.version"))
-          if (javaVersion.exists(jv => isJigsawEnabled(jv) && isJAXBBundled(jv)))
-            Seq("--add-modules", "java.xml.bind")
-          else
-            Nil
-        }
+        mainClass := Some(Codegen.mainClass(jooqVersion.value)),
+        javaOptions ++= Codegen.jaxbAddModulesOption(jooqVersion.value, Codegen.runtimeJavaVersion(javaHome.value))
       ))) ++
     Slf4jSimplePlugin.slf4jSimpleScopedSettings(JooqCodegen) ++
     inConfig(JooqCodegen)(Seq(
@@ -76,12 +60,9 @@ object JooqCodegenPlugin extends AutoPlugin {
     ))
 
   def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
-    libraryDependencies ++= {
-      if (!sys.props.get("java.version").forall(isJavaxAnnotationBundled))
-        Seq("javax.annotation" % "javax.annotation-api" % "1.3.2" % config)
-      else
-        Nil
-    }
+    libraryDependencies ++= Codegen
+      .javaxAnnotationDependencies((config / jooqVersion).value, Codegen.compileJavaVersion)
+      .map(_ % config)
   ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := jooqCodegenConfig.?.value.isEmpty,
@@ -95,12 +76,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
     jooqCodegenGeneratedSources := jooqCodegenGeneratedSourcesFinder.value.get,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
-    javacOptions ++= {
-      if (sys.props.get("java.version").exists(jv => isJigsawEnabled(jv) && isJavaxAnnotationBundled(jv)))
-        Seq("--add-modules", "java.xml.ws.annotation")
-      else
-        Nil
-    }
+    javacOptions ++= Codegen.javaxAnnotationAddModulesOption(jooqVersion.value, Codegen.compileJavaVersion)
   ))
 
   private def codegenVariablesTask(config: Configuration) = Def.taskDyn {
