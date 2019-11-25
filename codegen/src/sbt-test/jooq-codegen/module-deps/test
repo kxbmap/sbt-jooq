@@ -1,4 +1,0 @@
-> show app/jooqCodegen
-> clean
-> compile
-> app/runMain com.example.Main
