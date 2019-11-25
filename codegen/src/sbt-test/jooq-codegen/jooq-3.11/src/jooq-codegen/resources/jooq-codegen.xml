@@ -6,7 +6,7 @@
             <properties>
                 <property>
                     <key>scripts</key>
-                    <value>src/jooq-codegen/resources/database.sql</value>
+                    <value>${jooq-codegen:resourceDirectory}/database.sql</value>
                 </property>
             </properties>
         </database>
