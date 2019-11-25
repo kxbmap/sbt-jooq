@@ -88,6 +88,7 @@ TaskKey[Unit]("check") := {
       "baseDirectory" -> baseDirectory.value.toString,
       "sourceManaged" -> (Test / sourceManaged).value.toString,
       "test:sourceManaged" -> (Test / sourceManaged).value.toString,
+      "jooq-codegen:resourceDirectory" -> (JooqCodegen / resourceDirectory).value.toString,
 
       "compile:run::description" -> "Compile/run",
 
