@@ -38,6 +38,12 @@ object JooqCodegenPlugin extends AutoPlugin {
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
     libraryDependencies ++= Codegen
       .jaxbDependencies((JooqCodegen / jooqVersion).value, Codegen.runtimeJavaVersion((JooqCodegen / javaHome).value))
+      .map(_ % JooqCodegen),
+    libraryDependencies ++= Classpaths.autoLibraryDependency(
+      (JooqCodegen / autoScalaLibrary).value && (JooqCodegen / scalaHome).value.isEmpty && (JooqCodegen / managedScalaInstance).value,
+      plugin = false,
+      (JooqCodegen / scalaOrganization).value,
+      (JooqCodegen / scalaVersion).value)
       .map(_ % JooqCodegen)
   ) ++
     JooqPlugin.jooqScopedSettings(JooqCodegen) ++
