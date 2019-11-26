@@ -8,7 +8,7 @@ jooqCodegenConfig := file("jooq-codegen.xml")
 
 jooqCodegenStrategy := CodegenStrategy.Always
 
-libraryDependencies ++= Seq("runtime", "jooq-codegen").map { conf =>
+libraryDependencies ++= Seq(Runtime, JooqCodegen).map { conf =>
   "com.h2database" % "h2" % "1.4.196" % conf
 }
 
@@ -16,5 +16,5 @@ lazy val migration = project.settings(
   flywayUrl := "jdbc:h2:./test",
   flywaySchemas := Seq("PUBLIC"),
   flywayLocations := Seq("classpath:db/migration"),
-  libraryDependencies += "com.h2database" % "h2" % "1.4.196" % "runtime"
+  libraryDependencies += "com.h2database" % "h2" % "1.4.196" % Runtime
 )
