@@ -18,6 +18,7 @@ inThisBuild(Seq(
 ))
 
 lazy val scriptedSettings = Seq(
+  scriptedSbt := sbtVersion.value,
   scriptedBufferLog := false,
   scriptedLaunchOpts ++= Seq(
     "-Xmx1024M",
