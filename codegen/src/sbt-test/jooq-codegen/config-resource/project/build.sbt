@@ -1,3 +1,3 @@
 libraryDependencies ++= Seq(
-  "com.h2database" % "h2" % "1.4.196"
+  "com.h2database" % "h2" % "1.4.200"
 )
