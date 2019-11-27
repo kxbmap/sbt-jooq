@@ -7,7 +7,6 @@ jdk:
   - openjdk10
   - openjdk11
   - openjdk12
-  - openjdk13
 
 script:
   - sbt "scripted jooq-codegen/* jooq-checker/*"
