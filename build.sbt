@@ -4,13 +4,18 @@ organization in ThisBuild := "com.github.kxbmap"
 
 publish / skip := true
 
-scalacOptions in ThisBuild ++= Seq(
-  "-deprecation",
-  "-unchecked",
-  "-feature",
-  "-Xlint"
-)
-scalacOptions in (ThisBuild, Compile, console) += "-Xlint:-unused"
+inThisBuild(Seq(
+  scalacOptions ++= Seq(
+    "-deprecation",
+    "-unchecked",
+    "-feature",
+    "-Xlint"
+  ),
+  Compile / console / scalacOptions += "-Xlint:-unused",
+
+  // https://github.com/sbt/sbt/issues/5049
+  pluginCrossBuild / sbtVersion := "1.2.8"
+))
 
 lazy val scriptedSettings = Seq(
   scriptedBufferLog := false,
