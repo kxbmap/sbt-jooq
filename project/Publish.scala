@@ -16,7 +16,7 @@ object Publish extends AutoPlugin {
     licenses := Seq(
       "Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")
     ),
-    sonatypeProjectHosting := Some(GitHubHosting("kxbmap", "configs", "Tsukasa Kitachi", "kxbmap@gmail.com")),
+    sonatypeProjectHosting := Some(GitHubHosting("kxbmap", "sbt-jooq", "Tsukasa Kitachi", "kxbmap@gmail.com")),
     pomIncludeRepository := { _ => false }
   )
 
