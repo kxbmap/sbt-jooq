@@ -12,7 +12,7 @@ object Publish extends AutoPlugin {
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
     publishMavenStyle := true,
-    publishTo := sonatypePublishTo.value,
+    publishTo := sonatypePublishToBundle.value,
     licenses := Seq(
       "Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")
     ),
