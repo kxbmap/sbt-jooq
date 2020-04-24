@@ -58,11 +58,11 @@ autoJooqLibrary := true
 ```
 
 #### jooqCodegenConfig
-jOOQ-codegen configuration. Set file or classpath resource or XML directly.
+jOOQ-codegen configuration. This is empty by default and must be set. You can set a file, classpath resource, or XML directly.
 
 ```scala
 // Set file path
-jooqCodegenConfig := baseDirectory.value / "jooq-codegen.xml"
+jooqCodegenConfig := file("jooq-codegen.xml")
 ```
 
 ```scala
