@@ -50,5 +50,5 @@ lazy val checker = project
     name := "sbt-jooq-checker",
     scriptedSettings,
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
-    addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.3")
+    addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.8")
   )
