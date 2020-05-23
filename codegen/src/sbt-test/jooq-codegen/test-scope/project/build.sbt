@@ -1,3 +1,3 @@
 libraryDependencies ++= Seq(
-  "com.h2database" % "h2" % "1.4.200"
+  "com.h2database" % "h2" % sys.props("h2.version")
 )

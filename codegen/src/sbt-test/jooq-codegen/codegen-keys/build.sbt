@@ -2,6 +2,8 @@ ThisBuild / scalaVersion := "2.13.1"
 
 enablePlugins(JooqCodegenPlugin)
 
+jooqVersion := sys.props("jooq.version")
+
 Compile / run / description := "Compile/run"
 Test / run / description := "Test/run"
 

@@ -17,12 +17,17 @@ inThisBuild(Seq(
   pluginCrossBuild / sbtVersion := "1.2.8"
 ))
 
+val jooqVersion = "3.13.2"
+val h2Version = "1.4.200"
+
 lazy val scriptedSettings = Seq(
   scriptedSbt := sbtVersion.value,
   scriptedBufferLog := false,
   scriptedLaunchOpts ++= Seq(
     "-Xmx1024M",
-    s"-Dplugin.version=${version.value}"
+    s"-Dplugin.version=${version.value}",
+    s"-Djooq.version=$jooqVersion",
+    s"-Dh2.version=$h2Version",
   )
 )
 
@@ -61,9 +66,11 @@ lazy val docs = project
     mdocIn := (Compile / sourceDirectory).value / "mdoc",
     mdocVariables ++= Map(
       "VERSION" -> version.value,
-      "JOOQ_VERSION" -> "3.13.2",
-      "JOOQ_MINOR_VERSION" -> "3.13",
-      "H2_VERSION" -> "1.4.200",
+      "JOOQ_VERSION" -> jooqVersion,
+      "JOOQ_MINOR_VERSION" -> (jooqVersion match {
+        case VersionNumber(x +: y +: _, _, _) => s"$x.$y"
+      }),
+      "H2_VERSION" -> h2Version,
     ),
     libraryDependencies += sbtDependency.value
   )
