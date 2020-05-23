@@ -52,3 +52,23 @@ lazy val checker = project
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
     addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.8")
   )
+
+lazy val docs = project
+  .dependsOn(codegen, checker)
+  .enablePlugins(MdocPlugin)
+  .settings(
+    publish / skip := true,
+    mdocIn := (Compile / sourceDirectory).value / "mdoc",
+    mdocVariables ++= Map(
+      "VERSION" -> version.value,
+      "JOOQ_VERSION" -> "3.13.2",
+      "JOOQ_MINOR_VERSION" -> "3.13",
+      "H2_VERSION" -> "1.4.200",
+    ),
+    libraryDependencies += sbtDependency.value
+  )
+
+val updateReadme = taskKey[Unit]("Update README.md")
+val readmeFile = "README.md"
+updateReadme := IO.copyFile((docs / mdocOut).value / readmeFile, baseDirectory.value / readmeFile)
+updateReadme := updateReadme.dependsOn((docs / mdoc).toTask(s" --include $readmeFile")).value
