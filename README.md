@@ -5,22 +5,24 @@
 jOOQ plugin for sbt 1.0+
 
 
-## Installation
+## JooqCodegenPlugin
+
+### Installation
 
 Add the following to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq" % "0.4.1")
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.5.0")
 ```
 
 Then in your `build.sbt`:
 
 ```scala
 // Enable the plugin
-enablePlugins(JooqCodegen)
+enablePlugins(JooqCodegenPlugin)
 
-// Add your database driver dependency to `jooq` scope
-libraryDependencies += "com.h2database" % "h2" % "1.4.197" % "jooq"
+// Add your database driver dependency to `jooq-codegen` scope
+libraryDependencies += "com.h2database" % "h2" % "1.4.200" % JooqCodegen
 ```
 
 ### Configuration
@@ -28,17 +30,17 @@ libraryDependencies += "com.h2database" % "h2" % "1.4.197" % "jooq"
 #### jooqVersion
 Version of jOOQ library.
 
-Default: `"3.11.5"`
+Default: `"3.13.2"`
 
 ```scala
-jooqVersion := "3.11.5"
+jooqVersion := "3.13.2"
 ```
 
 #### jooqOrganization
 jOOQ organization/group ID.
 
-If you want to use commercial version of jOOQ, set appropriate one.
-For details, please refer to the [jOOQ manual](https://www.jooq.org/doc/3.11/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
+If you want to use a commercial version of jOOQ, set appropriate one.
+For details, please refer to the [jOOQ manual](https://www.jooq.org/doc/3.13/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
 
 Default: `"org.jooq"`
 
@@ -67,7 +69,7 @@ jooqCodegenConfig := file("jooq-codegen.xml")
 
 ```scala
 // Set classpath resource using String prefixed by `classpath:`
-jooqCodegenConfig := "classpath:jooq-codegen.xml" 
+jooqCodegenConfig := "classpath:jooq-codegen.xml"
 ```
 
 ```scala
