@@ -12,7 +12,7 @@ jOOQ plugin for sbt 1.0+
 Add the following to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.5.0")
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.5.1")
 ```
 
 Then in your `build.sbt`:
@@ -68,8 +68,8 @@ jooqCodegenConfig := file("jooq-codegen.xml")
 ```
 
 ```scala
-// Set classpath resource using String prefixed by `classpath:`
-jooqCodegenConfig := "classpath:jooq-codegen.xml"
+// Set URI of classpath resource
+jooqCodegenConfig := uri("classpath:jooq-codegen.xml")
 ```
 
 ```scala
@@ -128,7 +128,7 @@ You can substitute text using placeholder(`${KEY}`) in configuration file.
 e.g. Configuration file contains some placeholders:
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd">
     <jdbc>
         <!-- ...snip... -->
         <user>${DB_USER}</user>
@@ -147,7 +147,7 @@ e.g. Configuration file contains some placeholders:
 Plugin replace placeholders to substitution values:
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd">
     <jdbc>
         <!-- ...snip... -->
         <user>your-user</user>
