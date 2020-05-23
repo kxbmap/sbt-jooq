@@ -75,8 +75,8 @@ jooqCodegenConfig := file("jooq-codegen.xml")
 ```
 
 ```scala mdoc:compile-only
-// Set classpath resource using String prefixed by `classpath:`
-jooqCodegenConfig := "classpath:jooq-codegen.xml" 
+// Set URI of classpath resource
+jooqCodegenConfig := uri("classpath:jooq-codegen.xml")
 ```
 
 ```scala mdoc:compile-only

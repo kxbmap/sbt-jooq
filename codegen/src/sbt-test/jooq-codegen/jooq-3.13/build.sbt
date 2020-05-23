@@ -6,4 +6,4 @@ jooqVersion := "3.13.2"
 
 JooqCodegen / jooqModules += "jooq-meta-extensions"
 
-jooqCodegenConfig := "classpath:jooq-codegen.xml"
+jooqCodegenConfig := uri("classpath:jooq-codegen.xml")
