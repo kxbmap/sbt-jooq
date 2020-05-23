@@ -135,7 +135,7 @@ You can substitute text using placeholder(`${KEY}`) in configuration file.
 e.g. Configuration file contains some placeholders:
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-@JOOQ_MINOR_VERSION@.0.xsd">
     <jdbc>
         <!-- ...snip... -->
         <user>${DB_USER}</user>
@@ -154,7 +154,7 @@ e.g. Configuration file contains some placeholders:
 Plugin replace placeholders to substitution values:
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-@JOOQ_MINOR_VERSION@.0.xsd">
     <jdbc>
         <!-- ...snip... -->
         <user>your-user</user>
