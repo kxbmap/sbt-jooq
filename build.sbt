@@ -17,6 +17,7 @@ inThisBuild(Seq(
   pluginCrossBuild / sbtVersion := "1.2.8"
 ))
 
+val scalaVersion = "2.13.2"
 val jooqVersion = "3.13.2"
 val h2Version = "1.4.200"
 
@@ -26,6 +27,7 @@ lazy val scriptedSettings = Seq(
   scriptedLaunchOpts ++= Seq(
     "-Xmx1024M",
     s"-Dplugin.version=${version.value}",
+    s"-Dscala.version=$scalaVersion",
     s"-Djooq.version=$jooqVersion",
     s"-Dh2.version=$h2Version",
   )
