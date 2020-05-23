@@ -5,7 +5,8 @@ import sbt._
 import sbtjooq.JooqPlugin
 import sbtjooq.checker.JooqCheckerKeys._
 import sbtjooq.checker.internal.JooqWarts
-import wartremover._
+import wartremover.WartRemover
+import wartremover.WartRemover.autoImport._
 
 object JooqCheckerPlugin extends AutoPlugin {
 
