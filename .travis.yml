@@ -9,7 +9,7 @@ jdk:
   - openjdk12
 
 script:
-  - sbt "scripted jooq-codegen/* jooq-checker/*" docs/mdoc
+  - sbt scripted docs/mdoc
 
 cache:
   directories:

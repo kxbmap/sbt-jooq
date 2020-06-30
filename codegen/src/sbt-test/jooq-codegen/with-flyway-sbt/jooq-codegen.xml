@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd">
     <jdbc>
         <driver>org.h2.Driver</driver>
         <url>jdbc:h2:./test</url>
@@ -10,7 +10,7 @@
             <inputSchema>PUBLIC</inputSchema>
             <includes>.*</includes>
             <excludes>schema_version</excludes>
-            <schemaVersionProvider>SELECT :schema_name || '_' || MAX("installed_rank") || '_' || SUM("checksum") FROM "schema_version"</schemaVersionProvider>
+            <schemaVersionProvider>SELECT :schema_name || '_' || MAX("installed_rank") || '_' || SUM("checksum") FROM "flyway_schema_history"</schemaVersionProvider>
         </database>
         <generate>
             <deprecated>false</deprecated>
