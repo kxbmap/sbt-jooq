@@ -18,7 +18,7 @@ inThisBuild(Seq(
 ))
 
 val scalaVersion = "2.13.2"
-val jooqVersion = "3.13.2"
+val jooqVersion = "3.13.4"
 val h2Version = "1.4.200"
 
 lazy val scriptedSettings = Seq(
