@@ -47,7 +47,8 @@ lazy val codegen = project
     name := "sbt-jooq-codegen",
     scriptedSettings,
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
-    addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % "0.2.0")
+    addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % "0.2.0"),
+    libraryDependencies += "com.lihaoyi" %% "fastparse" % "2.3.0"
   )
 
 lazy val checker = project
