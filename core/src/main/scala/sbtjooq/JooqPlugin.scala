@@ -6,8 +6,6 @@ import sbtjooq.JooqKeys._
 
 object JooqPlugin extends AutoPlugin {
 
-  val DefaultJooqVersion = "3.13.4"
-
   object autoImport extends JooqKeys {
 
     def addJooqSettingsTo(config: Configuration): Seq[Setting[_]] =
@@ -16,7 +14,7 @@ object JooqPlugin extends AutoPlugin {
   }
 
   override def globalSettings: Seq[Setting[_]] = Seq(
-    jooqVersion := DefaultJooqVersion,
+    jooqVersion := BuildInfo.defaultJooqVersion,
     jooqOrganization := "org.jooq",
     jooqModules := Seq("jooq"),
     autoJooqLibrary := true

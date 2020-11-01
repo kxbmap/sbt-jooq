@@ -34,10 +34,12 @@ lazy val scriptedSettings = Seq(
 )
 
 lazy val core = project
-  .enablePlugins(SbtPlugin)
+  .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-core",
-    scriptedSettings
+    scriptedSettings,
+    buildInfoKeys := Seq[BuildInfoKey]("defaultJooqVersion" -> jooqVersion),
+    buildInfoPackage := "sbtjooq"
   )
 
 lazy val codegen = project
