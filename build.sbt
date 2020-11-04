@@ -19,23 +19,10 @@ inThisBuild(Seq(
 
 import Versions._
 
-lazy val scriptedSettings = Seq(
-  scriptedSbt := sbtVersion.value,
-  scriptedBufferLog := false,
-  scriptedLaunchOpts ++= Seq(
-    "-Xmx1024M",
-    s"-Dplugin.version=${version.value}",
-    s"-Dscala.version=$scalaVersion_",
-    s"-Djooq.version=$jooqVersion",
-    s"-Dh2.version=$h2Version",
-  )
-)
-
 lazy val core = project
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-core",
-    scriptedSettings,
     buildInfoKeys := Seq[BuildInfoKey]("defaultJooqVersion" -> jooqVersion),
     buildInfoPackage := "sbtjooq"
   )
@@ -45,7 +32,6 @@ lazy val codegen = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-jooq-codegen",
-    scriptedSettings,
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
     addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % sbtSlf4jSimpleVersion),
     libraryDependencies += "com.lihaoyi" %% "fastparse" % fastParseVersion
@@ -56,7 +42,6 @@ lazy val checker = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-jooq-checker",
-    scriptedSettings,
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
     addSbtPlugin("org.wartremover" % "sbt-wartremover" % sbtWartRemoverVersion)
   )
