@@ -2,9 +2,9 @@ import sbt.librarymanagement.VersionNumber
 
 object Versions {
 
-  val scalaVersion_ = "2.13.2"
+  val scalaVersion_ = "2.13.3"
 
-  val jooqVersion = "3.13.4"
+  val jooqVersion = "3.13.6"
 
   val fastParseVersion = "2.3.0"
 
@@ -12,7 +12,7 @@ object Versions {
 
   val sbtSlf4jSimpleVersion = "0.2.0"
 
-  val sbtWartRemoverVersion = "2.4.8"
+  val sbtWartRemoverVersion = "2.4.12"
 
 
   def minorVersion(version: String): String =
