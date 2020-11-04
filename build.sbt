@@ -17,9 +17,7 @@ inThisBuild(Seq(
   pluginCrossBuild / sbtVersion := "1.2.8"
 ))
 
-val scalaVersion = "2.13.2"
-val jooqVersion = "3.13.4"
-val h2Version = "1.4.200"
+import Versions._
 
 lazy val scriptedSettings = Seq(
   scriptedSbt := sbtVersion.value,
@@ -27,7 +25,7 @@ lazy val scriptedSettings = Seq(
   scriptedLaunchOpts ++= Seq(
     "-Xmx1024M",
     s"-Dplugin.version=${version.value}",
-    s"-Dscala.version=$scalaVersion",
+    s"-Dscala.version=$scalaVersion_",
     s"-Djooq.version=$jooqVersion",
     s"-Dh2.version=$h2Version",
   )
@@ -49,8 +47,8 @@ lazy val codegen = project
     name := "sbt-jooq-codegen",
     scriptedSettings,
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
-    addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % "0.2.0"),
-    libraryDependencies += "com.lihaoyi" %% "fastparse" % "2.3.0"
+    addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % sbtSlf4jSimpleVersion),
+    libraryDependencies += "com.lihaoyi" %% "fastparse" % fastParseVersion
   )
 
 lazy val checker = project
@@ -60,7 +58,7 @@ lazy val checker = project
     name := "sbt-jooq-checker",
     scriptedSettings,
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
-    addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.8")
+    addSbtPlugin("org.wartremover" % "sbt-wartremover" % sbtWartRemoverVersion)
   )
 
 lazy val docs = project
@@ -72,9 +70,7 @@ lazy val docs = project
     mdocVariables ++= Map(
       "VERSION" -> version.value,
       "JOOQ_VERSION" -> jooqVersion,
-      "JOOQ_MINOR_VERSION" -> (jooqVersion match {
-        case VersionNumber(x +: y +: _, _, _) => s"$x.$y"
-      }),
+      "JOOQ_MINOR_VERSION" -> minorVersion(jooqVersion),
       "H2_VERSION" -> h2Version,
     ),
     libraryDependencies += sbtDependency.value
