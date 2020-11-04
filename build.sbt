@@ -11,7 +11,6 @@ inThisBuild(Seq(
     "-feature",
     "-Xlint"
   ),
-  Compile / console / scalacOptions += "-Xlint:-unused",
 
   // https://github.com/sbt/sbt/issues/5049
   pluginCrossBuild / sbtVersion := "1.2.8"
