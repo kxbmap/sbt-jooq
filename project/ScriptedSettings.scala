@@ -19,7 +19,9 @@ object ScriptedSettings extends AutoPlugin {
       s"-Dscala.version=$scalaVersion_",
       s"-Djooq.version=$jooqVersion",
       s"-Dh2.version=$h2Version"
-    )
+    ) ++ jooqVersions.map { v =>
+      s"-Djooq.${minorVersion(v).replace('.', '_')}.version=$v"
+    }
   )
 
 }

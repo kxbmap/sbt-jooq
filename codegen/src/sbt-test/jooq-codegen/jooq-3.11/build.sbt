@@ -2,7 +2,7 @@ scalaVersion in ThisBuild := sys.props("scala.version")
 
 enablePlugins(JooqCodegenPlugin)
 
-jooqVersion := "3.11.12"
+jooqVersion := sys.props("jooq.3_11.version")
 
 JooqCodegen / jooqModules += "jooq-meta-extensions"
 

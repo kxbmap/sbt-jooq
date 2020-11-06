@@ -6,6 +6,13 @@ object Versions {
 
   val jooqVersion = "3.13.6"
 
+  val jooqVersions = Seq(
+    jooqVersion,
+    "3.12.4",
+    "3.11.12",
+    "3.10.8"
+  )
+
   val fastParseVersion = "2.3.0"
 
   val h2Version = "1.4.200"
