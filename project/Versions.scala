@@ -4,10 +4,11 @@ object Versions {
 
   val scalaVersion_ = "2.13.3"
 
-  val jooqVersion = "3.13.6"
+  val jooqVersion = "3.14.3"
 
   val jooqVersions = Seq(
     jooqVersion,
+    "3.13.6",
     "3.12.4",
     "3.11.12",
     "3.10.8"
