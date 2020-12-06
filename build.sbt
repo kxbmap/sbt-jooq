@@ -26,21 +26,31 @@ lazy val core = project
 
 lazy val codegen = project
   .dependsOn(core)
-  .enablePlugins(SbtPlugin)
+  .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-codegen",
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
     addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % sbtSlf4jSimpleVersion),
-    libraryDependencies += "com.lihaoyi" %% "fastparse" % fastParseVersion
+    libraryDependencies += "com.lihaoyi" %% "fastparse" % fastParseVersion,
+    buildInfoKeys := Seq[BuildInfoKey](
+      "javaxActivationVersion" -> javaxActivationVersion,
+      "jaxbApiVersion" -> jaxbApiVersion,
+      "jaxbCoreVersion" -> jaxbCoreVersion,
+      "jaxbImplVersion" -> jaxbImplVersion,
+      "javaxAnnotationApiVersion" -> javaxAnnotationApiVersion
+    ),
+    buildInfoPackage := "sbtjooq.codegen"
   )
 
 lazy val checker = project
   .dependsOn(core)
-  .enablePlugins(SbtPlugin)
+  .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-checker",
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
-    addSbtPlugin("org.wartremover" % "sbt-wartremover" % sbtWartRemoverVersion)
+    addSbtPlugin("org.wartremover" % "sbt-wartremover" % sbtWartRemoverVersion),
+    buildInfoKeys := Seq[BuildInfoKey]("defaultJooqWartsVersion" -> jooqWartsVersion),
+    buildInfoPackage := "sbtjooq.checker"
   )
 
 lazy val docs = project

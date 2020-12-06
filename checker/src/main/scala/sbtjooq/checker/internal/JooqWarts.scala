@@ -4,8 +4,6 @@ import wartremover.Wart
 
 object JooqWarts {
 
-  val DefaultVersion = "0.1.2"
-
   val PlainSQL: Wart = Wart.custom("jooqwarts.PlainSQL")
 
   val SQLDialect: Wart = Wart.custom("jooqwarts.SQLDialect")

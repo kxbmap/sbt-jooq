@@ -26,7 +26,7 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   override def globalSettings: Seq[Setting[_]] = Seq(
     jooqCheckerLevels := CheckerLevels.default,
-    jooqCheckerJooqWartsVersion := JooqWarts.DefaultVersion
+    jooqCheckerJooqWartsVersion := BuildInfo.defaultJooqWartsVersion
   )
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)

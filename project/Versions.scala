@@ -22,6 +22,18 @@ object Versions {
 
   val sbtWartRemoverVersion = "2.4.12"
 
+  val jooqWartsVersion = "0.1.2"
+
+  val javaxActivationVersion = "1.1.1"
+
+  val jaxbApiVersion = "2.3.1"
+
+  val jaxbCoreVersion = "2.3.0.1"
+
+  val jaxbImplVersion = "2.3.1"
+
+  val javaxAnnotationApiVersion = "1.3.2"
+
 
   def minorVersion(version: String): String =
     version match {

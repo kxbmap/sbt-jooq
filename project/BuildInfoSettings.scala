@@ -13,12 +13,12 @@ object BuildInfoSettings extends AutoPlugin {
     buildInfoOptions ++= Seq(BuildInfoOption.PackagePrivate, BuildInfoOption.ConstantValue),
     buildInfoUsePackageAsPath := true,
     Compile / packageSrc / mappings += {
-      val pkg = buildInfoPackage.value
+      val pkg = buildInfoPackage.value.replaceAll("""\.""", "/")
       val src = s"${buildInfoObject.value}.scala"
       (Compile / sourceManaged).value / pkg / src -> (file(pkg) / src).toString
     },
     Compile / packageBin / mappings := {
-      val pkg = buildInfoPackage.value
+      val pkg = buildInfoPackage.value.replaceAll("""\.""", "/")
       val obj = buildInfoObject.value
       val excludes = Set(s"$obj.class", s"$obj$$.class").map(file(pkg) / _).map(_.toString)
       (Compile / packageBin / mappings).value.filter {
