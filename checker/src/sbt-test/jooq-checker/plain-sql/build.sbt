@@ -1,4 +1,4 @@
-scalaVersion in ThisBuild := "2.13.1"
+ThisBuild / scalaVersion := sys.props("scala.version")
 
 enablePlugins(JooqCheckerPlugin)
 
