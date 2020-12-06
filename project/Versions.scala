@@ -34,6 +34,8 @@ object Versions {
 
   val javaxAnnotationApiVersion = "1.3.2"
 
+  val flywaySbtVersion = "6.4.2"
+
 
   def minorVersion(version: String): String =
     version match {
