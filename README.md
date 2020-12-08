@@ -12,7 +12,7 @@ jOOQ plugin for sbt 1.0+
 Add the following to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.5.1")
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.6.0")
 ```
 
 Then in your `build.sbt`:
@@ -30,17 +30,17 @@ libraryDependencies += "com.h2database" % "h2" % "1.4.200" % JooqCodegen
 #### jooqVersion
 Version of jOOQ library.
 
-Default: `"3.13.2"`
+Default: `"3.14.4"`
 
 ```scala
-jooqVersion := "3.13.2"
+jooqVersion := "3.14.4"
 ```
 
 #### jooqOrganization
 jOOQ organization/group ID.
 
 If you want to use a commercial version of jOOQ, set appropriate one.
-For details, please refer to the [jOOQ manual](https://www.jooq.org/doc/3.13/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
+For details, please refer to the [jOOQ manual](https://www.jooq.org/doc/3.14/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
 
 Default: `"org.jooq"`
 
@@ -128,7 +128,7 @@ You can substitute text using placeholder(`${KEY}`) in configuration file.
 e.g. Configuration file contains some placeholders:
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.14.0.xsd">
     <jdbc>
         <!-- ...snip... -->
         <user>${DB_USER}</user>
@@ -147,7 +147,7 @@ e.g. Configuration file contains some placeholders:
 Plugin replace placeholders to substitution values:
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.14.0.xsd">
     <jdbc>
         <!-- ...snip... -->
         <user>your-user</user>
