@@ -32,9 +32,6 @@ object CodegenConfig {
 
     implicit def uriToCodegenConfig(uri: sbt.URI): CodegenConfig = fromURI(uri)
 
-    @deprecated("Use `uri(...)` instead", "0.5.1")
-    implicit def stringToCodegenConfig(s: String): CodegenConfig = fromURIString(s)
-
   }
 
 }
