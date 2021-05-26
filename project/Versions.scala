@@ -2,9 +2,9 @@ import sbt.librarymanagement.VersionNumber
 
 object Versions {
 
-  val scalaVersion_ = "2.13.4"
+  val scalaVersion_ = "2.13.6"
 
-  val jooqVersion = "3.14.4"
+  val jooqVersion = "3.14.11"
 
   val jooqVersions = Seq(
     jooqVersion,
@@ -14,13 +14,13 @@ object Versions {
     "3.10.8"
   )
 
-  val fastParseVersion = "2.3.0"
+  val fastParseVersion = "2.3.2"
 
   val h2Version = "1.4.200"
 
   val sbtSlf4jSimpleVersion = "0.2.0"
 
-  val sbtWartRemoverVersion = "2.4.13"
+  val sbtWartRemoverVersion = "2.4.15"
 
   val jooqWartsVersion = "0.1.2"
 
@@ -34,7 +34,7 @@ object Versions {
 
   val javaxAnnotationApiVersion = "1.3.2"
 
-  val flywaySbtVersion = "6.5.0"
+  val flywaySbtVersion = "7.4.0"
 
 
   def minorVersion(version: String): String =
