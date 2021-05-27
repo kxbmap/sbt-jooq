@@ -16,7 +16,7 @@ object ScriptedSettings extends AutoPlugin {
     scriptedLaunchOpts ++= Seq(
       "-Xmx1024M",
       s"-Dplugin.version=${version.value}",
-      s"-Dscala.version=$scalaVersion_",
+      s"-Dscala.version=$scriptedScalaVersion",
       s"-Djooq.version=$jooqVersion",
       s"-Dh2.version=$h2Version",
       s"-Dflywaysbt.version=$flywaySbtVersion"
