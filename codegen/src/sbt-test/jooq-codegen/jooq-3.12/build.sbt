@@ -1,4 +1,4 @@
-scalaVersion in ThisBuild := sys.props("scala.version")
+ThisBuild / scalaVersion := sys.props("scala.version")
 
 enablePlugins(JooqCodegenPlugin)
 
