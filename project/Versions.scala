@@ -15,13 +15,13 @@ object Versions {
     "3.10.8"
   )
 
-  val fastParseVersion = "2.3.2"
+  val fastParseVersion = "2.3.3"
 
   val h2Version = "1.4.200"
 
   val sbtSlf4jSimpleVersion = "0.2.0"
 
-  val sbtWartRemoverVersion = "2.4.15"
+  val sbtWartRemoverVersion = "2.4.16"
 
   val jooqWartsVersion = "0.1.2"
 
