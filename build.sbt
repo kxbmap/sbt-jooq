@@ -71,7 +71,9 @@ lazy val docs = project
     libraryDependencies += sbtDependency.value
   )
 
-val updateReadme = taskKey[Unit]("Update README.md")
 val readmeFile = "README.md"
-updateReadme := IO.copyFile((docs / mdocOut).value / readmeFile, baseDirectory.value / readmeFile)
-updateReadme := updateReadme.dependsOn((docs / mdoc).toTask(s" --include $readmeFile")).value
+TaskKey[Unit]("updateReadme") :=
+  Def.sequential(
+    (docs / mdoc).toTask(s" --include $readmeFile"),
+    Def.task(IO.copyFile((docs / mdocOut).value / readmeFile, baseDirectory.value / readmeFile)),
+  ).value
