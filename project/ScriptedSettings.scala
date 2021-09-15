@@ -17,12 +17,20 @@ object ScriptedSettings extends AutoPlugin {
       "-Xmx1024M",
       s"-Dplugin.version=${version.value}",
       s"-Dscala.version=$scriptedScalaVersion",
-      s"-Djooq.version=$jooqVersion",
+      s"-Djooq.version=$correspondingJooqVersion",
       s"-Dh2.version=$h2Version",
       s"-Dflywaysbt.version=$flywaySbtVersion"
     ) ++ jooqVersions.map { v =>
       s"-Djooq.${minorVersion(v).replace('.', '_')}.version=$v"
     }
   )
+
+  private def javaVersion = sys.props("java.version").takeWhile(_.isDigit).toInt
+
+  private def correspondingJooqVersion =
+    if (javaVersion < 11)
+      jooqVersionForJava8
+    else
+      jooqVersion
 
 }
