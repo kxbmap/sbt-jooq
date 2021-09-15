@@ -112,7 +112,7 @@ Default: `sys.env ++ Seq(baseDirectory, sourceManaged in Compile)`
 ```scala mdoc:compile-only
 jooqCodegenKeys ++= Seq[CodegenKey](
   scalaVersion,     // Setting key
-  skip in publish,  // Task key
+  publish / skip,   // Task key
   "Answer" -> 42    // constant  
 )
 ```

@@ -65,6 +65,9 @@ lazy val docs = project
       "JOOQ_MINOR_VERSION" -> minorVersion(jooqVersion),
       "H2_VERSION" -> h2Version,
     ),
+    scalacOptions ++= Seq(
+      "-Wconf:cat=unused-nowarn:s",
+    ),
     libraryDependencies += sbtDependency.value
   )
 
