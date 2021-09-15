@@ -9,7 +9,7 @@ jdk:
   - openjdk12
 
 script:
-  - sbt scripted docs/mdoc
+  - sbt disableScriptedTestsForEarlierJava scripted docs/mdoc
 
 cache:
   directories:
