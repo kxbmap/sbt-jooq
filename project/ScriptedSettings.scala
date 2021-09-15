@@ -48,8 +48,8 @@ object ScriptedSettings extends AutoPlugin {
         m.matches() && VersionNumber(m.group(1)).matchesSemVer(SemanticSelector(">=3.15"))
       }
       def disableTest(path: Path): Unit = {
-        val disable = path / "disable"
-        if (Files.notExists(disable)) Files.createFile(disable)
+        val disabled = path / "disabled"
+        if (Files.notExists(disabled)) Files.createFile(disabled)
       }
       val dir = sbtTestDirectory.value.toPath
       if (Files.isDirectory(dir))
