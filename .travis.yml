@@ -4,9 +4,8 @@ language: scala
 jdk:
   - openjdk8  # baseline
   - openjdk9  # Jigsaw / module JAXB and javax.annotation bundled
-  - openjdk10 # Jigsaw / module JAXB and javax.annotation bundled
   - openjdk11 # LTS / modules no longer bundled
-  - openjdk12
+  - openjdk17 # LTS
 
 script:
   - sbt disableIncompatibleTests scripted docs/mdoc
