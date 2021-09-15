@@ -12,7 +12,7 @@ object ScriptedSettings extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   object autoImport {
-    val disableScriptedTestsForEarlierJava = taskKey[Unit]("")
+    val disableIncompatibleTests = taskKey[Unit]("")
   }
 
   import autoImport._
@@ -30,7 +30,7 @@ object ScriptedSettings extends AutoPlugin {
     ) ++ jooqVersions.map { v =>
       s"-Djooq.${minorVersion(v).replace('.', '_')}.version=$v"
     },
-    disableScriptedTestsForEarlierJava := disableScriptedTestsTask.value
+    disableIncompatibleTests := disableIncompatibleTestsTask.value
   )
 
   private def javaVersion = sys.props("java.version").takeWhile(_.isDigit).toInt
@@ -41,7 +41,7 @@ object ScriptedSettings extends AutoPlugin {
     else
       jooqVersion
 
-  private def disableScriptedTestsTask = Def.task[Unit] {
+  private def disableIncompatibleTestsTask = Def.task[Unit] {
     if (javaVersion < 11) {
       def isTarget(name: String): Boolean = {
         val m = """jooq-(\d+\.\d+)""".r.pattern.matcher(name)
