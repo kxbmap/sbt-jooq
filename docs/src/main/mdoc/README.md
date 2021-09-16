@@ -1,6 +1,6 @@
 # sbt-jooq
 
-[![Build Status](https://app.travis-ci.com/kxbmap/sbt-jooq.svg?branch=master)](https://app.travis-ci.com/kxbmap/sbt-jooq)
+[![CI](https://github.com/kxbmap/sbt-jooq/actions/workflows/ci.yml/badge.svg)](https://github.com/kxbmap/sbt-jooq/actions/workflows/ci.yml)
 
 jOOQ plugin for sbt 1.0+
 

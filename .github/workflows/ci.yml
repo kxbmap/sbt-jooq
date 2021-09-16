@@ -1,0 +1,34 @@
+name: CI
+on:
+  push:
+  pull_request:
+    branches: [ $default-branch ]
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        java:
+          - 8   # baseline
+          - 9   # Jigsaw / module JAXB and javax.annotation bundled
+          - 11  # LTS / modules no longer bundled
+          - 17  # LTS
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v13
+        with:
+          java-version: "zulu@1.${{ matrix.java }}"
+      - uses: coursier/cache-action@v6
+
+      - name: Build and test
+        run: |
+          cp ./.github/workflows/.jvmopts .
+          sbt -v disableIncompatibleTests scripted docs/mdoc
+
+      - name: Delete non-cached files
+        run: |
+          rm -rf "$HOME/.ivy2/local" || true
+          find $HOME/.sbt             -name "*.lock"                -delete || true
+          find $HOME/.ivy2/cache      -name "ivydata-*.properties"  -delete || true
+          find $HOME/.cache/coursier  -name "ivydata-*.properties"  -delete || true
