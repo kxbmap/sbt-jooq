@@ -7,6 +7,9 @@ jdk:
   - openjdk11 # LTS / modules no longer bundled
   - openjdk17 # LTS
 
+before_script:
+  - export JVM_OPTS=@./.travis/jvmopts
+
 script:
   - sbt disableIncompatibleTests scripted docs/mdoc
 

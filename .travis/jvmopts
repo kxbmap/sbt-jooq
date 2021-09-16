@@ -1,0 +1,3 @@
+-Dfile.encoding=utf8
+-Xmx2048M
+-Xss6M
