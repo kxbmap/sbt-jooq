@@ -39,7 +39,16 @@ lazy val codegen = project
       "jaxbImplVersion" -> jaxbImplVersion,
       "javaxAnnotationApiVersion" -> javaxAnnotationApiVersion
     ),
-    buildInfoPackage := "sbtjooq.codegen"
+    buildInfoPackage := "sbtjooq.codegen",
+
+    TaskKey[Unit]("disableIncompatibleTestsWithEarlierThanJava11") := {
+      val log = state.value.log
+      val disabled = ScriptedSettings.disableScriptedTests(sbtTestDirectory.value) { name =>
+        val m = """jooq-codegen-compat/jooq-(\d+\.\d+)""".r.pattern.matcher(name)
+        m.matches() && VersionNumber(m.group(1)).matchesSemVer(SemanticSelector(">=3.15"))
+      }
+      disabled.foreach(p => log.warn(s"Scripted test disabled: $p"))
+    }
   )
 
 lazy val checker = project

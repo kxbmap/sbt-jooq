@@ -6,11 +6,9 @@ object Versions {
 
   val jooqVersion = "3.15.2"
 
-  val jooqVersionForJava8 = "3.14.14"
-
   val jooqVersions = Seq(
     jooqVersion,
-    jooqVersionForJava8,
+    "3.14.14",
     "3.13.6",
     "3.12.4",
     "3.11.12",
