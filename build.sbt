@@ -30,7 +30,6 @@ lazy val codegen = project
   .settings(
     name := "sbt-jooq-codegen",
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
-    addSbtPlugin("com.github.kxbmap" % "sbt-slf4j-simple" % sbtSlf4jSimpleVersion),
     libraryDependencies += "com.lihaoyi" %% "fastparse" % fastParseVersion,
     buildInfoKeys := Seq[BuildInfoKey](
       "javaxActivationVersion" -> javaxActivationVersion,

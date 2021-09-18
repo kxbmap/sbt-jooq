@@ -19,8 +19,6 @@ object Versions {
 
   val h2Version = "1.4.200"
 
-  val sbtSlf4jSimpleVersion = "0.2.0"
-
   val sbtWartRemoverVersion = "2.4.16"
 
   val jooqWartsVersion = "0.1.2"

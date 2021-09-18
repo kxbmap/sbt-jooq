@@ -8,14 +8,12 @@ import sbtjooq.JooqKeys._
 import sbtjooq.JooqPlugin
 import sbtjooq.codegen.JooqCodegenKeys._
 import sbtjooq.codegen.internal.{ClasspathLoader, Codegen, SubstitutionParser}
-import sbtslf4jsimple.Slf4jSimpleKeys._
-import sbtslf4jsimple.Slf4jSimplePlugin
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Node, Text, XML}
 
 object JooqCodegenPlugin extends AutoPlugin {
 
-  override def requires: Plugins = JooqPlugin && Slf4jSimplePlugin
+  override def requires: Plugins = JooqPlugin
 
   object autoImport extends JooqCodegenKeys with CodegenConfig.Implicits {
 
@@ -55,15 +53,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         fork := true,
         mainClass := Some(Codegen.mainClass(jooqVersion.value)),
         javaOptions ++= Codegen.jaxbAddModulesOption(jooqVersion.value, Codegen.runtimeJavaVersion(javaHome.value))
-      ))) ++
-    Slf4jSimplePlugin.slf4jSimpleScopedSettings(JooqCodegen) ++
-    inConfig(JooqCodegen)(Seq(
-      slf4jSimpleLogFile := "System.out",
-      slf4jSimpleCacheOutputStream := true,
-      slf4jSimpleShowThreadName := false,
-      slf4jSimpleShowLogName := false,
-      slf4jSimpleLevelInBrackets := true
-    ))
+      )))
 
   def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++= Codegen
