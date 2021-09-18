@@ -50,7 +50,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         jooqModules := Seq("jooq-codegen")
       ) ++
       inTask(run)(Seq(
-        fork := true,
+        fork := Codegen.needsFork(jooqVersion.value, Codegen.javaVersion(javaHome.value)),
         mainClass := Some(Codegen.mainClass(jooqVersion.value)),
         javaOptions ++= Codegen.javaOptions(jooqVersion.value, Codegen.javaVersion(javaHome.value))
       )))

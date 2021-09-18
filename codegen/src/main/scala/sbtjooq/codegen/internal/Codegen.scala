@@ -24,6 +24,9 @@ object Codegen {
   def javaOptions(jooqVersion: String, javaVersion: String): Seq[String] =
     jaxbAddModulesOption(jooqVersion, javaVersion)
 
+  def needsFork(jooqVersion: String, javaVersion: String): Boolean =
+    javaOptions(jooqVersion, javaVersion).nonEmpty
+
   def compileDependencies(jooqVersion: String, javaVersion: String): Seq[ModuleID] =
     javaxAnnotationDependencies(jooqVersion, javaVersion)
 
