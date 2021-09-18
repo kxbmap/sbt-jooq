@@ -18,6 +18,9 @@ object Codegen {
       case _ => "org.jooq.util.GenerationTool"
     }
 
+  def codegenToolDependencies: Seq[ModuleID] =
+    Seq("com.github.kxbmap" % "sbt-jooq-codegen-tool" % BuildInfo.sbtJooqVersion)
+
   private def hasModuleDeps(jooqVersion: String): Boolean =
     CrossVersion.partialVersion(jooqVersion).forall {
       case (x, y) => x < 3 || x == 3 && y <= 11

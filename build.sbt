@@ -29,9 +29,13 @@ lazy val codegen = project
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-codegen",
-    scripted := scripted.dependsOn(core / publishLocal).evaluated,
+    scripted := scripted.dependsOn(Def.task {
+      (core / publishLocal).value
+      (codegenTool / publishLocal).value
+    }).evaluated,
     libraryDependencies += "com.lihaoyi" %% "fastparse" % fastParseVersion,
     buildInfoKeys := Seq[BuildInfoKey](
+      "sbtJooqVersion" -> version.value,
       "javaxActivationVersion" -> javaxActivationVersion,
       "jaxbApiVersion" -> jaxbApiVersion,
       "jaxbCoreVersion" -> jaxbCoreVersion,
@@ -48,6 +52,17 @@ lazy val codegen = project
       }
       disabled.foreach(p => log.warn(s"Scripted test disabled: $p"))
     }
+  )
+
+lazy val codegenTool = project
+  .in(file("codegen-tool"))
+  .settings(
+    name := "sbt-jooq-codegen-tool",
+    crossPaths := false,
+    autoScalaLibrary := false,
+    libraryDependencies ++= Seq(
+      "ch.qos.logback" % "logback-classic" % logbackVersion
+    )
   )
 
 lazy val checker = project

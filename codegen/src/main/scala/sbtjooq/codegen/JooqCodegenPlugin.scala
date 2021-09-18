@@ -34,6 +34,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
 
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
+    libraryDependencies ++= Codegen.codegenToolDependencies.map(_ % JooqCodegen),
     libraryDependencies ++= Codegen
       .jaxbDependencies((JooqCodegen / jooqVersion).value, Codegen.runtimeJavaVersion((JooqCodegen / javaHome).value))
       .map(_ % JooqCodegen),

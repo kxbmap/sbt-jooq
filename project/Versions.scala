@@ -15,6 +15,8 @@ object Versions {
     "3.10.8"
   )
 
+  val logbackVersion = "1.2.6"
+
   val fastParseVersion = "2.3.3"
 
   val h2Version = "1.4.200"
