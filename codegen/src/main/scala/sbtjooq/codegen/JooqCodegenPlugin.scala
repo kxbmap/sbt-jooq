@@ -34,9 +34,8 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
 
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
-    libraryDependencies ++= Codegen.codegenToolDependencies.map(_ % JooqCodegen),
     libraryDependencies ++= Codegen
-      .jaxbDependencies((JooqCodegen / jooqVersion).value, Codegen.runtimeJavaVersion((JooqCodegen / javaHome).value))
+      .dependencies((JooqCodegen / jooqVersion).value, Codegen.javaVersion((JooqCodegen / javaHome).value))
       .map(_ % JooqCodegen),
     libraryDependencies ++= Classpaths.autoLibraryDependency(
       (JooqCodegen / autoScalaLibrary).value && (JooqCodegen / scalaHome).value.isEmpty && (JooqCodegen / managedScalaInstance).value,
@@ -53,12 +52,12 @@ object JooqCodegenPlugin extends AutoPlugin {
       inTask(run)(Seq(
         fork := true,
         mainClass := Some(Codegen.mainClass(jooqVersion.value)),
-        javaOptions ++= Codegen.jaxbAddModulesOption(jooqVersion.value, Codegen.runtimeJavaVersion(javaHome.value))
+        javaOptions ++= Codegen.javaOptions(jooqVersion.value, Codegen.javaVersion(javaHome.value))
       )))
 
   def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++= Codegen
-      .javaxAnnotationDependencies((config / jooqVersion).value, Codegen.compileJavaVersion)
+      .compileDependencies((config / jooqVersion).value, Codegen.compileJavaVersion)
       .map(_ % config)
   ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
@@ -77,7 +76,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
     jooqCodegenGeneratedSources := jooqCodegenGeneratedSourcesFinder.value.get,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
-    javacOptions ++= Codegen.javaxAnnotationAddModulesOption(jooqVersion.value, Codegen.compileJavaVersion)
+    javacOptions ++= Codegen.javacOptions(jooqVersion.value, Codegen.compileJavaVersion)
   ))
 
   private def codegenVariablesTask(config: Configuration) = Def.taskDyn {
