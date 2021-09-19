@@ -25,26 +25,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v13
+      - uses: actions/setup-java@v2
+        id: runtimejava
         with:
-          java-version: "zulu@1.${{ matrix.compile-java }}"
-      - uses: coursier/cache-action@v6
-
-      - name: Install runtime Java
-        if: ${{ matrix.task == 'compat' }}
-        env:
-          RUNTIME_JAVA: "zulu@1.${{ matrix.runtime-java }}"
+          distribution: 'zulu'
+          java-version: ${{ matrix.runtime-java }}
+          check-latest: true
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: ${{ matrix.compile-java }}
+          check-latest: true
+      - name: Setup SBT
         run: |
-          COMPILE_JAVA="$(jabba current)"
-          RUNTIME_JAVA="$(jabba ls-remote | grep "${RUNTIME_JAVA}." | head -n 1)"
-
-          echo "Installing ${RUNTIME_JAVA}"
-          jabba install "${RUNTIME_JAVA}"
-          RUNTIME_JAVA_HOME="$(jabba which --home "${RUNTIME_JAVA}")"
-          export RUNTIME_JAVA_HOME
-
-          echo "Use ${COMPILE_JAVA} for compile"
-          jabba use "${COMPILE_JAVA}"
+          curl -sL https://raw.githubusercontent.com/sbt/sbt/develop/sbt > /usr/local/bin/sbt
+          chmod +x /usr/local/bin/sbt
+      - uses: coursier/cache-action@v6
 
       - run: cp ./.github/workflows/.jvmopts .
 
@@ -54,6 +50,8 @@ jobs:
           sbt -v "codegen/disableIncompatibleTestsWithEarlierThanJava11"
 
       - name: Build and test
+        env:
+          RUNTIME_JAVA_HOME: ${{ steps.runtimejava.outputs.path }}
         run: |
           case ${{ matrix.task }} in
             codegen)
