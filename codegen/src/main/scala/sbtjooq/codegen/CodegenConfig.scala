@@ -24,14 +24,10 @@ object CodegenConfig {
   def fromURIString(uri: String): CodegenConfig = fromURI(sbt.uri(uri))
 
 
-  trait Implicits {
+  implicit def fileToCodegenConfig(file: sbt.File): File = File(file)
 
-    implicit def fileToCodegenConfig(file: sbt.File): File = File(file)
+  implicit def xmlNodeToCodegenConfig(xml: Node): XML = XML(xml)
 
-    implicit def xmlNodeToCodegenConfig(xml: Node): XML = XML(xml)
-
-    implicit def uriToCodegenConfig(uri: sbt.URI): CodegenConfig = fromURI(uri)
-
-  }
+  implicit def uriToCodegenConfig(uri: sbt.URI): CodegenConfig = fromURI(uri)
 
 }

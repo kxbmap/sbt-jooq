@@ -15,7 +15,7 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   override def requires: Plugins = JooqPlugin
 
-  object autoImport extends JooqCodegenKeys with CodegenConfig.Implicits {
+  object autoImport extends JooqCodegenKeys {
 
     type CodegenStrategy = sbtjooq.codegen.CodegenStrategy
     val CodegenStrategy = sbtjooq.codegen.CodegenStrategy
