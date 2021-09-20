@@ -1,15 +1,15 @@
 package sbtjooq.codegen
 
 import java.nio.file.Files
-import sbt.Keys._
 import sbt._
+import sbt.Keys._
 import sbt.io.Using
 import sbtjooq.JooqKeys._
 import sbtjooq.JooqPlugin
 import sbtjooq.codegen.JooqCodegenKeys._
 import sbtjooq.codegen.internal.{ClasspathLoader, Codegen, SubstitutionParser}
-import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Node, Text, XML}
+import scala.xml.transform.{RewriteRule, RuleTransformer}
 
 object JooqCodegenPlugin extends AutoPlugin {
 
@@ -47,7 +47,8 @@ object JooqCodegenPlugin extends AutoPlugin {
     JooqPlugin.jooqScopedSettings(JooqCodegen) ++
     inConfig(JooqCodegen)(Defaults.configSettings ++
       Seq(
-        jooqModules := Seq("jooq-codegen")
+        jooqModules := Seq("jooq-codegen"),
+        bgRun := codegenBgRunTask.evaluated
       ) ++
       inTask(run)(Seq(
         fork := Codegen.needsFork(jooqVersion.value, Codegen.javaVersion(javaHome.value)),
@@ -123,6 +124,29 @@ object JooqCodegenPlugin extends AutoPlugin {
       case Some(CodegenConfig.XML(xml)) => Def.task(xml)
     }
     xml.map(transformer)
+  }
+
+  private def codegenBgRunTask = {
+    import Def.parserToInput
+    val parser = Def.spaceDelimited()
+    Def.inputTask {
+      val service = bgJobService.value
+      val products = exportedProductJars.value
+      val classpath = fullClasspathAsJars.value
+      val wrapped = Codegen.wrapperMainClass
+      val delegate = (run / mainClass).value.getOrElse(sys.error("No main class detected."))
+      val copyClasspath = (bgRun / bgCopyClasspath).value
+      val scalaRun = (run / runner).value
+      service.runInBackground(resolvedScoped.value, state.value) { (logger, workingDir) =>
+        val cp =
+          if (copyClasspath)
+            service.copyClasspath(products, classpath, workingDir)
+          else
+            classpath
+        val options = delegate +: parser.parsed
+        scalaRun.run(wrapped, cp.files, options, logger).get
+      }
+    }
   }
 
   private def codegenTask = Def.taskDyn {

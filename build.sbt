@@ -62,7 +62,8 @@ lazy val codegenTool = project
     autoScalaLibrary := false,
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % logbackVersion
-    )
+    ),
+    Compile / javacOptions ++= Seq("--release", "8")
   )
 
 lazy val checker = project
