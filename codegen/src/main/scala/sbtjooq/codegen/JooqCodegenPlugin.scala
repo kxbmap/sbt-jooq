@@ -157,14 +157,21 @@ object JooqCodegenPlugin extends AutoPlugin {
   private def generatedSourcesFinderTask = Def.task {
     val config = jooqCodegenTransformedConfig.value
     val target = config \ "generator" \ "target"
-    val targetDir = file((target \ "directory").text.trim).getAbsoluteFile
+    val targetDir = {
+      val dir = (target \ "directory").text.trim match {
+        case "" => "target/generated-sources/jooq"
+        case text => text
+      }
+      file(dir).getAbsoluteFile
+    }
     val packageDir = {
-      val p = target \ "packageName"
-      val r = """^\w+(\.\w+)*$""".r
-      p.text.trim match {
-        case t@r(_) => t.split('.').foldLeft(targetDir)(_ / _)
+      val regex = """^\w+(\.\w+)*$""".r
+      val pkg = (target \ "packageName").text.trim match {
+        case "" => "org.jooq.generated"
+        case txt@regex(_) => txt
         case invalid => throw new MessageOnlyException(s"invalid packageName format: $invalid")
       }
+      pkg.split('.').foldLeft(targetDir)(_ / _)
     }
     packageDir.descendantsExcept(
       (jooqCodegenGeneratedSources / includeFilter).value,

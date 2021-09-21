@@ -1,0 +1,2 @@
+> core/jooqCodegen
+$ exists target/generated-sources/jooq/org/jooq/generated/Tables.java
