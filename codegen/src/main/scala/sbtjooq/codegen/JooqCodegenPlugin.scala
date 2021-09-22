@@ -2,6 +2,7 @@ package sbtjooq.codegen
 
 import java.nio.file.Files
 import sbt._
+import sbt.Def.Initialize
 import sbt.Keys._
 import sbt.io.Using
 import sbtjooq.JooqKeys._
@@ -79,7 +80,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     javacOptions ++= Codegen.javacOptions(jooqVersion.value, Codegen.compileJavaVersion)
   ))
 
-  private def codegenVariablesTask(config: Configuration) = Def.taskDyn {
+  private def codegenVariablesTask(config: Configuration): Initialize[Task[Map[String, String]]] = Def.taskDyn {
     val keys = jooqCodegenKeys.value
     val s = state.value
     val p = thisProjectRef.value
@@ -88,22 +89,22 @@ object JooqCodegenPlugin extends AutoPlugin {
     }
   }
 
-  private def configTransformerTask =
-    jooqCodegenConfigVariables.map { vars =>
-      val parser = new SubstitutionParser(vars)
-      new RuleTransformer(new RewriteRule {
-        override def transform(n: Node): Seq[Node] = n match {
-          case Text(data) =>
-            parser.parse(data).fold(
-              e => throw new MessageOnlyException(s"Substitution failure: $e"),
-              s => Text(s)
-            )
-          case otherwise => otherwise
-        }
-      })
-    }
+  private def configTransformerTask: Initialize[Task[RuleTransformer]] = Def.task {
+    val vars = jooqCodegenConfigVariables.value
+    val parser = new SubstitutionParser(vars)
+    new RuleTransformer(new RewriteRule {
+      override def transform(n: Node): Seq[Node] = n match {
+        case Text(data) =>
+          parser.parse(data).fold(
+            e => throw new MessageOnlyException(s"Substitution failure: $e"),
+            s => Text(s)
+          )
+        case otherwise => otherwise
+      }
+    })
+  }
 
-  private def configTransformTask = Def.taskDyn {
+  private def configTransformTask: Initialize[Task[Node]] = Def.taskDyn {
     val transformer = jooqCodegenConfigTransformer.value
     val xml = jooqCodegenConfig.?.value match {
       case None => throw new MessageOnlyException("required: jooqCodegenConfig")
@@ -122,10 +123,10 @@ object JooqCodegenPlugin extends AutoPlugin {
         }
       case Some(CodegenConfig.XML(xml)) => Def.task(xml)
     }
-    xml.map(transformer)
+    Def.task(transformer(xml.value))
   }
 
-  private def codegenTask = Def.taskDyn {
+  private def codegenTask: Initialize[Task[Seq[File]]] = Def.taskDyn {
     if ((jooqCodegen / skip).value) Def.task(Seq.empty[File])
     else Def.taskDyn {
       val config = jooqCodegenTransformedConfig.value
@@ -140,7 +141,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     }
   }
 
-  private def autoCodegenTask = Def.taskDyn {
+  private def autoCodegenTask: Initialize[Task[Seq[File]]] = Def.taskDyn {
     if ((jooqCodegen / skip).value) Def.task(Seq.empty[File])
     else Def.taskDyn {
       jooqCodegenStrategy.value match {
@@ -154,7 +155,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     }
   }
 
-  private def generatedSourcesFinderTask = Def.task {
+  private def generatedSourcesFinderTask: Initialize[Task[PathFinder]] = Def.task {
     val config = jooqCodegenTransformedConfig.value
     val target = config \ "generator" \ "target"
     val targetDir =
