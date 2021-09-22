@@ -1,1 +1,2 @@
-> runMain com.example.Main
+> compile
+> run

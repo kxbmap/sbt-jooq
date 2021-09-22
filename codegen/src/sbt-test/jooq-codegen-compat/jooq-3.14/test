@@ -3,5 +3,5 @@
 > checkJavacOptions
 > checkCompileDependencies
 
-> jooqCodegen
-> runMain com.example.Main
+> show jooqCodegen
+> run
