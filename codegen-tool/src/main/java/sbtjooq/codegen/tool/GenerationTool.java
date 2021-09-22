@@ -38,12 +38,21 @@ public class GenerationTool {
         return MethodHandles.publicLookup().findStatic(mainClass, "main", mainType);
     }
 
+    public static void showJooqLogo() {
+        try {
+            Class.forName("org.jooq.impl.DefaultRenderContext");
+        } catch (ClassNotFoundException ignored) {
+        }
+    }
+
     public static void main(String[] args) throws Throwable {
         final int xc = 1;
         if (xc > args.length) throw new IndexOutOfBoundsException("Index out of range: " + (xc - 1));
 
         final MethodHandle delegate = getMainMethod(args[0]);
         final List<Path> configurations = Arrays.stream(args, xc, args.length).map(Paths::get).collect(toList());
+
+        showJooqLogo();
 
         new GenerationTool(delegate, configurations).generate();
     }
