@@ -3,6 +3,7 @@ package sbtjooq.codegen.internal
 import sbt._
 import sbtjooq.codegen.BuildInfo
 import sbtjooq.codegen.internal.JavaUtil._
+import scala.xml.Node
 
 object Codegen {
 
@@ -66,5 +67,27 @@ object Codegen {
       Seq("--add-modules", "java.xml.ws.annotation")
     else
       Nil
+
+
+  def generatorTargetDirectory(config: Node): String =
+    (config \ "generator" \ "target" \ "directory").text.trim match {
+      case "" => "target/generated-sources/jooq"
+      case text => text
+    }
+
+  def generatorTargetPackage(config: Node): Seq[String] =
+    (config \ "generator" \ "target" \ "packageName").text.trim match {
+      case "" => Seq("org", "jooq", "generated")
+      case text =>
+        text.split('.').map {
+          case s if s.headOption.exists(!_.isUnicodeIdentifierStart) => s"_$s"
+          case s => s
+        }.map(_.flatMap {
+          case '-' | ' ' => "_"
+          case c if c.isUnicodeIdentifierPart => c.toString
+          case c if c <= 0xff => f"_${c.toInt}%02x"
+          case c => f"_${c.toInt}%04x"
+        }).toSeq
+    }
 
 }

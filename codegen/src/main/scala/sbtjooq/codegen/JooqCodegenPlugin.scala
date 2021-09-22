@@ -134,7 +134,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       Def.sequential(
         Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
         (JooqCodegen / run).toTask(s" $file"),
-        Def.task(jooqCodegenGeneratedSourcesFinder.value.get)
+        jooqCodegenGeneratedSources
       ).andFinally {
         Files.delete(file)
       }
@@ -147,7 +147,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       jooqCodegenStrategy.value match {
         case CodegenStrategy.Always => jooqCodegen
         case CodegenStrategy.IfAbsent => Def.taskDyn {
-          val files = jooqCodegenGeneratedSourcesFinder.value.get
+          val files = jooqCodegenGeneratedSources.value
           if (files.isEmpty) jooqCodegen else Def.task(files)
         }
         case CodegenStrategy.Never => Def.task(Seq.empty[File])
@@ -157,28 +157,12 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   private def generatedSourcesFinderTask: Initialize[Task[PathFinder]] = Def.task {
     val config = jooqCodegenTransformedConfig.value
-    val target = config \ "generator" \ "target"
-    val targetDir =
-      file((target \ "directory").text.trim match {
-        case "" => "target/generated-sources/jooq"
-        case text => text
-      }).getAbsoluteFile
-    val packageDir =
-      ((target \ "packageName").text.trim match {
-        case "" => "org.jooq.generated"
-        case text => text
-      }).split('.').map {
-        case s if s.headOption.exists(!_.isUnicodeIdentifierStart) => s"_$s"
-        case s => s
-      }.map(_.flatMap {
-        case '-' => "_"
-        case c if c.isUnicodeIdentifierPart => c.toString
-        case c if c <= 0xff => f"_${c.toInt}%02x"
-        case c => f"_${c.toInt}%04x"
-      }).foldLeft(targetDir)(_ / _)
-    packageDir.descendantsExcept(
-      (jooqCodegenGeneratedSources / includeFilter).value,
-      (jooqCodegenGeneratedSources / excludeFilter).value)
+    val target = file(Codegen.generatorTargetDirectory(config)).getAbsoluteFile
+    Codegen.generatorTargetPackage(config)
+      .foldLeft(target)(_ / _)
+      .descendantsExcept(
+        (jooqCodegenGeneratedSources / includeFilter).value,
+        (jooqCodegenGeneratedSources / excludeFilter).value)
   }
 
 }
