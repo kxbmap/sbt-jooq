@@ -12,14 +12,8 @@ object Codegen {
   def compileJavaVersion: String =
     sys.props("java.version")
 
-  def wrapperMainClass: String =
+  def mainClass: String =
     "sbtjooq.codegen.tool.GenerationTool"
-
-  def mainClass(jooqVersion: String): String =
-    CrossVersion.partialVersion(jooqVersion) match {
-      case Some((x, y)) if x > 3 || x == 3 && y >= 11 => "org.jooq.codegen.GenerationTool"
-      case _ => "org.jooq.util.GenerationTool"
-    }
 
   def dependencies(jooqVersion: String, javaVersion: String): Seq[ModuleID] =
     codegenToolDependencies ++ jaxbDependencies(jooqVersion, javaVersion)

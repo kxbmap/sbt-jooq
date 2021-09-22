@@ -1,5 +1,8 @@
 package sbtjooq.codegen.tool;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -12,6 +15,8 @@ import static java.util.stream.Collectors.toList;
 
 
 public class GenerationTool {
+
+    private static final Logger logger = LoggerFactory.getLogger(GenerationTool.class);
 
     private final MethodHandle delegate;
     private final List<Path> configurations;
@@ -32,8 +37,20 @@ public class GenerationTool {
     }
 
 
-    public static MethodHandle getMainMethod(String className) throws ReflectiveOperationException {
-        final Class<?> mainClass = Class.forName(className);
+    public static Class<?> detectGenerationToolClass() throws ClassNotFoundException {
+        try {
+            return Class.forName("org.jooq.codegen.GenerationTool");
+        } catch (ClassNotFoundException e1) {
+            try {
+                return Class.forName("org.jooq.util.GenerationTool");
+            } catch (ClassNotFoundException e2) {
+                e2.addSuppressed(e1);
+                throw e2;
+            }
+        }
+    }
+
+    public static MethodHandle getMainMethod(Class<?> mainClass) throws ReflectiveOperationException {
         final MethodType mainType = MethodType.methodType(void.class, String[].class);
         return MethodHandles.publicLookup().findStatic(mainClass, "main", mainType);
     }
@@ -46,11 +63,11 @@ public class GenerationTool {
     }
 
     public static void main(String[] args) throws Throwable {
-        final int xc = 1;
-        if (xc > args.length) throw new IndexOutOfBoundsException("Index out of range: " + (xc - 1));
+        final Class<?> genToolClass = detectGenerationToolClass();
+        logger.debug("Delegate to detected {}", genToolClass.getName());
 
-        final MethodHandle delegate = getMainMethod(args[0]);
-        final List<Path> configurations = Arrays.stream(args, xc, args.length).map(Paths::get).collect(toList());
+        final MethodHandle delegate = getMainMethod(genToolClass);
+        final List<Path> configurations = Arrays.stream(args).map(Paths::get).collect(toList());
 
         showJooqLogo();
 
