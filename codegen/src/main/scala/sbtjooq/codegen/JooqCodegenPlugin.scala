@@ -140,7 +140,7 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def autoCodegenTask: Initialize[Task[Seq[File]]] = Def.task {
-    if ((jooqCodegen / skip).value) Seq.empty[File]
+    if ((jooqCodegen / skip).value) jooqCodegenGeneratedSources.value
     else Def.taskDyn {
       jooqCodegenAutoStrategy.value match {
         case AutoStrategy.Always => jooqCodegen
