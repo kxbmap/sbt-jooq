@@ -105,7 +105,6 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def configTransformTask: Initialize[Task[Node]] = Def.taskDyn {
-    val transformer = jooqCodegenConfigTransformer.value
     val xml = jooqCodegenConfig.?.value match {
       case None => throw new MessageOnlyException("required: jooqCodegenConfig")
       case Some(CodegenConfig.File(file)) =>
@@ -123,36 +122,37 @@ object JooqCodegenPlugin extends AutoPlugin {
         }
       case Some(CodegenConfig.XML(xml)) => Def.task(xml)
     }
-    Def.task(transformer(xml.value))
+    Def.task(jooqCodegenConfigTransformer.value(xml.value))
   }
 
-  private def codegenTask: Initialize[Task[Seq[File]]] = Def.taskDyn {
-    if ((jooqCodegen / skip).value) Def.task(Seq.empty[File])
+  private def codegenTask: Initialize[Task[Seq[File]]] = Def.task {
+    if ((jooqCodegen / skip).value) Seq.empty[File]
     else Def.taskDyn {
-      val config = jooqCodegenTransformedConfig.value
       val file = Files.createTempFile("jooq-codegen-", ".xml")
       Def.sequential(
-        Def.task(XML.save(file.toString, config, "UTF-8", xmlDecl = true)),
+        Def.task(XML.save(file.toString, jooqCodegenTransformedConfig.value, "UTF-8", xmlDecl = true)),
         (JooqCodegen / run).toTask(s" $file"),
         jooqCodegenGeneratedSources
       ).andFinally {
         Files.delete(file)
       }
-    }
+    }.value
   }
 
-  private def autoCodegenTask: Initialize[Task[Seq[File]]] = Def.taskDyn {
-    if ((jooqCodegen / skip).value) Def.task(Seq.empty[File])
+  private def autoCodegenTask: Initialize[Task[Seq[File]]] = Def.task {
+    if ((jooqCodegen / skip).value) Seq.empty[File]
     else Def.taskDyn {
       jooqCodegenAutoStrategy.value match {
         case AutoStrategy.Always => jooqCodegen
-        case AutoStrategy.IfAbsent => Def.taskDyn {
-          val files = jooqCodegenGeneratedSourcesFinder.value.get
-          if (files.isEmpty) jooqCodegen else Def.task(files)
+        case AutoStrategy.IfAbsent => Def.task {
+          if (jooqCodegenGeneratedSourcesFinder.value.get.isEmpty)
+            jooqCodegen.value
+          else
+            jooqCodegenGeneratedSources.value
         }
         case AutoStrategy.Never => jooqCodegenGeneratedSources
       }
-    }
+    }.value
   }
 
   private def generatedSourcesFinderTask: Initialize[Task[PathFinder]] = Def.task {
