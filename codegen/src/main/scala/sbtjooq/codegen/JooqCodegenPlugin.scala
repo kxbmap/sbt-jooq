@@ -1,6 +1,5 @@
 package sbtjooq.codegen
 
-import java.nio.file.Files
 import sbt._
 import sbt.Def.Initialize
 import sbt.Keys._
@@ -18,7 +17,7 @@ object JooqCodegenPlugin extends AutoPlugin {
   object autoImport extends JooqCodegenKeys {
 
     type AutoStrategy = sbtjooq.codegen.AutoStrategy
-    val AutoStrategy = sbtjooq.codegen.AutoStrategy
+    final val AutoStrategy = sbtjooq.codegen.AutoStrategy
 
     def addJooqCodegenSettingsTo(config: Configuration): Seq[Setting[_]] =
       jooqCodegenScopedSettings(config)
@@ -57,6 +56,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       .compileDependencies((config / jooqVersion).value, Codegen.compileJavaVersion)
       .map(_ % config)
   ) ++ inConfig(config)(Seq(
+    javacOptions ++= Codegen.javacOptions(jooqVersion.value, Codegen.compileJavaVersion),
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := jooqCodegenConfig.?.value.isEmpty,
     jooqCodegenVariables := Map(
@@ -65,12 +65,13 @@ object JooqCodegenPlugin extends AutoPlugin {
     ),
     jooqCodegenConfigTransformer := Codegen.configTransformer(jooqCodegenVariables.value),
     jooqCodegenTransformedConfig := configTransformTask.value,
+    jooqCodegenTransformedConfigFile := transformedConfigFileTask(config).value,
     jooqCodegenAutoStrategy := AutoStrategy.IfAbsent,
     sourceGenerators += autoCodegenTask.taskValue,
-    jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
-    jooqCodegenGeneratedSources := jooqCodegenGeneratedSourcesFinder.value.get,
+    jooqCodegenGeneratorTarget := generatorTargetTask.value,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
-    javacOptions ++= Codegen.javacOptions(jooqVersion.value, Codegen.compileJavaVersion)
+    jooqCodegenGeneratedSources := jooqCodegenGeneratedSourcesFinder.value.get,
+    jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
   ))
 
 
@@ -95,17 +96,23 @@ object JooqCodegenPlugin extends AutoPlugin {
     Def.task(jooqCodegenConfigTransformer.value(xml.value))
   }
 
+  private def transformedConfigFileTask(config: Configuration): Initialize[Task[File]] = Def.task {
+    val xml = jooqCodegenTransformedConfig.value
+    val dir = target.value / "jooq-codegen" / config.name
+    if (!dir.exists()) dir.mkdirs()
+    val configFile = dir / "jooq-codegen.xml"
+    XML.save(configFile.toString, xml, "UTF-8", xmlDecl = true)
+    configFile
+  }
+
   private def codegenTask: Initialize[Task[Seq[File]]] = Def.task {
     if ((jooqCodegen / skip).value) Seq.empty[File]
     else Def.taskDyn {
-      val file = Files.createTempFile("jooq-codegen-", ".xml")
+      val file = jooqCodegenTransformedConfigFile.value
       Def.sequential(
-        Def.task(XML.save(file.toString, jooqCodegenTransformedConfig.value, "UTF-8", xmlDecl = true)),
         (JooqCodegen / run).toTask(s" $file"),
         jooqCodegenGeneratedSources
-      ).andFinally {
-        Files.delete(file)
-      }
+      )
     }.value
   }
 
@@ -130,14 +137,24 @@ object JooqCodegenPlugin extends AutoPlugin {
       }.value
   }
 
+  private def generatorTargetTask: Initialize[Task[File]] = Def.task {
+    def parse(conf: File): File = {
+      val config = IO.reader(conf)(XML.load)
+      val target = file(Codegen.generatorTargetDirectory(config)).getAbsoluteFile
+      Codegen.generatorTargetPackage(config).foldLeft(target)(_ / _)
+    }
+    val prev = jooqCodegenGeneratorTarget.previous
+    val store = streams.value.cacheStoreFactory.make("input")
+    val cached = Tracked.inputChanged[HashFileInfo, File](store) {
+      (changed, in) => prev.fold(parse(in.file))(if (changed) parse(in.file) else _)
+    }
+    cached(FileInfo.hash(jooqCodegenTransformedConfigFile.value))
+  }
+
   private def generatedSourcesFinderTask: Initialize[Task[PathFinder]] = Def.task {
-    val config = jooqCodegenTransformedConfig.value
-    val target = file(Codegen.generatorTargetDirectory(config)).getAbsoluteFile
-    Codegen.generatorTargetPackage(config)
-      .foldLeft(target)(_ / _)
-      .descendantsExcept(
-        (jooqCodegenGeneratedSources / includeFilter).value,
-        (jooqCodegenGeneratedSources / excludeFilter).value)
+    jooqCodegenGeneratorTarget.value.descendantsExcept(
+      (jooqCodegenGeneratedSources / includeFilter).value,
+      (jooqCodegenGeneratedSources / excludeFilter).value)
   }
 
 }
