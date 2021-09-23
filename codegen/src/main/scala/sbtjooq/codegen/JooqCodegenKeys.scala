@@ -15,7 +15,7 @@ trait JooqCodegenKeys {
   val jooqCodegenConfigTransformer = taskKey[Node => Node]("jOOQ codegen configuration transform function")
   val jooqCodegenTransformedConfig = taskKey[Node]("transformed jOOQ codegen configuration")
 
-  val jooqCodegenStrategy = settingKey[CodegenStrategy]("jOOQ codegen strategy")
+  val jooqCodegenAutoStrategy = settingKey[AutoStrategy]("jOOQ codegen strategy")
 
   val jooqCodegenGeneratedSources = taskKey[Seq[File]]("jOOQ codegen generated sources")
   val jooqCodegenGeneratedSourcesFinder = taskKey[PathFinder]("PathFinder for jOOQ codegen generated sources")

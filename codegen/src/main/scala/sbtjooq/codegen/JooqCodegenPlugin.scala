@@ -18,8 +18,8 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   object autoImport extends JooqCodegenKeys {
 
-    type CodegenStrategy = sbtjooq.codegen.CodegenStrategy
-    val CodegenStrategy = sbtjooq.codegen.CodegenStrategy
+    type AutoStrategy = sbtjooq.codegen.AutoStrategy
+    val AutoStrategy = sbtjooq.codegen.AutoStrategy
 
     type CodegenKey = sbtjooq.codegen.CodegenKey
     val CodegenKey = sbtjooq.codegen.CodegenKey
@@ -72,7 +72,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenConfigVariables ++= sys.env,
     jooqCodegenConfigTransformer := configTransformerTask.value,
     jooqCodegenTransformedConfig := configTransformTask.value,
-    jooqCodegenStrategy := CodegenStrategy.IfAbsent,
+    jooqCodegenAutoStrategy := AutoStrategy.IfAbsent,
     sourceGenerators += autoCodegenTask.taskValue,
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
     jooqCodegenGeneratedSources := jooqCodegenGeneratedSourcesFinder.value.get,
@@ -144,13 +144,13 @@ object JooqCodegenPlugin extends AutoPlugin {
   private def autoCodegenTask: Initialize[Task[Seq[File]]] = Def.taskDyn {
     if ((jooqCodegen / skip).value) Def.task(Seq.empty[File])
     else Def.taskDyn {
-      jooqCodegenStrategy.value match {
-        case CodegenStrategy.Always => jooqCodegen
-        case CodegenStrategy.IfAbsent => Def.taskDyn {
+      jooqCodegenAutoStrategy.value match {
+        case AutoStrategy.Always => jooqCodegen
+        case AutoStrategy.IfAbsent => Def.taskDyn {
           val files = jooqCodegenGeneratedSourcesFinder.value.get
           if (files.isEmpty) jooqCodegen else Def.task(files)
         }
-        case CodegenStrategy.Never => jooqCodegenGeneratedSources
+        case AutoStrategy.Never => jooqCodegenGeneratedSources
       }
     }
   }

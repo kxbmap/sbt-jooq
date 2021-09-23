@@ -87,7 +87,7 @@ jooqCodegenConfig :=
   </configuration>
 ```
 
-#### jooqCodegenStrategy
+#### jooqCodegenAutoStrategy
 jOOQ-codegen auto execution strategy.
 
 |Value      |Description                                              |
@@ -96,10 +96,10 @@ jOOQ-codegen auto execution strategy.
 |`Always`   |Always execute                                           |
 |`Never`    |Never execute                                            |
 
-Default: `CodegenStrategy.IfAbsent`
+Default: `AutoStrategy.IfAbsent`
 
 ```scala mdoc:compile-only
-jooqCodegenStrategy := CodegenStrategy.IfAbsent
+Compile / jooqCodegenAutoStrategy := AutoStrategy.IfAbsent
 ```
 
 #### jooqCodegenKeys
@@ -110,7 +110,7 @@ For details, please refer the below section.
 Default: `sys.env ++ Seq(baseDirectory, sourceManaged in Compile)`
 
 ```scala mdoc:compile-only
-jooqCodegenKeys ++= Seq[CodegenKey](
+Compile / jooqCodegenKeys ++= Seq[CodegenKey](
   scalaVersion,     // Setting key
   publish / skip,   // Task key
   "Answer" -> 42    // constant  
@@ -119,7 +119,7 @@ jooqCodegenKeys ++= Seq[CodegenKey](
 
 You can confirm substitution values using `jooqCodegenSubstitutions`.
 ```
-> show jooqCodegenSubstitutions
+> show Compile / jooqCodegenSubstitutions
 * ...Env vars...
 * (baseDirectory, /path/to/base-directory)
 * (compile:sourceManaged, /path/to/source-managed)
