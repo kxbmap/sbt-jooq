@@ -1,0 +1,20 @@
+> set Compile / jooqCodegenStrategy := CodegenStrategy.IfAbsent
+> compile
+> compile
+> checkCalledOnce
+> clean
+
+> set Compile / jooqCodegenStrategy := CodegenStrategy.Always
+> compile
+> compile
+> checkCalledTwice
+> clean
+
+> set Compile / jooqCodegenStrategy := CodegenStrategy.Never
+-> compile
+> checkCalledNever
+> jooqCodegen
+> checkCalledOnce
+> compile
+> compile
+> checkCalledNever

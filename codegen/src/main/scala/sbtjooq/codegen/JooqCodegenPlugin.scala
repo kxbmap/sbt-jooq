@@ -147,10 +147,10 @@ object JooqCodegenPlugin extends AutoPlugin {
       jooqCodegenStrategy.value match {
         case CodegenStrategy.Always => jooqCodegen
         case CodegenStrategy.IfAbsent => Def.taskDyn {
-          val files = jooqCodegenGeneratedSources.value
+          val files = jooqCodegenGeneratedSourcesFinder.value.get
           if (files.isEmpty) jooqCodegen else Def.task(files)
         }
-        case CodegenStrategy.Never => Def.task(Seq.empty[File])
+        case CodegenStrategy.Never => jooqCodegenGeneratedSources
       }
     }
   }
