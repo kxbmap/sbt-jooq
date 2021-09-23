@@ -140,19 +140,24 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def autoCodegenTask: Initialize[Task[Seq[File]]] = Def.task {
-    if ((jooqCodegen / skip).value) jooqCodegenGeneratedSources.value
-    else Def.taskDyn {
-      jooqCodegenAutoStrategy.value match {
-        case AutoStrategy.Always => jooqCodegen
-        case AutoStrategy.IfAbsent => Def.task {
-          if (jooqCodegenGeneratedSourcesFinder.value.get.isEmpty)
-            jooqCodegen.value
-          else
-            jooqCodegenGeneratedSources.value
+    if ((jooqCodegen / skip).value)
+      Def.task {
+        if (jooqCodegenConfig.?.value.isEmpty) Seq.empty[File]
+        else jooqCodegenGeneratedSources.value
+      }.value
+    else
+      Def.taskDyn {
+        jooqCodegenAutoStrategy.value match {
+          case AutoStrategy.Always => jooqCodegen
+          case AutoStrategy.IfAbsent => Def.task {
+            if (jooqCodegenGeneratedSourcesFinder.value.get.isEmpty)
+              jooqCodegen.value
+            else
+              jooqCodegenGeneratedSources.value
+          }
+          case AutoStrategy.Never => jooqCodegenGeneratedSources
         }
-        case AutoStrategy.Never => jooqCodegenGeneratedSources
-      }
-    }.value
+      }.value
   }
 
   private def generatedSourcesFinderTask: Initialize[Task[PathFinder]] = Def.task {
