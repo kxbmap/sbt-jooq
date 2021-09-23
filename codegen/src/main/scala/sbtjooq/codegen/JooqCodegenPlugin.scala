@@ -8,9 +8,8 @@ import sbt.io.Using
 import sbtjooq.JooqKeys._
 import sbtjooq.JooqPlugin
 import sbtjooq.codegen.JooqCodegenKeys._
-import sbtjooq.codegen.internal.{ClasspathLoader, Codegen, SubstitutionParser}
-import scala.xml.{Node, Text, XML}
-import scala.xml.transform.{RewriteRule, RuleTransformer}
+import sbtjooq.codegen.internal.{ClasspathLoader, Codegen}
+import scala.xml.{Node, XML}
 
 object JooqCodegenPlugin extends AutoPlugin {
 
@@ -20,9 +19,6 @@ object JooqCodegenPlugin extends AutoPlugin {
 
     type AutoStrategy = sbtjooq.codegen.AutoStrategy
     val AutoStrategy = sbtjooq.codegen.AutoStrategy
-
-    type CodegenKey = sbtjooq.codegen.CodegenKey
-    val CodegenKey = sbtjooq.codegen.CodegenKey
 
     def addJooqCodegenSettingsTo(config: Configuration): Seq[Setting[_]] =
       jooqCodegenScopedSettings(config)
@@ -63,14 +59,11 @@ object JooqCodegenPlugin extends AutoPlugin {
   ) ++ inConfig(config)(Seq(
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := jooqCodegenConfig.?.value.isEmpty,
-    jooqCodegenKeys := Seq(
-      baseDirectory,
-      config / sourceManaged,
-      JooqCodegen / resourceDirectory
+    jooqCodegenVariables := Map(
+      "TARGET_DIRECTORY" -> sourceManaged.value.toString,
+      "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value.toString,
     ),
-    jooqCodegenConfigVariables := codegenVariablesTask(config).value,
-    jooqCodegenConfigVariables ++= sys.env,
-    jooqCodegenConfigTransformer := configTransformerTask.value,
+    jooqCodegenConfigTransformer := Codegen.configTransformer(jooqCodegenVariables.value),
     jooqCodegenTransformedConfig := configTransformTask.value,
     jooqCodegenAutoStrategy := AutoStrategy.IfAbsent,
     sourceGenerators += autoCodegenTask.taskValue,
@@ -80,29 +73,6 @@ object JooqCodegenPlugin extends AutoPlugin {
     javacOptions ++= Codegen.javacOptions(jooqVersion.value, Codegen.compileJavaVersion)
   ))
 
-  private def codegenVariablesTask(config: Configuration): Initialize[Task[Map[String, String]]] = Def.taskDyn {
-    val keys = jooqCodegenKeys.value
-    val s = state.value
-    val p = thisProjectRef.value
-    Def.task {
-      CodegenKey.build(keys, config, s, p).value
-    }
-  }
-
-  private def configTransformerTask: Initialize[Task[RuleTransformer]] = Def.task {
-    val vars = jooqCodegenConfigVariables.value
-    val parser = new SubstitutionParser(vars)
-    new RuleTransformer(new RewriteRule {
-      override def transform(n: Node): Seq[Node] = n match {
-        case Text(data) =>
-          parser.parse(data).fold(
-            e => throw new MessageOnlyException(s"Substitution failure: $e"),
-            s => Text(s)
-          )
-        case otherwise => otherwise
-      }
-    })
-  }
 
   private def configTransformTask: Initialize[Task[Node]] = Def.taskDyn {
     val xml = jooqCodegenConfig.?.value match {

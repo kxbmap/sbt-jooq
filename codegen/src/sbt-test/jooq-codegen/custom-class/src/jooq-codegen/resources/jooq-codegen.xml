@@ -9,7 +9,7 @@
             <properties>
                 <property>
                     <key>scripts</key>
-                    <value>${jooq-codegen:resourceDirectory}/database.sql</value>
+                    <value>${RESOURCE_DIRECTORY}/database.sql</value>
                 </property>
             </properties>
         </database>
@@ -18,7 +18,7 @@
         </generate>
         <target>
             <packageName>com.example.db</packageName>
-            <directory>${sourceManaged}</directory>
+            <directory>${TARGET_DIRECTORY}</directory>
         </target>
     </generator>
 </configuration>

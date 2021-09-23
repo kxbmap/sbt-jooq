@@ -71,12 +71,12 @@ jOOQ-codegen configuration. This is empty by default and must be set. You can se
 
 ```scala mdoc:compile-only
 // Set file path
-jooqCodegenConfig := file("jooq-codegen.xml")
+jooqCodegenConfig := file("path/to/jooq-codegen.xml")
 ```
 
 ```scala mdoc:compile-only
 // Set URI of classpath resource
-jooqCodegenConfig := uri("classpath:jooq-codegen.xml")
+jooqCodegenConfig := uri("classpath:path/to/jooq-codegen.xml")
 ```
 
 ```scala mdoc:compile-only
@@ -99,66 +99,55 @@ jOOQ-codegen auto execution strategy.
 Default: `AutoStrategy.IfAbsent`
 
 ```scala mdoc:compile-only
-Compile / jooqCodegenAutoStrategy := AutoStrategy.IfAbsent
+jooqCodegenAutoStrategy := AutoStrategy.IfAbsent
 ```
 
-#### jooqCodegenKeys
-Keys for jOOQ-codegen configuration text substitution.
+#### jooqCodegenVariables
+Variables for jOOQ-codegen configuration text replacement.
 
-For details, please refer the below section.
+Default:
 
-Default: `sys.env ++ Seq(baseDirectory, sourceManaged in Compile)`
+|Key                |Value (example)                    |
+|-------------------|-----------------------------------|
+|TARGET_DIRECTORY   |target/scala-2.13/src_managed/main |
+|RESOURCE_DIRECTORY |src/main/jooq-codegen/resources    |
 
 ```scala mdoc:compile-only
-Compile / jooqCodegenKeys ++= Seq[CodegenKey](
-  scalaVersion,     // Setting key
-  publish / skip,   // Task key
-  "Answer" -> 42    // constant  
+jooqCodegenVariables ++= Map(
+  "JDBC_DRIVER" -> "org.h2.Driver",
+  "JDBC_URL" -> "jdbc:h2:path/to/database",
 )
 ```
 
-You can confirm substitution values using `jooqCodegenSubstitutions`.
-```
-> show Compile / jooqCodegenSubstitutions
-* ...Env vars...
-* (baseDirectory, /path/to/base-directory)
-* (compile:sourceManaged, /path/to/source-managed)
-* (sourceManaged, /path/to/source-managed)
-* (scalaVersion, 2.12.6)
-* (publish::skip, false)
-* (Answer, 42)
-```
-
-### jOOQ-codegen configuration text substitution
-You can substitute text using placeholder(`${KEY}`) in configuration file.
+The plugin replaces placeholders like `${KEY}` in configuration to variables.
 
 e.g. Configuration file contains some placeholders:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-@JOOQ_MINOR_VERSION@.0.xsd">
     <jdbc>
-        <!-- ...snip... -->
-        <user>${DB_USER}</user>
-        <password>${DB_PASSWORD}</password>
+        <driver>${JDBC_DRIVER}</driver>
+        <url>${JDBC_URL}</url>
     </jdbc>
     <generator>
         <!-- ...snip... -->
         <target>
             <packageName>com.example</packageName>
-            <directory>${sourceManaged}</directory>
+            <directory>${TARGET_DIRECTORY}</directory>
         </target>
     </generator>
 </configuration>
 ```
 
-Plugin replace placeholders to substitution values:
+Then replace to:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-@JOOQ_MINOR_VERSION@.0.xsd">
     <jdbc>
-        <!-- ...snip... -->
-        <user>your-user</user>
-        <password>your-password</password>
+        <driver>org.h2.Driver</driver>
+        <url>jdbc:h2:path/to/database</url>
     </jdbc>
     <generator>
         <!-- ...snip... -->

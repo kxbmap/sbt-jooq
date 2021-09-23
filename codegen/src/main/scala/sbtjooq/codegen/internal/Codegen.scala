@@ -3,7 +3,8 @@ package sbtjooq.codegen.internal
 import sbt._
 import sbtjooq.codegen.BuildInfo
 import sbtjooq.codegen.internal.JavaUtil._
-import scala.xml.Node
+import scala.xml.{Node, Text}
+import scala.xml.transform.{RewriteRule, RuleTransformer}
 
 object Codegen {
 
@@ -68,6 +69,19 @@ object Codegen {
     else
       Nil
 
+
+  def configTransformer(vars: Map[String, String]): RuleTransformer =
+    new RuleTransformer(new RewriteRule {
+      val parser = new SubstitutionParser(vars)
+      override def transform(n: Node): Seq[Node] = n match {
+        case Text(data) =>
+          parser.parse(data).fold(
+            e => throw new MessageOnlyException(s"Substitution failure: $e"),
+            s => Text(s)
+          )
+        case otherwise => otherwise
+      }
+    })
 
   def generatorTargetDirectory(config: Node): String =
     (config \ "generator" \ "target" \ "directory").text.trim match {
