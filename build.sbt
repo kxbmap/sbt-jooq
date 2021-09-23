@@ -9,9 +9,6 @@ inThisBuild(Seq(
     "-feature",
     "-Xlint"
   ),
-
-  // https://github.com/sbt/sbt/issues/5049
-  pluginCrossBuild / sbtVersion := "1.2.8"
 ))
 
 import Versions._
