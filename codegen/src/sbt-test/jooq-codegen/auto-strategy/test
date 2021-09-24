@@ -1,16 +1,16 @@
-> set Compile / jooqCodegenAutoStrategy := AutoStrategy.IfAbsent
+> set jooqCodegenAutoStrategy := AutoStrategy.IfAbsent
 > compile
 > compile
 > checkCalledOnce
 > clean
 
-> set Compile / jooqCodegenAutoStrategy := AutoStrategy.Always
+> set jooqCodegenAutoStrategy := AutoStrategy.Always
 > compile
 > compile
 > checkCalledTwice
 > clean
 
-> set Compile / jooqCodegenAutoStrategy := AutoStrategy.Never
+> set jooqCodegenAutoStrategy := AutoStrategy.Never
 -> compile
 > checkCalledNever
 > jooqCodegen

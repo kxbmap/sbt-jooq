@@ -29,6 +29,11 @@ object JooqCodegenPlugin extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] =
     jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
 
+  override def globalSettings: Seq[Setting[_]] = Seq(
+    jooqCodegenVariables := Map.empty,
+    jooqCodegenAutoStrategy := AutoStrategy.IfAbsent,
+  )
+
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
     libraryDependencies ++= Codegen
       .dependencies((JooqCodegen / jooqVersion).value, Codegen.javaVersion((JooqCodegen / javaHome).value))
@@ -59,14 +64,13 @@ object JooqCodegenPlugin extends AutoPlugin {
     javacOptions ++= Codegen.javacOptions(jooqVersion.value, Codegen.compileJavaVersion),
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := jooqCodegenConfig.?.value.isEmpty,
-    jooqCodegenVariables := Map(
+    jooqCodegenVariables ++= Map(
       "TARGET_DIRECTORY" -> sourceManaged.value.toString,
       "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value.toString,
     ),
     jooqCodegenConfigTransformer := Codegen.configTransformer(jooqCodegenVariables.value),
     jooqCodegenTransformedConfig := configTransformTask.value,
     jooqCodegenTransformedConfigFile := transformedConfigFileTask(config).value,
-    jooqCodegenAutoStrategy := AutoStrategy.IfAbsent,
     sourceGenerators += autoCodegenTask.taskValue,
     jooqCodegenGeneratorTarget := generatorTargetTask.value,
     jooqCodegenGeneratedSourcesFinder := generatedSourcesFinderTask.value,
