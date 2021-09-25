@@ -78,7 +78,8 @@ autoJooqLibrary := true
 ```
 
 #### jooqCodegenConfig
-jOOQ-codegen configuration. This is empty by default and must be set. You can set a file, classpath resource, or XML directly.
+jOOQ-codegen configuration.
+This is empty by default and must be set. You can set a file, classpath resource, XML directly, or sequence of these.
 
 ```scala mdoc:compile-only
 // Set file path
@@ -96,6 +97,17 @@ jooqCodegenConfig :=
   <configuration>
     <!-- Your configurations -->
   </configuration>
+```
+
+```scala mdoc:compile-only
+// Seq of configurations
+jooqCodegenConfig := Seq[CodegenConfig](
+  file("path/to/jooq-codegen.xml"),
+  uri("classpath:path/to/jooq-codegen.xml"),
+  <configuration>
+    <!-- Your configurations -->
+  </configuration>
+)
 ```
 
 #### jooqCodegenAutoStrategy
