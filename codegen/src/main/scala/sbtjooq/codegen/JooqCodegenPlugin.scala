@@ -76,7 +76,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     ),
     jooqCodegenConfigTransformer := Codegen.configTransformer(jooqCodegenVariables.value),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
-    jooqCodegenTransformedConfigFiles := transformedConfigFilesTask(config).value,
+    jooqCodegenTransformedConfigFiles := transformedConfigFilesTask.value,
     sourceGenerators += sourceGeneratorTask.taskValue,
     jooqCodegenGeneratorTargets := generatorTargetsTask.value,
     jooqCodegenGeneratedSourcesFinders := generatedSourcesFindersTask.value,
@@ -101,10 +101,9 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenConfig.value.toSeq.map(load).map(jooqCodegenConfigTransformer.value)
   }
 
-  private def transformedConfigFilesTask(config: Configuration): Initialize[Task[Seq[File]]] = Def.task {
+  private def transformedConfigFilesTask: Initialize[Task[Seq[File]]] = Def.task {
     val configs = jooqCodegenTransformedConfigs.value
-    val dir = target.value / "jooq-codegen" / config.name
-    IO.createDirectory(dir)
+    val dir = streams.value.cacheDirectory
     configs.zipWithIndex.map {
       case (xml, idx) =>
         val file = dir / s"$idx.xml"
