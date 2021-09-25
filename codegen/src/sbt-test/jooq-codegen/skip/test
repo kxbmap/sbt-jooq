@@ -1,6 +1,6 @@
 > set Compile / jooqCodegen / skip := true
 > jooqCodegen
-> checkCalledOnce
+> checkCalledNever
 -> compile
 > checkCalledNever
 

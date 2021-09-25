@@ -1,2 +1,5 @@
-> compile
+> jooqCodegen
 > run
+
+> flywayClean
+> compile

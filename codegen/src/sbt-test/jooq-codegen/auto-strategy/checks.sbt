@@ -1,19 +1,19 @@
-Compile / jooqCodegen := {
+JooqCodegen / run := {
   Counter.increment()
-  (Compile / jooqCodegen).value
+  (JooqCodegen / run).evaluated
 }
 
 TaskKey[Unit]("checkCalledOnce") := {
   val c = Counter.getAndReset()
-  require(c == 1, s"Required to called once but $c")
+  require(c == 1, s"Required to called once, but called $c times")
 }
 
 TaskKey[Unit]("checkCalledTwice") := {
   val c = Counter.getAndReset()
-  require(c == 2, s"Required to called twice but $c")
+  require(c == 2, s"Required to called twice, but called $c times")
 }
 
 TaskKey[Unit]("checkCalledNever") := {
   val c = Counter.getAndReset()
-  require(c == 0, s"Required to called never but $c")
+  require(c == 0, s"Required to never called, but called $c times")
 }

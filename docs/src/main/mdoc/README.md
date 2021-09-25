@@ -32,7 +32,18 @@ enablePlugins(JooqCodegenPlugin)
 libraryDependencies += "com.h2database" % "h2" % "@H2_VERSION@" % JooqCodegen
 ```
 
-### Configuration
+### Tasks
+
+#### jooqCodegen
+
+Run jOOQ-codegen according to configurations.
+
+#### jooqCodegenIfAbsent
+
+Run jOOQ-codegen if generated files absent.
+If generated files present, there is no effect.
+
+### Settings
 
 #### jooqVersion
 Version of jOOQ library.
@@ -107,10 +118,10 @@ Variables for jOOQ-codegen configuration text replacement.
 
 Default:
 
-|Key                |Value (example)                    |
-|-------------------|-----------------------------------|
-|TARGET_DIRECTORY   |target/scala-2.13/src_managed/main |
-|RESOURCE_DIRECTORY |src/main/jooq-codegen/resources    |
+|Key                |Value (example)                                |
+|-------------------|-----------------------------------------------|
+|TARGET_DIRECTORY   |/path/to/target/scala-2.13/src_managed/main    |
+|RESOURCE_DIRECTORY |/path/to/src/main/jooq-codegen/resources       |
 
 ```scala mdoc:compile-only
 jooqCodegenVariables ++= Map(
@@ -153,7 +164,7 @@ Then replace to:
         <!-- ...snip... -->
         <target>
             <packageName>com.example</packageName>
-            <directory>/path/to/source-managed</directory>
+            <directory>/path/to/target/scala-2.13/src_managed/main</directory>
         </target>
     </generator>
 </configuration>

@@ -1,0 +1,5 @@
+> setup
+> run
+
+$ delete target/scala-2.13/src_managed/main/com/example/db2
+> compile
