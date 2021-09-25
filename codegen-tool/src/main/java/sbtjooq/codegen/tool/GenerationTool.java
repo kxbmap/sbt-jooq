@@ -6,12 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 
 public class GenerationTool {
@@ -19,11 +13,11 @@ public class GenerationTool {
     private static final Logger logger = LoggerFactory.getLogger(GenerationTool.class);
 
     private final MethodHandle delegate;
-    private final List<Path> configurations;
+    private final String[] args;
 
-    public GenerationTool(MethodHandle delegate, List<Path> configurations) {
+    public GenerationTool(MethodHandle delegate, String[] args) {
         this.delegate = delegate;
-        this.configurations = configurations;
+        this.args = args;
     }
 
     public void generate() throws Throwable {
@@ -31,7 +25,6 @@ public class GenerationTool {
     }
 
     private void invokeDelegate() throws Throwable {
-        final String[] args = configurations.stream().map(Path::toString).toArray(String[]::new);
         //noinspection ConfusingArgumentToVarargsMethod
         delegate.invokeExact(args);
     }
@@ -40,12 +33,12 @@ public class GenerationTool {
     public static Class<?> detectGenerationToolClass() throws ClassNotFoundException {
         try {
             return Class.forName("org.jooq.codegen.GenerationTool");
-        } catch (ClassNotFoundException e1) {
+        } catch (ClassNotFoundException e) {
             try {
                 return Class.forName("org.jooq.util.GenerationTool");
-            } catch (ClassNotFoundException e2) {
-                e2.addSuppressed(e1);
-                throw e2;
+            } catch (ClassNotFoundException suppressed) {
+                e.addSuppressed(suppressed);
+                throw e;
             }
         }
     }
@@ -64,14 +57,10 @@ public class GenerationTool {
 
     public static void main(String[] args) throws Throwable {
         final Class<?> genToolClass = detectGenerationToolClass();
-        logger.debug("Delegate to detected {}", genToolClass.getName());
-
         final MethodHandle delegate = getMainMethod(genToolClass);
-        final List<Path> configurations = Arrays.stream(args).map(Paths::get).collect(toList());
-
+        logger.debug("Delegate to detected {}", genToolClass);
         showJooqLogo();
-
-        new GenerationTool(delegate, configurations).generate();
+        new GenerationTool(delegate, args).generate();
     }
 
 }
