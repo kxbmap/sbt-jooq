@@ -69,6 +69,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     javacOptions ++= Codegen.javacOptions(jooqVersion.value, Codegen.compileJavaVersion),
     jooqCodegen := codegenTask.value,
     jooqCodegenIfAbsent := codegenIfAbsentTask.value,
+    jooqCodegenIfAbsent / skip := (jooqCodegen / skip).value,
     jooqCodegenVariables ++= Map(
       "TARGET_DIRECTORY" -> sourceManaged.value.toString,
       "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value.toString,
@@ -120,7 +121,7 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def codegenIfAbsentTask: Initialize[Task[Seq[File]]] = Def.task {
-    if ((jooqCodegen / skip).value) jooqCodegenGeneratedSources.value
+    if ((jooqCodegenIfAbsent / skip).value) jooqCodegenGeneratedSources.value
     else Def.taskDyn {
       val configs = jooqCodegenGeneratedSourcesFinders.value.collect {
         case (config, finder) if finder.get().isEmpty => config
