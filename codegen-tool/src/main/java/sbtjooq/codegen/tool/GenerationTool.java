@@ -55,11 +55,17 @@ public class GenerationTool {
         }
     }
 
+    public static void showJavaVersion() {
+        logger.info(String.format(
+            "Running on %s Java %s", System.getProperty("java.vendor"), System.getProperty("java.version")));
+    }
+
     public static void main(String[] args) throws Throwable {
         final Class<?> genToolClass = detectGenerationToolClass();
         final MethodHandle delegate = getMainMethod(genToolClass);
         logger.debug("Delegate to detected {}", genToolClass);
         showJooqLogo();
+        showJavaVersion();
         new GenerationTool(delegate, args).generate();
     }
 
