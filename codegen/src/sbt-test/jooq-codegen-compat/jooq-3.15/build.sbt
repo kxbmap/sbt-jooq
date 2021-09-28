@@ -1,16 +1,17 @@
-ThisBuild / scalaVersion := sys.props("scala.version")
+enablePlugins(SbtPlugin)
 
-ThisBuild / javacOptions ++= Seq("-source", "11", "-target", "11")
+scriptedBufferLog := false
 
-enablePlugins(JooqCodegenPlugin)
+scriptedLaunchOpts ++=
+  Seq("plugin", "scala", "jooq.3_15")
+    .map(x => s"$x.version")
+    .map(x => s"-D$x=${sys.props(x)}")
 
-jooqVersion := sys.props("jooq.3_15.version")
-
-JooqCodegen / jooqModules += "jooq-meta-extensions"
-
-jooqCodegenConfig := uri("classpath:jooq-codegen.xml")
-
-Seq(JooqCodegen, Compile).flatMap { c => Seq(
-  c / run / fork := true,
-  c / run / javaHome := sys.env.get("RUNTIME_JAVA_HOME").map(file))
-}
+scripted := scripted.dependsOn(Def.task {
+  if (
+    sys.env.get("RUNTIME_JAVA_HOME")
+      .map(file(_).getName)
+      .map(_.dropWhile(!_.isDigit).takeWhile(_.isDigit).toInt)
+      .exists(_ < 11)
+  ) IO.touch(sbtTestDirectory.value / "compat" / "3.15" / "disabled")
+}).evaluated

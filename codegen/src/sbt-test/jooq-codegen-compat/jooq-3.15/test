@@ -1,7 +1,1 @@
-> checkCodegenJavaOptions
-> checkCodegenDependencies
-> checkJavacOptions
-> checkCompileDependencies
-
-> show jooqCodegen
-> run
+> scripted

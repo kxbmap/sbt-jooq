@@ -47,11 +47,6 @@ jobs:
           echo "Use ${COMPILE_JAVA} for compile"
           jabba use "${COMPILE_JAVA}"
 
-      - name: Disable incompatible tests
-        if: ${{ matrix.task == 'compat' && matrix.runtime-java < 11 }}
-        run: |
-          sbt -v "codegen/disableIncompatibleTestsWithEarlierThanJava11"
-
       - name: Build and test
         run: |
           case ${{ matrix.task }} in
