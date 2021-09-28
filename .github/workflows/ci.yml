@@ -22,7 +22,8 @@ jobs:
           - { task: checker, compile-java: 11 }
           - { task: checker, compile-java: 17 }
           - { task: mdoc, compile-java: 11 }
-
+    env:
+      JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
     steps:
       - uses: actions/checkout@v2
       - uses: olafurpg/setup-scala@v13
@@ -45,8 +46,6 @@ jobs:
 
           echo "Use ${COMPILE_JAVA} for compile"
           jabba use "${COMPILE_JAVA}"
-
-      - run: cp ./.github/workflows/.jvmopts .
 
       - name: Disable incompatible tests
         if: ${{ matrix.task == 'compat' && matrix.runtime-java < 11 }}
