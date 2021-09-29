@@ -29,7 +29,14 @@ TaskKey[Unit]("checkJavacOptions") := {
 
 TaskKey[Unit]("checkCompileDependencies") := {
   val deps = libraryDependencies.value.filter(_.configurations.contains(Compile.name))
+  val jv = sys.props("java.version")
+  val cjv = Codegen.javaVersion((JooqCodegen / run / javaHome).value)
   val x = "javax.annotation" % "javax.annotation-api" % "???"
-  if (deps.exists(m => x.organization == m.organization && x.name == m.name))
-    sys.error(s"libraryDependencies should not contains javax.annotation libraries")
+  if (!JavaUtil.isJavaEEModulesBundled(jv) && cjv.takeWhile(_.isDigit).toInt <= 8) {
+    if (!deps.exists(m => x.organization == m.organization && x.name == m.name))
+      sys.error(s"libraryDependencies should contains javax.annotation (Java compile: $jv, codegen: $cjv)")
+  } else {
+    if (deps.exists(m => x.organization == m.organization && x.name == m.name))
+      sys.error(s"libraryDependencies should not contains javax.annotation libraries (Java compile: $jv, codegen: $cjv)")
+  }
 }
