@@ -10,7 +10,9 @@ JooqCodegen / jooqModules += "jooq-meta-extensions"
 
 jooqCodegenConfig := uri("classpath:jooq-codegen.xml")
 
-Seq(JooqCodegen, Compile).flatMap { c => Seq(
+Seq(JooqCodegen, Compile).flatMap(c => Seq(
   c / run / fork := true,
-  c / run / javaHome := sys.env.get("RUNTIME_JAVA_HOME").map(file))
-}
+  c / run / javaHome := {
+    val key = "RUNTIME_JAVA_HOME"
+    (if (insideCI.value) Some(sys.env(key)) else sys.env.get(key)).map(file)
+  }))
