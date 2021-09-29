@@ -84,7 +84,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     ),
     jooqCodegenConfigTransformer := Codegen.configTransformer(jooqCodegenVariables.value),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
-    jooqCodegenTransformedConfigFiles := transformedConfigFilesTask.value,
+    jooqCodegenConfigFiles := configFilesTask.value,
     sourceGenerators += sourceGeneratorTask.taskValue,
     jooqCodegenGeneratorTargets := generatorTargetsTask.value,
     jooqCodegenGeneratedSourcesFinders := generatedSourcesFindersTask.value,
@@ -109,7 +109,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenConfig.value.toSeq.map(load).map(jooqCodegenConfigTransformer.value)
   }
 
-  private def transformedConfigFilesTask: Initialize[Task[Seq[File]]] = Def.task {
+  private def configFilesTask: Initialize[Task[Seq[File]]] = Def.task {
     val configs = jooqCodegenTransformedConfigs.value
     val dir = streams.value.cacheDirectory
     configs.zipWithIndex.map {
@@ -124,7 +124,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     if ((jooqCodegen / skip).value)
       jooqCodegenGeneratedSources.value
     else
-      Def.taskDyn(runCodegen(jooqCodegenTransformedConfigFiles.value)).value
+      Def.taskDyn(runCodegen(jooqCodegenConfigFiles.value)).value
   }
 
   private def codegenIfAbsentTask: Initialize[Task[Seq[File]]] = Def.task {
@@ -160,7 +160,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       conf -> Codegen.generatorTargetPackage(config).foldLeft(target)(_ / _)
     }
     val prev = jooqCodegenGeneratorTargets.previous.getOrElse(Seq.empty)
-    val files = jooqCodegenTransformedConfigFiles.value
+    val files = jooqCodegenConfigFiles.value
     val store = streams.value.cacheStoreFactory.make("inputs")
     Tracked.diffInputs(store, FileInfo.hash)(files.toSet) { diff =>
       prev.filter(x => diff.unmodified(x._1)) ++ (diff.modified -- diff.removed).map(parse)
