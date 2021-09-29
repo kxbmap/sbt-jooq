@@ -26,10 +26,10 @@ lazy val codegen = project
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-codegen",
-    scripted := scripted.dependsOn(Def.task {
-      (core / publishLocal).value
-      (codegenTool / publishLocal).value
-    }).evaluated,
+    scripted := scripted.dependsOn(
+      core / publishLocal,
+      codegenTool / publishLocal,
+    ).evaluated,
     libraryDependencies += "com.lihaoyi" %% "fastparse" % fastParseVersion,
     buildInfoKeys := Seq[BuildInfoKey](
       "sbtJooqVersion" -> version.value,
