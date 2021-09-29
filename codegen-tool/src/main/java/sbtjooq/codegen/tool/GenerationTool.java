@@ -30,7 +30,7 @@ public class GenerationTool {
     }
 
 
-    public static Class<?> detectGenerationToolClass() throws ClassNotFoundException {
+    private static Class<?> detectGenerationToolClass() throws ClassNotFoundException {
         try {
             return Class.forName("org.jooq.codegen.GenerationTool");
         } catch (ClassNotFoundException e) {
@@ -43,29 +43,29 @@ public class GenerationTool {
         }
     }
 
-    public static MethodHandle getMainMethod(Class<?> mainClass) throws ReflectiveOperationException {
+    private static MethodHandle getMainMethod(Class<?> mainClass) throws ReflectiveOperationException {
         final MethodType mainType = MethodType.methodType(void.class, String[].class);
         return MethodHandles.publicLookup().findStatic(mainClass, "main", mainType);
     }
 
-    public static void showJooqLogo() {
+    private static void showRunningInfo(Class<?> mainClass) {
+        final String vendor = System.getProperty("java.vendor");
+        final String version = System.getProperty("java.version");
+        logger.info("Running {} ({} Java {})", mainClass.getName(), vendor, version);
+    }
+
+    private static void showJooqLogo() {
         try {
             Class.forName("org.jooq.impl.DefaultRenderContext");
         } catch (ClassNotFoundException ignored) {
         }
     }
 
-    public static void showJavaVersion() {
-        logger.info(String.format(
-            "Running on %s Java %s", System.getProperty("java.vendor"), System.getProperty("java.version")));
-    }
-
     public static void main(String[] args) throws Throwable {
-        final Class<?> genToolClass = detectGenerationToolClass();
-        final MethodHandle delegate = getMainMethod(genToolClass);
-        logger.debug("Delegate to detected {}", genToolClass);
+        final Class<?> mainClass = detectGenerationToolClass();
+        final MethodHandle delegate = getMainMethod(mainClass);
+        showRunningInfo(mainClass);
         showJooqLogo();
-        showJavaVersion();
         new GenerationTool(delegate, args).generate();
     }
 
