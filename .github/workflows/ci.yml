@@ -36,16 +36,10 @@ jobs:
         env:
           RUNTIME_JAVA: "zulu@1.${{ matrix.runtime-java }}"
         run: |
-          COMPILE_JAVA="$(jabba current)"
           RUNTIME_JAVA="$(jabba ls-remote | grep "${RUNTIME_JAVA}." | head -n 1)"
-
           echo "Installing ${RUNTIME_JAVA}"
           jabba install "${RUNTIME_JAVA}"
-          RUNTIME_JAVA_HOME="$(jabba which --home "${RUNTIME_JAVA}")"
-          export RUNTIME_JAVA_HOME
-
-          echo "Use ${COMPILE_JAVA} for compile"
-          jabba use "${COMPILE_JAVA}"
+          echo "RUNTIME_JAVA_HOME=$(jabba which --home "${RUNTIME_JAVA}")" >> $GITHUB_ENV
 
       - name: Build and test
         run: |
