@@ -1,11 +1,10 @@
 import sbtjooq.codegen.internal.Codegen
-import sbtjooq.codegen.internal.JavaUtil
 
 TaskKey[Unit]("checkCodegenJavaOptions") := {
   val opts = (JooqCodegen / run / javaOptions).value
   val jv = Codegen.javaVersion((JooqCodegen / run / javaHome).value)
   val xs = Seq("--add-modules", "java.xml.bind")
-  if (JavaUtil.isJigsawEnabled(jv) && JavaUtil.isJavaEEModulesBundled(jv)) {
+  if (jv >= 9 && jv < 11) {
     if (!opts.containsSlice(xs))
       sys.error(s"javaOptions should contains: --add-modules java.xml.bind (Java: $jv)")
   } else {
@@ -23,7 +22,7 @@ TaskKey[Unit]("checkCodegenDependencies") := {
     "com.sun.xml.bind" % "jaxb-core" % "???",
     "com.sun.xml.bind" % "jaxb-impl" % "???"
   )
-  if (!JavaUtil.isJavaEEModulesBundled(jv)) {
+  if (jv >= 11) {
     if (!xs.forall(x => deps.exists(m => x.organization == m.organization && x.name == m.name)))
       sys.error(s"libraryDependencies should contains JAXB libraries (Java: $jv)")
   } else {
@@ -34,9 +33,9 @@ TaskKey[Unit]("checkCodegenDependencies") := {
 
 TaskKey[Unit]("checkJavacOptions") := {
   val opts = (Compile / javacOptions).value
-  val jv = sys.props("java.version")
+  val jv = Codegen.javaVersion((Compile / compile / javaHome).value)
   val xs = Seq("--add-modules", "java.xml.ws.annotation")
-  if (JavaUtil.isJigsawEnabled(jv) && JavaUtil.isJavaEEModulesBundled(jv)) {
+  if (jv >= 9 && jv < 11) {
     if (!opts.containsSlice(xs))
       sys.error(s"javaOptions should contains: --add-modules java.xml.ws.annotation (Java: $jv)")
   } else {
@@ -47,9 +46,9 @@ TaskKey[Unit]("checkJavacOptions") := {
 
 TaskKey[Unit]("checkCompileDependencies") := {
   val deps = libraryDependencies.value.filter(_.configurations.contains(Compile.name))
-  val jv = sys.props("java.version")
+  val jv = Codegen.javaVersion((Compile / compile / javaHome).value)
   val x = "javax.annotation" % "javax.annotation-api" % "???"
-  if (!JavaUtil.isJavaEEModulesBundled(jv)) {
+  if (jv >= 11) {
     if (!deps.exists(m => x.organization == m.organization && x.name == m.name))
       sys.error(s"libraryDependencies should contains javax.annotation (Java: $jv)")
   } else {

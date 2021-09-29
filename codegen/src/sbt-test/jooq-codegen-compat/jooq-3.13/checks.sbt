@@ -1,6 +1,3 @@
-import sbtjooq.codegen.internal.Codegen
-import sbtjooq.codegen.internal.JavaUtil
-
 TaskKey[Unit]("checkCodegenJavaOptions") := {
   val opts = (JooqCodegen / run / javaOptions).value
   val xs = Seq("--add-modules", "java.xml.bind")

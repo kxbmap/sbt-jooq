@@ -8,25 +8,25 @@ import scala.xml.transform.{RewriteRule, RuleTransformer}
 
 object Codegen {
 
-  def javaVersion(javaHome: Option[File]): String =
-    javaHome.map(parseJavaVersion).getOrElse(sys.props("java.version"))
+  def javaVersion(javaHome: Option[File]): Int =
+    javaHome.map(parseJavaVersion).getOrElse(majorVersion(sys.props("java.version")))
 
   def mainClass: String =
     "sbtjooq.codegen.tool.GenerationTool"
 
-  def dependencies(jooqVersion: String, javaVersion: String): Seq[ModuleID] =
+  def dependencies(jooqVersion: String, javaVersion: Int): Seq[ModuleID] =
     codegenToolDependencies ++ jaxbDependencies(jooqVersion, javaVersion)
 
-  def javaOptions(jooqVersion: String, javaVersion: String): Seq[String] =
+  def javaOptions(jooqVersion: String, javaVersion: Int): Seq[String] =
     jaxbAddModulesOption(jooqVersion, javaVersion)
 
-  def needsFork(jooqVersion: String, javaVersion: String): Boolean =
+  def needsFork(jooqVersion: String, javaVersion: Int): Boolean =
     javaOptions(jooqVersion, javaVersion).nonEmpty
 
-  def compileDependencies(javaVersion: String, codegenJooqVersion: String, codegenJavaVersion: String): Seq[ModuleID] =
+  def compileDependencies(javaVersion: Int, codegenJooqVersion: String, codegenJavaVersion: Int): Seq[ModuleID] =
     javaxAnnotationDependencies(javaVersion, codegenJooqVersion, codegenJavaVersion)
 
-  def javacOptions(javaVersion: String, codegenJooqVersion: String, codegenJavaVersion: String): Seq[String] =
+  def javacOptions(javaVersion: Int, codegenJooqVersion: String, codegenJavaVersion: Int): Seq[String] =
     javaxAnnotationAddModulesOption(javaVersion, codegenJooqVersion, codegenJavaVersion)
 
 
@@ -34,7 +34,7 @@ object Codegen {
     Seq("com.github.kxbmap" % "sbt-jooq-codegen-tool" % BuildInfo.sbtJooqVersion)
 
   //noinspection SbtDependencyVersionInspection
-  private def jaxbDependencies(jooqVersion: String, javaVersion: String): Seq[ModuleID] =
+  private def jaxbDependencies(jooqVersion: String, javaVersion: Int): Seq[ModuleID] =
     if (needsJaxbSettings(jooqVersion) && !isJavaEEModulesBundled(javaVersion))
       Seq(
         "javax.activation" % "activation" % BuildInfo.javaxActivationVersion,
@@ -44,7 +44,7 @@ object Codegen {
     else
       Nil
 
-  private def jaxbAddModulesOption(jooqVersion: String, javaVersion: String): Seq[String] =
+  private def jaxbAddModulesOption(jooqVersion: String, javaVersion: Int): Seq[String] =
     if (needsJaxbSettings(jooqVersion) && isJigsawEnabled(javaVersion) && isJavaEEModulesBundled(javaVersion))
       Seq("--add-modules", "java.xml.bind")
     else
@@ -56,9 +56,9 @@ object Codegen {
     }
 
   private def javaxAnnotationDependencies(
-      javaVersion: String,
+      javaVersion: Int,
       codegenJooqVersion: String,
-      codegenJavaVersion: String,
+      codegenJavaVersion: Int,
   ): Seq[ModuleID] =
     if (!isJavaEEModulesBundled(javaVersion)
       && !generatedAnnotationDisabledByDefault(codegenJooqVersion)
@@ -68,9 +68,9 @@ object Codegen {
       Nil
 
   private def javaxAnnotationAddModulesOption(
-      javaVersion: String,
+      javaVersion: Int,
       codegenJooqVersion: String,
-      codegenJavaVersion: String,
+      codegenJavaVersion: Int,
   ): Seq[String] =
     if (isJigsawEnabled(javaVersion)
       && isJavaEEModulesBundled(javaVersion)
@@ -85,8 +85,8 @@ object Codegen {
       case (x, y) => x > 3 || x == 3 && y >= 13
     }
 
-  private def useJavaxAnnotationByDefault(jooqVersion: String, javaVersion: String): Boolean =
-    major(javaVersion) <= 8 || CrossVersion.partialVersion(jooqVersion).forall {
+  private def useJavaxAnnotationByDefault(jooqVersion: String, javaVersion: Int): Boolean =
+    javaVersion <= 8 || CrossVersion.partialVersion(jooqVersion).forall {
       case (x, y) => x < 3 || x == 3 && y < 12
     }
 

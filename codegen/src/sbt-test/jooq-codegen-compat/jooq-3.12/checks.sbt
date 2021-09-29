@@ -1,5 +1,4 @@
 import sbtjooq.codegen.internal.Codegen
-import sbtjooq.codegen.internal.JavaUtil
 
 TaskKey[Unit]("checkCodegenJavaOptions") := {
   val opts = (JooqCodegen / run / javaOptions).value
@@ -29,10 +28,10 @@ TaskKey[Unit]("checkJavacOptions") := {
 
 TaskKey[Unit]("checkCompileDependencies") := {
   val deps = libraryDependencies.value.filter(_.configurations.contains(Compile.name))
-  val jv = sys.props("java.version")
+  val jv = Codegen.javaVersion((Compile / compile / javaHome).value)
   val cjv = Codegen.javaVersion((JooqCodegen / run / javaHome).value)
   val x = "javax.annotation" % "javax.annotation-api" % "???"
-  if (!JavaUtil.isJavaEEModulesBundled(jv) && cjv.takeWhile(_.isDigit).toInt <= 8) {
+  if (jv >= 11 && cjv <= 8) {
     if (!deps.exists(m => x.organization == m.organization && x.name == m.name))
       sys.error(s"libraryDependencies should contains javax.annotation (Java compile: $jv, codegen: $cjv)")
   } else {
