@@ -15,7 +15,7 @@ object JavaUtil {
   }
 
   def majorVersion(full: String): Int =
-    (if (full.startsWith("1.")) full.drop(2) else full).takeWhile(_.isDigit).toInt
+    full.stripPrefix("1.").takeWhile(_.isDigit).toInt
 
   def isJigsawEnabled(javaVersion: Int): Boolean = javaVersion >= 9
 
