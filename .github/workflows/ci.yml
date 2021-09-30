@@ -23,7 +23,6 @@ jobs:
           - { task: checker, compile-java: 17 }
           - { task: test, compile-java: 11 }
           - { task: test, compile-java: 17 }
-          - { task: mdoc, compile-java: 11 }
     env:
       JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
     steps:
@@ -56,10 +55,7 @@ jobs:
               sbt -v "checker/scripted jooq-checker/*"
               ;;
             test)
-              sbt -v test
-              ;;
-            mdoc)
-              sbt -v "docs/mdoc"
+              sbt -v test docs/mdoc
               ;;
             *)
               echo "unknown task"
