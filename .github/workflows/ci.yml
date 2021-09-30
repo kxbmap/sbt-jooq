@@ -21,6 +21,8 @@ jobs:
           - { task: codegen, compile-java: 17 }
           - { task: checker, compile-java: 11 }
           - { task: checker, compile-java: 17 }
+          - { task: test, compile-java: 11 }
+          - { task: test, compile-java: 17 }
           - { task: mdoc, compile-java: 11 }
     env:
       JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
@@ -52,6 +54,9 @@ jobs:
               ;;
             checker)
               sbt -v "checker/scripted jooq-checker/*"
+              ;;
+            test)
+              sbt -v test
               ;;
             mdoc)
               sbt -v "docs/mdoc"
