@@ -92,21 +92,23 @@ object JooqCodegenPlugin extends AutoPlugin {
   ))
 
 
-  private def transformConfigsTask: Initialize[Task[Seq[Node]]] = Def.task {
-    def load(config: CodegenConfig.Single): Node =
+  private def transformConfigsTask: Initialize[Task[Seq[Node]]] = Def.taskDyn {
+    def load(config: CodegenConfig.Single): Initialize[Task[Node]] =
       config match {
         case CodegenConfig.File(file) =>
-          IO.reader(IO.resolve(baseDirectory.value, file))(XML.load)
+          Def.task(IO.reader(IO.resolve(baseDirectory.value, file))(XML.load))
         case CodegenConfig.Resource(resource) =>
-          ClasspathLoader.using((JooqCodegen / fullClasspath).value) { loader =>
+          Def.task(ClasspathLoader.using((JooqCodegen / fullClasspath).value) { loader =>
             loader.getResourceAsStream(resource) match {
               case null => throw new MessageOnlyException(s"resource $resource not found in classpath")
               case in => Using.bufferedInputStream(in)(XML.load)
             }
-          }
-        case CodegenConfig.XML(xml) => xml
+          })
+        case CodegenConfig.XML(xml) => Def.task(xml)
       }
-    jooqCodegenConfig.value.toSeq.map(load).map(jooqCodegenConfigTransformer.value)
+    val config = jooqCodegenConfig.value
+    val transform = jooqCodegenConfigTransformer.value
+    config.toSeq.map(load).joinWith(_.map(_.map(transform)).join)
   }
 
   private def configFilesTask: Initialize[Task[Seq[File]]] = Def.task {
