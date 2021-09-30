@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/kxbmap/sbt-jooq/actions/workflows/ci.yml/badge.svg)](https://github.com/kxbmap/sbt-jooq/actions/workflows/ci.yml)
 
-jOOQ plugin for sbt 1.0+
+jOOQ plugin for sbt 1.3+
 
 ```scala mdoc:invisible
 import sbt._

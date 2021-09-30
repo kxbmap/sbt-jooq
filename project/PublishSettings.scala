@@ -11,7 +11,7 @@ object PublishSettings extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   override def buildSettings: Seq[Setting[_]] = Seq(
-    description := "jOOQ plugin for sbt 1.0+",
+    description := "jOOQ plugin for sbt 1.3+",
     organization := "com.github.kxbmap",
     versionScheme := Some("early-semver"),
     licenses := Seq(
