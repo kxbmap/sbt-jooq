@@ -1,5 +1,6 @@
 package sbtjooq.codegen
 
+import sbt._
 import scala.language.implicitConversions
 import scala.xml.Node
 
@@ -10,15 +11,15 @@ sealed trait CodegenConfig {
 
 object CodegenConfig {
 
-  sealed trait Single extends CodegenConfig  {
+  sealed trait Single extends CodegenConfig {
     override def toSeq: Seq[Single] = Seq(this)
   }
 
-  case class File(file: sbt.File) extends Single
+  case class FromFile(file: File) extends Single
 
-  case class Resource(resource: String) extends Single
+  case class FromResource(resource: String) extends Single
 
-  case class XML(xml: Node) extends Single
+  case class FromXML(xml: Node) extends Single
 
   case class Sequence(seq: Seq[CodegenConfig]) extends CodegenConfig {
     override def toSeq: Seq[Single] = seq.flatMap(_.toSeq)
@@ -28,21 +29,21 @@ object CodegenConfig {
 
   def empty: CodegenConfig = Sequence(Seq.empty)
 
-  def fromURI(uri: sbt.URI): CodegenConfig =
+  def fromURI(uri: URI): CodegenConfig =
     uri.getScheme match {
-      case "classpath" => Resource(uri.getSchemeSpecificPart)
-      case "file" => File(new sbt.File(uri))
+      case "classpath" => FromResource(uri.getSchemeSpecificPart)
+      case "file" => FromFile(new File(uri))
       case _ => throw new IllegalArgumentException(s"Unknown scheme: $uri")
     }
 
   def fromURIString(uri: String): CodegenConfig = fromURI(sbt.uri(uri))
 
 
-  implicit def fileToCodegenConfig(file: sbt.File): CodegenConfig = File(file)
+  implicit def fileToCodegenConfig(file: File): CodegenConfig = FromFile(file)
 
-  implicit def xmlNodeToCodegenConfig(xml: Node): CodegenConfig = XML(xml)
+  implicit def xmlNodeToCodegenConfig(xml: Node): CodegenConfig = FromXML(xml)
 
-  implicit def uriToCodegenConfig(uri: sbt.URI): CodegenConfig = fromURI(uri)
+  implicit def uriToCodegenConfig(uri: URI): CodegenConfig = fromURI(uri)
 
   implicit def seqToCodegenConfig(seq: Seq[CodegenConfig]): CodegenConfig = Sequence(seq)
 
