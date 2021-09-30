@@ -13,17 +13,18 @@ lazy val disableIncompatibleTests = taskKey[Unit]("")
 scripted := scripted.dependsOn(copyChanges, disableIncompatibleTests).evaluated
 
 copyChanges := {
-  val dir = sbtTestDirectory.value / "compat"
+  val changes = file("changes")
+  val testDir = sbtTestDirectory.value / "compat"
   val copies = for {
-    (src, dst) <- Seq(
-      "test" -> "test",
-      "plugins.sbt" -> "project/plugins.sbt",
-      "Main.scala" -> "src/main/scala/com/example/Main.scala",
-      "database.sql" -> "src/jooq-codegen/resources/database.sql",
+    (f, d) <- Seq(
+      "test" -> ".",
+      "plugins.sbt" -> "project",
+      "Main.scala" -> "src/main/scala/com/example",
+      "database.sql" -> "src/jooq-codegen/resources",
     )
-    ver <- 10 to 15
+    ver <- (10 to 15).map(v => s"3.$v")
   } yield
-    (file("changes") / src) -> (dir / s"3.$ver" / dst)
+    (changes / f) -> (testDir / ver / d / f)
 
   IO.copy(copies)
 }
