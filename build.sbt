@@ -30,7 +30,10 @@ lazy val codegen = project
       core / publishLocal,
       codegenTool / publishLocal,
     ).evaluated,
-    libraryDependencies += "com.lihaoyi" %% "fastparse" % fastParseVersion,
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" %% "fastparse" % fastParseVersion,
+      "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
+    ),
     buildInfoKeys := Seq[BuildInfoKey](
       "sbtJooqVersion" -> version.value,
       "javaxActivationVersion" -> javaxActivationVersion,
