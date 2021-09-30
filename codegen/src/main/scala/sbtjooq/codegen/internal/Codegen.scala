@@ -114,15 +114,15 @@ object Codegen {
     (config \ "generator" \ "target" \ "packageName").text.trim match {
       case "" => Seq("org", "jooq", "generated")
       case text =>
-        text.split('.').map {
-          case s if s.headOption.exists(!_.isUnicodeIdentifierStart) => s"_$s"
-          case s => s
-        }.map(_.flatMap {
-          case '-' | ' ' => "_"
+        text.split('.').map(_.flatMap {
+          case '_' | '-' | ' ' => "_"
           case c if c.isUnicodeIdentifierPart => c.toString
           case c if c <= 0xff => f"_${c.toInt}%02x"
           case c => f"_${c.toInt}%04x"
-        }).toSeq
+        }).map {
+          case s if s.headOption.exists(c => c != '_' && !c.isUnicodeIdentifierStart) => s"_$s"
+          case s => s
+        }.toSeq
     }
 
 }
