@@ -6,13 +6,14 @@ import scala.xml.Node
 
 sealed trait CodegenConfig {
   def toSeq: Seq[CodegenConfig.Single]
-  def isEmpty: Boolean = false
+  def isEmpty: Boolean
 }
 
 object CodegenConfig {
 
   sealed trait Single extends CodegenConfig {
     override def toSeq: Seq[Single] = Seq(this)
+    override def isEmpty: Boolean = false
   }
 
   case class FromFile(file: File) extends Single
