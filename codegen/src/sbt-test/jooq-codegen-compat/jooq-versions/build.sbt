@@ -9,6 +9,7 @@ scriptedLaunchOpts ++=
 
 lazy val copyChanges = taskKey[Unit]("")
 lazy val disableIncompatibleTests = taskKey[Unit]("")
+lazy val cleanup = taskKey[Unit]("")
 
 scripted := scripted.dependsOn(copyChanges, disableIncompatibleTests).evaluated
 
@@ -37,4 +38,9 @@ disableIncompatibleTests := {
 
   if (version.exists(_ < 11))
     IO.touch(sbtTestDirectory.value / "compat" / "3.15" / "disabled")
+}
+
+cleanup := {
+  val dir = file(sys.props("user.home")) / ".ivy2" / "local" / organization.value / name.value
+  IO.deleteFilesEmptyDirs(Seq(dir))
 }
