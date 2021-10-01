@@ -16,6 +16,13 @@ trait JooqCodegenKeys {
   val jooqCodegenVariables = settingKey[Map[String, String]]("Variables to replace configuration text")
   val jooqCodegenAutoStrategy = settingKey[AutoStrategy]("jOOQ-codegen auto generation strategy")
 
+}
+
+object JooqCodegenKeys extends JooqCodegenKeys
+
+
+trait JooqCodegenInternalKeys {
+
   // For internal use
   val jooqCodegenConfigTransformer = settingKey[Node => Node]("jOOQ-codegen configuration transform function")
   val jooqCodegenTransformedConfigs = taskKey[Seq[Node]]("Transformed jOOQ-codegen configurations")
@@ -26,4 +33,4 @@ trait JooqCodegenKeys {
 
 }
 
-object JooqCodegenKeys extends JooqCodegenKeys
+object JooqCodegenInternalKeys extends JooqCodegenInternalKeys

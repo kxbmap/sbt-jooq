@@ -6,6 +6,7 @@ import sbt.Keys._
 import sbt.io.Using
 import sbtjooq.JooqKeys._
 import sbtjooq.JooqPlugin
+import sbtjooq.codegen.JooqCodegenInternalKeys._
 import sbtjooq.codegen.JooqCodegenKeys._
 import sbtjooq.codegen.internal.{ClasspathLoader, Codegen}
 import scala.xml.{Node, XML}
