@@ -107,7 +107,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       }
     val config = jooqCodegenConfig.value
     val transform = jooqCodegenConfigTransformer.value
-    config.toSeq.map(load).joinWith(_.map(_.map(transform)).join)
+    config.toSeq.map(load(_).map(transform)).joinWith(_.join)
   }
 
   private def configFilesTask: Initialize[Task[Seq[File]]] = Def.task {
