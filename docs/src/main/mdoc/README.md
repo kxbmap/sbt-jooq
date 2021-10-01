@@ -14,6 +14,10 @@ import sbtjooq.codegen.JooqCodegenPlugin.autoImport._
 
 ## JooqCodegenPlugin
 
+The plugin for easy use of jOOQ-codegen.
+
+Automatically performs code generation at compile time.
+
 ### Installation
 
 Add the following to your `project/plugins.sbt`:
@@ -36,71 +40,95 @@ libraryDependencies += "com.h2database" % "h2" % "@H2_VERSION@" % JooqCodegen
 
 #### jooqCodegen
 
-Run jOOQ-codegen according to configurations.
+Run jOOQ-codegen manually according to configurations.
 
 #### jooqCodegenIfAbsent
 
-Run jOOQ-codegen if generated files absent.
+Run jOOQ-codegen manually if generated files absent.
+
 If generated files present, there is no effect.
 
 ### Settings
 
 #### jooqVersion
-Version of jOOQ library.
 
 Default: `"@JOOQ_VERSION@"`
+
+Version of jOOQ library to use.
+
+##### Example
 
 ```scala mdoc:compile-only
 jooqVersion := "@JOOQ_VERSION@"
 ```
 
 #### jooqOrganization
-jOOQ organization/group ID.
-
-If you want to use a commercial version of jOOQ, set appropriate one.
-For details, please refer to the [jOOQ manual](https://www.jooq.org/doc/@JOOQ_MINOR_VERSION@/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
 
 Default: `"org.jooq"`
 
+jOOQ organization/group ID.
+
+If you want to use a commercial version of jOOQ, set appropriate one and install jOOQ to local.
+
+For details, please refer to the [jOOQ manual](https://www.jooq.org/doc/@JOOQ_MINOR_VERSION@/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
+
+##### Example
+
 ```scala mdoc:compile-only
-jooqOrganization := "org.jooq"
+jooqOrganization := "org.jooq.trial"
 ```
 
 #### autoJooqLibrary
+
+Default: `true`
+
 Add jOOQ dependencies automatically if true.
 
 If you want to manage jOOQ dependencies manually, set this flag to false.
 
-Default: `true`
+##### Example
 
 ```scala mdoc:compile-only
 autoJooqLibrary := true
 ```
 
 #### jooqCodegenConfig
-jOOQ-codegen configuration.
-This is empty by default and must be set. You can set a file, classpath resource, XML directly, or sequence of these.
+
+Default: `empty`
+
+Configuration of jOOQ-codegen.
+
+This is empty by default and must be set. You can set a file, classpath resource, XML directly, or multiple of them.
+
+##### Example: Set a file
 
 ```scala mdoc:compile-only
-// Set file path
 jooqCodegenConfig := file("path/to/jooq-codegen.xml")
 ```
 
+Note: relative paths are resolved from the root of the project.
+
+##### Example: Set a URI of classpath resource
+
 ```scala mdoc:compile-only
-// Set URI of classpath resource
 jooqCodegenConfig := uri("classpath:path/to/jooq-codegen.xml")
 ```
 
+Note: resources are loaded from the `jooq-codegen` scope. (e.g. under the `./src/jooq-codegen/resources/` directory)
+
+##### Example: Set XML directly using literal
+
 ```scala mdoc:compile-only
-// Set XML configuration
 jooqCodegenConfig :=
   <configuration>
     <!-- Your configurations -->
   </configuration>
 ```
 
+##### Example: Set multiple configurations
+
 ```scala mdoc:compile-only
-// Seq of configurations
+// Set configurations
 jooqCodegenConfig := Seq[CodegenConfig](
   file("path/to/jooq-codegen.xml"),
   uri("classpath:path/to/jooq-codegen.xml"),
@@ -108,32 +136,46 @@ jooqCodegenConfig := Seq[CodegenConfig](
     <!-- Your configurations -->
   </configuration>
 )
+
+// Append a configuration
+jooqCodegenConfig += file("append1.xml")
+
+// Append configurations
+jooqCodegenConfig ++= Seq(file("append2.xml"), file("append3.xml"))
 ```
 
 #### jooqCodegenAutoStrategy
-jOOQ-codegen auto execution strategy.
-
-|Value      |Description                                              |
-|-----------|---------------------------------------------------------|
-|`IfAbsent` |Execute if absent files in jOOQ-codegen target directory |
-|`Always`   |Always execute                                           |
-|`Never`    |Never execute                                            |
 
 Default: `AutoStrategy.IfAbsent`
 
+Auto-generation strategy at compile time.
+
+|Value      |Description                                    |
+|-----------|-----------------------------------------------|
+|`IfAbsent` |Execute if files in target directory absent    |
+|`Always`   |Always execute                                 |
+|`Never`    |Never execute                                  |
+
+##### Example
+
 ```scala mdoc:compile-only
-jooqCodegenAutoStrategy := AutoStrategy.IfAbsent
+jooqCodegenAutoStrategy := AutoStrategy.Always
 ```
 
 #### jooqCodegenVariables
-Variables for jOOQ-codegen configuration text replacement.
 
 Default:
 
-|Key                |Value (example)                                |
+|KEY                |VALUE (example)                                |
 |-------------------|-----------------------------------------------|
 |TARGET_DIRECTORY   |/path/to/target/scala-2.13/src_managed/main    |
 |RESOURCE_DIRECTORY |/path/to/src/main/jooq-codegen/resources       |
+
+Variables for configuration text replacement.
+
+The plugin replaces placeholders like `${KEY}` in configuration to `VALUE`.
+
+##### Example
 
 ```scala mdoc:compile-only
 jooqCodegenVariables ++= Map(
@@ -142,9 +184,7 @@ jooqCodegenVariables ++= Map(
 )
 ```
 
-The plugin replaces placeholders like `${KEY}` in configuration to variables.
-
-e.g. Configuration file contains some placeholders:
+If configuration file contains some placeholders:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -154,7 +194,6 @@ e.g. Configuration file contains some placeholders:
         <url>${JDBC_URL}</url>
     </jdbc>
     <generator>
-        <!-- ...snip... -->
         <target>
             <packageName>com.example</packageName>
             <directory>${TARGET_DIRECTORY}</directory>
@@ -163,7 +202,7 @@ e.g. Configuration file contains some placeholders:
 </configuration>
 ```
 
-Then replace to:
+Then replace them before code generation:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -173,7 +212,6 @@ Then replace to:
         <url>jdbc:h2:path/to/database</url>
     </jdbc>
     <generator>
-        <!-- ...snip... -->
         <target>
             <packageName>com.example</packageName>
             <directory>/path/to/target/scala-2.13/src_managed/main</directory>
