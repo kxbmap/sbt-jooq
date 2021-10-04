@@ -104,10 +104,10 @@ object Codegen {
       }
     })
 
-  def generatorTargetDirectory(config: Node): String =
+  def generatorTargetDirectory(config: Node): File =
     (config \ "generator" \ "target" \ "directory").text.trim match {
-      case "" => "target/generated-sources/jooq"
-      case text => text
+      case "" => file("target") / "generated-sources" / "jooq"
+      case text => file(text)
     }
 
   def generatorTargetPackage(config: Node): Seq[String] =

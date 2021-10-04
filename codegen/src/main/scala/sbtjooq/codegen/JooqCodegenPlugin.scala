@@ -158,7 +158,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     import sbt.util.CacheImplicits._
     def parse(conf: File): (File, File) = {
       val config = IO.reader(conf)(XML.load)
-      val target = file(Codegen.generatorTargetDirectory(config)).getAbsoluteFile
+      val target = Codegen.generatorTargetDirectory(config).getAbsoluteFile
       conf -> Codegen.generatorTargetPackage(config).foldLeft(target)(_ / _)
     }
     val prev = jooqCodegenGeneratorTargets.previous.getOrElse(Seq.empty)
