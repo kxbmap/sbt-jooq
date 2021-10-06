@@ -12,11 +12,12 @@ trait JooqCodegenKeys {
   val jooqCodegenIfAbsent = taskKey[Seq[File]]("Run jOOQ-codegen if generated files absent")
 
   // User settings
+  val jooqCodegenMode = settingKey[CodegenMode]("jOOQ-codegen execution mode")
   val jooqCodegenConfig = settingKey[CodegenConfig]("jOOQ-codegen configuration")
   val jooqCodegenVariables = settingKey[Map[String, String]]("Variables to replace configuration text")
-  val jooqCodegenAutoStrategy = settingKey[AutoStrategy]("jOOQ-codegen auto generation strategy")
 
   // For reference
+  val jooqSource = settingKey[File]("Default generated jOOQ source directory")
   val jooqCodegenConfigFiles = taskKey[Seq[File]]("Actual jOOQ-codegen configuration files")
   val jooqCodegenGeneratedSources = taskKey[Seq[File]]("jOOQ-codegen generated sources")
 

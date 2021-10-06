@@ -12,8 +12,3 @@ TaskKey[Unit]("checkCalledTwice") := {
   val c = Counter.getAndReset()
   require(c == 2, s"Required to called twice, but called $c times")
 }
-
-TaskKey[Unit]("checkCalledNever") := {
-  val c = Counter.getAndReset()
-  require(c == 0, s"Required to never called, but called $c times")
-}

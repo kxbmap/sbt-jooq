@@ -17,8 +17,8 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   object autoImport extends JooqCodegenKeys {
 
-    type AutoStrategy = sbtjooq.codegen.AutoStrategy
-    final val AutoStrategy = sbtjooq.codegen.AutoStrategy
+    type CodegenMode = sbtjooq.codegen.CodegenMode
+    final val CodegenMode = sbtjooq.codegen.CodegenMode
 
     type CodegenConfig = sbtjooq.codegen.CodegenConfig
     final val CodegenConfig = sbtjooq.codegen.CodegenConfig
@@ -34,9 +34,9 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
 
   override def globalSettings: Seq[Setting[_]] = Seq(
+    jooqCodegenMode := CodegenMode.Auto,
     jooqCodegenConfig := CodegenConfig.empty,
     jooqCodegenVariables := Map.empty,
-    jooqCodegenAutoStrategy := AutoStrategy.IfAbsent,
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
   )
 
@@ -79,14 +79,32 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegen := codegenTask.value,
     jooqCodegenIfAbsent := codegenIfAbsentTask.value,
     jooqCodegenIfAbsent / skip := (jooqCodegen / skip).value,
+    jooqSource := {
+      if (jooqCodegenMode.value.isUnmanaged)
+        sourceDirectory.value / "jooq-generated"
+      else
+        sourceManaged.value
+    },
+    unmanagedSourceDirectories := {
+      if (jooqCodegenMode.value.isUnmanaged)
+        (unmanagedSourceDirectories.value :+ jooqSource.value).distinct
+      else
+        unmanagedSourceDirectories.value
+    },
+    managedSourceDirectories := {
+      if (jooqCodegenMode.value.isUnmanaged)
+        managedSourceDirectories.value
+      else
+        (managedSourceDirectories.value :+ jooqSource.value).distinct
+    },
     jooqCodegenVariables ++= Map(
-      "TARGET_DIRECTORY" -> sourceManaged.value.toString,
+      "TARGET_DIRECTORY" -> jooqSource.value.toString,
       "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value.toString,
     ),
     jooqCodegenConfigTransformer := Codegen.configTransformer(jooqCodegenVariables.value),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
     jooqCodegenConfigFiles := configFilesTask.value,
-    sourceGenerators += sourceGeneratorTask.taskValue,
+    sourceGenerators ++= sourceGeneratorsSetting.value,
     jooqCodegenGeneratorTargets := generatorTargetsTask.value,
     jooqCodegenGeneratedSourcesFinders := generatedSourcesFindersTask.value,
     jooqCodegenGeneratedSources := generatedSourcesTask.value,
@@ -146,11 +164,11 @@ object JooqCodegenPlugin extends AutoPlugin {
       jooqCodegenGeneratedSources
     )
 
-  private def sourceGeneratorTask: Initialize[Task[Seq[File]]] = Def.taskDyn {
-    jooqCodegenAutoStrategy.value match {
-      case AutoStrategy.Always => jooqCodegen
-      case AutoStrategy.IfAbsent => jooqCodegenIfAbsent
-      case AutoStrategy.Never => jooqCodegenGeneratedSources
+  private def sourceGeneratorsSetting: Initialize[Seq[Task[Seq[File]]]] = Def.setting {
+    jooqCodegenMode.value match {
+      case CodegenMode.Auto => jooqCodegenIfAbsent.taskValue :: Nil
+      case CodegenMode.Always => jooqCodegen.taskValue :: Nil
+      case CodegenMode.Unmanaged => Nil
     }
   }
 

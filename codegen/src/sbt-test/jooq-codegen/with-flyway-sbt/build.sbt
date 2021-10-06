@@ -6,9 +6,9 @@ jooqVersion := sys.props("jooq.version")
 
 Compile / jooqCodegen := (Compile / jooqCodegen).dependsOn(migration / flywayMigrate).value
 
-jooqCodegenConfig := file("jooq-codegen.xml")
+jooqCodegenMode := CodegenMode.Always
 
-jooqCodegenAutoStrategy := AutoStrategy.Always
+jooqCodegenConfig := file("jooq-codegen.xml")
 
 libraryDependencies += "com.h2database" % "h2" % sys.props("h2.version") % JooqCodegen
 

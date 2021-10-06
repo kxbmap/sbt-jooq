@@ -1,0 +1,16 @@
+> set jooqCodegenMode := CodegenMode.Auto
+> compile
+> compile
+> checkCalledOnce
+> clean
+
+> set jooqCodegenMode := CodegenMode.Always
+> compile
+> compile
+> checkCalledTwice
+> clean
+
+> set jooqCodegenMode := CodegenMode.Auto
+> set Compile / jooqSource := crossTarget.value / "jooq-generated"
+> compile
+$ exists target/scala-2.13/jooq-generated/com/example/db/Tables.java
