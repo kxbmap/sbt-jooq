@@ -9,7 +9,7 @@
             <name>org.jooq.meta.h2.H2Database</name>
             <inputSchema>PUBLIC</inputSchema>
             <includes>.*</includes>
-            <excludes>schema_version</excludes>
+            <excludes>flyway_schema_history</excludes>
             <schemaVersionProvider>SELECT :schema_name || '_' || MAX("installed_rank") || '_' || SUM("checksum") FROM "flyway_schema_history"</schemaVersionProvider>
         </database>
         <generate>

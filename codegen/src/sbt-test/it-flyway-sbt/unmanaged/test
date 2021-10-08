@@ -1,0 +1,10 @@
+-> compile
+
+> show jooqCodegen
+$ exists src/main/jooq-generated/com/example/db/Tables.java
+> run
+
+> flywayClean
+> clean
+$ exists src/main/jooq-generated/com/example/db/Tables.java
+> run

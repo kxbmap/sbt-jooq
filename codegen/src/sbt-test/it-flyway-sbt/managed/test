@@ -1,4 +1,4 @@
-> jooqCodegen
+> show jooqCodegen
 > run
 
 > flywayClean

@@ -2,11 +2,11 @@ ThisBuild / scalaVersion := sys.props("scala.version")
 
 enablePlugins(JooqCodegenPlugin)
 
+jooqCodegenMode := CodegenMode.Always
+
 jooqVersion := sys.props("jooq.version")
 
 Compile / jooqCodegen := (Compile / jooqCodegen).dependsOn(migration / flywayMigrate).value
-
-jooqCodegenMode := CodegenMode.Always
 
 jooqCodegenConfig := file("jooq-codegen.xml")
 

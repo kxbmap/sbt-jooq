@@ -19,6 +19,8 @@ jobs:
         include:
           - { task: codegen, compile-java: 11 }
           - { task: codegen, compile-java: 17 }
+          - { task: it, compile-java: 11 }
+          - { task: it, compile-java: 17 }
           - { task: checker, compile-java: 11 }
           - { task: checker, compile-java: 17 }
           - { task: test, compile-java: 11 }
@@ -50,6 +52,9 @@ jobs:
               ;;
             compat)
               sbt -v "codegen/scripted jooq-codegen-compat/*"
+              ;;
+            it)
+              sbt -v "codegen/scripted it-flyway-sbt/*"
               ;;
             checker)
               sbt -v "checker/scripted jooq-checker/*"
