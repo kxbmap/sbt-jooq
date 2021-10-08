@@ -4,23 +4,11 @@ import sbt._
 import scala.language.implicitConversions
 import scala.xml.{Elem, Node, NodeBuffer}
 
-sealed trait CodegenConfig {
-  def toSeq: Seq[CodegenConfig.Single]
-  def isEmpty: Boolean
-
-  def +(other: CodegenConfig.Single): CodegenConfig =
-    CodegenConfig.Sequence(toSeq :+ other)
-
-  def ++(other: CodegenConfig): CodegenConfig =
-    CodegenConfig.Sequence(toSeq ++ other.toSeq)
-}
+sealed trait CodegenConfig
 
 object CodegenConfig {
 
-  sealed trait Single extends CodegenConfig {
-    override def toSeq: Seq[Single] = Seq(this)
-    override def isEmpty: Boolean = false
-  }
+  sealed trait Single extends CodegenConfig
 
   case class FromFile(file: File) extends Single
 
@@ -28,8 +16,26 @@ object CodegenConfig {
 
   case class FromXML(xml: Node) extends Single
 
-  case class Sequence(override val toSeq: Seq[Single]) extends CodegenConfig {
-    override def isEmpty: Boolean = toSeq.isEmpty
+  case class Sequence(seq: Seq[Single]) extends CodegenConfig
+
+  implicit class CodegenConfigOps(config: CodegenConfig) {
+    def toSeq: Seq[Single] =
+      config match {
+        case single: Single => Seq(single)
+        case Sequence(seq) => seq
+      }
+
+    def isEmpty: Boolean =
+      config match {
+        case Sequence(seq) => seq.isEmpty
+        case _ => false
+      }
+
+    def +(other: Single): CodegenConfig =
+      Sequence(toSeq :+ other)
+
+    def ++(other: CodegenConfig): CodegenConfig =
+      Sequence(toSeq ++ other.toSeq)
   }
 
 
