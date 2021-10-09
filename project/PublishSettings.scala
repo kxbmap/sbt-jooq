@@ -15,7 +15,7 @@ object PublishSettings extends AutoPlugin {
     organization := "com.github.kxbmap",
     versionScheme := Some("early-semver"),
     licenses := Seq(
-      "Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")
+      "Apache License, Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")
     ),
   )
 
