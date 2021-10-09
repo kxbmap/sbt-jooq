@@ -3,7 +3,7 @@ package sbtjooq.codegen.internal
 import sbt._
 import sbtjooq.codegen.BuildInfo
 import sbtjooq.codegen.internal.JavaUtil._
-import scala.xml.{Node, Text}
+import scala.xml.{Atom, Elem, Node, Text}
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 
 object Codegen {
@@ -91,7 +91,33 @@ object Codegen {
     }
 
 
-  def configTransformer(vars: Map[String, String]): RuleTransformer =
+  def configTransformer(target: File, vars: Map[String, String]): Node => Node =
+    appendGeneratorTargetDirectory(target).andThen(configVariableTransformer(vars))
+
+  def appendGeneratorTargetDirectory(target: File): Node => Node = {
+    def append(node: Node, child: Node): Node =
+      (node, child) match {
+        case (e@Elem(p, l, a, s, xs@_*), x: Atom[_]) if e.text.trim.isEmpty =>
+          Elem(p, l, a, s, false, xs :+ x: _*)
+        case (Elem(p, l, a, s, xs@_*), c@Elem(_, _, _, _, cc@_*)) =>
+          xs.span(_.label != c.label) match {
+            case (ls, Seq(t, rs@_*)) =>
+              Elem(p, l, a, s, false, ls ++ cc.foldLeft(t)(append) ++ rs: _*)
+            case _ =>
+              Elem(p, l, a, s, false, xs :+ c: _*)
+          }
+        case _ => node
+      }
+    val elem =
+      <generator>
+        <target>
+          <directory>{target.toString}</directory>
+        </target>
+      </generator>
+    append(_, elem)
+  }
+
+  def configVariableTransformer(vars: Map[String, String]): RuleTransformer =
     new RuleTransformer(new RewriteRule {
       val parser = new SubstitutionParser(vars)
       override def transform(n: Node): Seq[Node] = n match {
@@ -103,6 +129,7 @@ object Codegen {
         case otherwise => otherwise
       }
     })
+
 
   def generatorTargetDirectory(config: Node): File =
     (config \ "generator" \ "target" \ "directory").text.trim match {

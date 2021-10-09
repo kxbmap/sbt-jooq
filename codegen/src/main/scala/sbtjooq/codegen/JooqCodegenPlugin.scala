@@ -98,10 +98,9 @@ object JooqCodegenPlugin extends AutoPlugin {
         (managedSourceDirectories.value :+ jooqSource.value).distinct
     },
     jooqCodegenVariables ++= Map(
-      "TARGET_DIRECTORY" -> jooqSource.value.toString,
       "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value.toString,
     ),
-    jooqCodegenConfigTransformer := Codegen.configTransformer(jooqCodegenVariables.value),
+    jooqCodegenConfigTransformer := Codegen.configTransformer(jooqSource.value, jooqCodegenVariables.value),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
     jooqCodegenConfigFiles := configFilesTask.value,
     sourceGenerators ++= sourceGeneratorsSetting.value,

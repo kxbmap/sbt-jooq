@@ -15,7 +15,6 @@
         </generate>
         <target>
             <packageName>com.example.42-f/o-b@r-b z.＠漢字　𩸽</packageName>
-            <directory>${TARGET_DIRECTORY}</directory>
         </target>
     </generator>
 </configuration>

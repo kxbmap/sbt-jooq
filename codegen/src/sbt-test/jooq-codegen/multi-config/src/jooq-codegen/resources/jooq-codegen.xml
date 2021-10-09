@@ -15,7 +15,6 @@
         </generate>
         <target>
             <packageName>com.example.db2</packageName>
-            <directory>${TARGET_DIRECTORY}</directory>
         </target>
     </generator>
 </configuration>
