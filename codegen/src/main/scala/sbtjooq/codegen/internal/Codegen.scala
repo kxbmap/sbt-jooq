@@ -3,7 +3,7 @@ package sbtjooq.codegen.internal
 import sbt._
 import sbtjooq.codegen.BuildInfo
 import sbtjooq.codegen.internal.JavaUtil._
-import scala.xml.{Atom, Elem, Node, Text}
+import scala.xml.{Elem, Node, Text}
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 
 object Codegen {
@@ -97,7 +97,7 @@ object Codegen {
   def appendGeneratorTargetDirectory(target: File): Node => Node = {
     def append(node: Node, child: Node): Node =
       (node, child) match {
-        case (e@Elem(p, l, a, s, xs@_*), x: Atom[_]) if e.text.trim.isEmpty =>
+        case (e@Elem(p, l, a, s, xs@_*), x) if x.isAtom && e.text.trim.isEmpty =>
           Elem(p, l, a, s, false, xs :+ x: _*)
         case (Elem(p, l, a, s, xs@_*), c@Elem(_, _, _, _, cc@_*)) =>
           xs.span(_.label != c.label) match {
