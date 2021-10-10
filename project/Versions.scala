@@ -17,8 +17,6 @@ object Versions {
 
   final val logbackVersion = "1.2.6"
 
-  final val fastParseVersion = "2.3.3"
-
   final val h2Version = "1.4.200"
 
   final val sbtWartRemoverVersion = "2.4.16"

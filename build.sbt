@@ -31,7 +31,6 @@ lazy val codegen = project
       codegenTool / publishLocal,
     ).evaluated,
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "fastparse" % fastParseVersion,
       "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
     ),
     buildInfoKeys := Seq[BuildInfoKey](

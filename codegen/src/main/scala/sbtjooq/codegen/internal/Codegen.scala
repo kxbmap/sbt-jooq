@@ -3,8 +3,7 @@ package sbtjooq.codegen.internal
 import sbt._
 import sbtjooq.codegen.BuildInfo
 import sbtjooq.codegen.internal.JavaUtil._
-import scala.xml.{Elem, Node, Text}
-import scala.xml.transform.{RewriteRule, RuleTransformer}
+import scala.xml.{Elem, Node, NodeSeq, Text}
 
 object Codegen {
 
@@ -92,7 +91,7 @@ object Codegen {
 
 
   def configTransformer(target: File, vars: Map[String, Any]): Node => Node =
-    appendGeneratorTargetDirectory(target).andThen(configVariableTransformer(vars))
+    appendGeneratorTargetDirectory(target).andThen(replaceConfigVariables(vars))
 
   def appendGeneratorTargetDirectory(target: File): Node => Node = {
     def append(node: Node, child: Node): Node =
@@ -111,24 +110,41 @@ object Codegen {
     val elem =
       <generator>
         <target>
-          <directory>{target.toString}</directory>
+          <directory>{target}</directory>
         </target>
       </generator>
     append(_, elem)
   }
 
-  def configVariableTransformer(vars: Map[String, Any]): RuleTransformer =
-    new RuleTransformer(new RewriteRule {
-      val parser = new SubstitutionParser(vars)
-      override def transform(n: Node): Seq[Node] = n match {
-        case Text(data) =>
-          parser.parse(data).fold(
-            e => throw new MessageOnlyException(s"Substitution failure: $e"),
-            s => Text(s)
-          )
-        case otherwise => otherwise
+  def replaceConfigVariables(vars: Map[String, Any]): Node => Node = {
+    def go(parents: List[Node]): Node => NodeSeq = {
+      def path = parents.reverseMap(_.label).mkString("/", "/", "")
+      def replace(t: String): NodeSeq = {
+        t.span(_ != '$') match {
+          case (_, "") => Text(t)
+          case (l, r) if r.startsWith("$$") => Text(l + "$") +: replace(r.drop(2))
+          case (l, r) if r.startsWith("${") => Text(l) +: value(r.drop(2))
+          case (_, r) => sys.error("Expected '$$' or '${' but " + r)
+        }
       }
-    })
+      def value(t: String): NodeSeq =
+        t.span(_ != '}') match {
+          case (_, "") => sys.error(s" Missing closing brace `}` at '$path'")
+          case (k, r) =>
+            val v = vars.getOrElse(k, sys.error(s"No variables found for key '$k' at '$path'"))
+            Text(v.toString) +: replace(r.drop(1))
+        }
+      locally {
+        case e@Elem(p, l, a, s, xs@_*) => Elem(p, l, a, s, xs.isEmpty, xs.flatMap(go(e :: parents)): _*)
+        case Text(text) => replace(text)
+        case node => node
+      }
+    }
+    locally {
+      case e@Elem(p, l, a, s, xs@_*) => Elem(p, l, a, s, xs.isEmpty, xs.flatMap(go(e :: Nil)): _*)
+      case node => node
+    }
+  }
 
 
   def generatorTargetDirectory(config: Node): File =
