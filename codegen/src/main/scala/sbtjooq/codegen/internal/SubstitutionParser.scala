@@ -3,13 +3,13 @@ package sbtjooq.codegen.internal
 import fastparse._, NoWhitespace._
 import sbt.Command
 
-class SubstitutionParser(vars: Map[String, String]) {
+class SubstitutionParser(vars: Map[String, Any]) {
 
   private def Substitution[_: P]: P[String] =
     P("{" ~/
       CharsWhile(_ != '}').!
         .map(_.trim)
-        .flatMap(vars.get(_).fold[P[String]](Fail)(Pass(_)))
+        .flatMap(vars.get(_).map(_.toString).fold[P[String]](Fail)(Pass(_)))
         .opaque("VariableName") ~/ "}")
 
   private def Text[_: P]: P[String] =

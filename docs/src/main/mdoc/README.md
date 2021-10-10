@@ -173,7 +173,7 @@ Variables for configuration placeholders replacement.
 
 ```scala mdoc:compile-only
 jooqCodegenVariables ++= Map(
-  "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value.toString
+  "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value
 )
 ```
 

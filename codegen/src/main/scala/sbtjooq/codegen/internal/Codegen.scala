@@ -91,7 +91,7 @@ object Codegen {
     }
 
 
-  def configTransformer(target: File, vars: Map[String, String]): Node => Node =
+  def configTransformer(target: File, vars: Map[String, Any]): Node => Node =
     appendGeneratorTargetDirectory(target).andThen(configVariableTransformer(vars))
 
   def appendGeneratorTargetDirectory(target: File): Node => Node = {
@@ -117,7 +117,7 @@ object Codegen {
     append(_, elem)
   }
 
-  def configVariableTransformer(vars: Map[String, String]): RuleTransformer =
+  def configVariableTransformer(vars: Map[String, Any]): RuleTransformer =
     new RuleTransformer(new RewriteRule {
       val parser = new SubstitutionParser(vars)
       override def transform(n: Node): Seq[Node] = n match {

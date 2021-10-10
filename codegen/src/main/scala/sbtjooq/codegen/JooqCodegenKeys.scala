@@ -14,7 +14,7 @@ trait JooqCodegenKeys {
   // User settings
   val jooqCodegenMode = settingKey[CodegenMode]("jOOQ-codegen execution mode")
   val jooqCodegenConfig = settingKey[CodegenConfig]("jOOQ-codegen configuration")
-  val jooqCodegenVariables = settingKey[Map[String, String]]("Variables to replace configuration text")
+  val jooqCodegenVariables = settingKey[Map[String, Any]]("Variables to replace configuration placeholders")
 
   // For reference
   val jooqSource = settingKey[File]("Default generated jOOQ source directory")
