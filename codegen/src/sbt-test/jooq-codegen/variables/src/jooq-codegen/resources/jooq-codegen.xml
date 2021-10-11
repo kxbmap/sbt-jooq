@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.15.0.xsd">
+    <generator>
+        <database>
+            <name>${DATABASE_NAME}</name>
+            <properties>${DATABASE_PROPS}</properties>
+        </database>
+        <generate>
+            <deprecated>false</deprecated>
+        </generate>
+        <target>
+            <packageName>${PACKAGE}</packageName>
+        </target>
+    </generator>
+</configuration>
