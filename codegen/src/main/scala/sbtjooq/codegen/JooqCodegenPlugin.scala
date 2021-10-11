@@ -140,11 +140,11 @@ object JooqCodegenPlugin extends AutoPlugin {
       }.value
   }
 
-  private def warnIfConfigIsEmpty: Initialize[Task[Unit]] = Def.task {
+  private lazy val warnIfConfigIsEmpty: Initialize[Task[Unit]] = Def.task {
     if (jooqCodegenConfig.value.isEmpty) {
       val conf = configuration.value.id
       streams.value.log.warn(
-        s"""Skip code generation due to `$conf / jooqCodegenConfig` is empty.
+        s"""Skip jOOQ code generation due to `$conf / jooqCodegenConfig` is empty.
            |To turn off this warning,
            |- `set $conf / jooqCodegenConfig := <your configuration>` or
            |- `set $conf / jooqCodegen / skip := true`
