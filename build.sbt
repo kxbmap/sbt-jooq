@@ -31,6 +31,7 @@ lazy val codegen = project
       codegenTool / publishLocal,
     ).evaluated,
     libraryDependencies ++= Seq(
+      "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
       "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
     ),
     buildInfoKeys := Seq[BuildInfoKey](
@@ -82,7 +83,10 @@ lazy val docs = project
     scalacOptions ++= Seq(
       "-Wconf:cat=unused-nowarn:s",
     ),
-    libraryDependencies += sbtDependency.value
+    libraryDependencies += sbtDependency.value,
+    libraryDependencySchemes ++= Seq(
+      "org.scala-lang.modules" %% "scala-xml" % "always",
+    )
   )
 
 val readmeFile = "README.md"

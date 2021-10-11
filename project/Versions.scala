@@ -15,6 +15,8 @@ object Versions {
     "3.10.8"
   )
 
+  final val scalaXMLVersion = "2.0.1"
+
   final val logbackVersion = "1.2.6"
 
   final val h2Version = "1.4.200"
