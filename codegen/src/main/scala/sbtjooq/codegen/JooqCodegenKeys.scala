@@ -30,7 +30,7 @@ trait JooqCodegenInternalKeys {
 
   // For internal use
   val jooqCodegenConfigTransformer = settingKey[Node => Node]("jOOQ-codegen configuration transform function")
-  val jooqCodegenConfigVariableExpander = settingKey[PartialFunction[Any, NodeSeq]]("Partial function to expand variables")
+  val jooqCodegenVariableExpander = settingKey[PartialFunction[Any, NodeSeq]]("Partial function to expand variables")
   val jooqCodegenTransformedConfigs = taskKey[Seq[Node]]("Transformed jOOQ-codegen configurations")
   val jooqCodegenGeneratorTargets = taskKey[Seq[(File, File)]]("jOOQ-codegen generator target directory")
   val jooqCodegenGeneratedSourcesFinders = taskKey[Seq[(File, PathFinder)]]("PathFinders for generated sources")

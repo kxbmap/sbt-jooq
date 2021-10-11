@@ -37,6 +37,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenMode := CodegenMode.Auto,
     jooqCodegenConfig := CodegenConfig.empty,
     jooqCodegenVariables := Map.empty,
+    jooqCodegenVariableExpander := Codegen.expandVariable,
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
   )
 
@@ -79,6 +80,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegen := codegenTask.value,
     jooqCodegenIfAbsent := codegenIfAbsentTask.value,
     jooqCodegenIfAbsent / skip := (jooqCodegen / skip).value,
+    sourceGenerators ++= sourceGeneratorsSetting.value,
     jooqSource := {
       if (jooqCodegenMode.value.isUnmanaged)
         sourceDirectory.value / "jooq-generated"
@@ -100,49 +102,18 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenVariables ++= Map(
       "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value,
     ),
-    jooqCodegenConfigVariableExpander := Codegen.expandVariable,
     jooqCodegenConfigTransformer := Codegen.configTransformer(
       jooqSource.value,
       jooqCodegenVariables.value,
-      jooqCodegenConfigVariableExpander.value.applyOrElse(_, Codegen.expandVariableFallback),
+      jooqCodegenVariableExpander.value.applyOrElse(_, Codegen.expandVariableFallback),
     ),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
     jooqCodegenConfigFiles := configFilesTask.value,
-    sourceGenerators ++= sourceGeneratorsSetting.value,
     jooqCodegenGeneratorTargets := generatorTargetsTask.value,
     jooqCodegenGeneratedSourcesFinders := generatedSourcesFindersTask.value,
     jooqCodegenGeneratedSources := generatedSourcesTask.value,
   ))
 
-
-  private def transformConfigsTask: Initialize[Task[Seq[Node]]] = Def.taskDyn {
-    def load(config: CodegenConfig.Single): Initialize[Task[Node]] =
-      config match {
-        case CodegenConfig.FromFile(file) => Def.task(IO.reader(file.getAbsoluteFile)(XML.load))
-        case CodegenConfig.FromXML(xml) => Def.task(xml)
-        case CodegenConfig.FromResource(resource) =>
-          Def.task(ClasspathLoader.using((JooqCodegen / fullClasspath).value) { loader =>
-            loader.getResourceAsStream(resource) match {
-              case null => throw new MessageOnlyException(s"resource $resource not found in classpath")
-              case in => Using.bufferedInputStream(in)(XML.load)
-            }
-          })
-      }
-    val config = jooqCodegenConfig.value
-    val transform = jooqCodegenConfigTransformer.value
-    config.toSeq.map(load(_).map(transform)).joinWith(_.join)
-  }
-
-  private def configFilesTask: Initialize[Task[Seq[File]]] = Def.task {
-    val configs = jooqCodegenTransformedConfigs.value
-    val dir = streams.value.cacheDirectory
-    configs.zipWithIndex.map {
-      case (xml, idx) =>
-        val file = dir / s"$idx.xml"
-        XML.save(file.toString, xml, "UTF-8", xmlDecl = true)
-        file
-    }
-  }
 
   private def codegenTask: Initialize[Task[Seq[File]]] = Def.task {
     if ((jooqCodegen / skip).value)
@@ -173,6 +144,35 @@ object JooqCodegenPlugin extends AutoPlugin {
       case CodegenMode.Auto => jooqCodegenIfAbsent.taskValue :: Nil
       case CodegenMode.Always => jooqCodegen.taskValue :: Nil
       case CodegenMode.Unmanaged => Nil
+    }
+  }
+
+  private def transformConfigsTask: Initialize[Task[Seq[Node]]] = Def.taskDyn {
+    def load(config: CodegenConfig.Single): Initialize[Task[Node]] =
+      config match {
+        case CodegenConfig.FromFile(file) => Def.task(IO.reader(file.getAbsoluteFile)(XML.load))
+        case CodegenConfig.FromXML(xml) => Def.task(xml)
+        case CodegenConfig.FromResource(resource) =>
+          Def.task(ClasspathLoader.using((JooqCodegen / fullClasspath).value) { loader =>
+            loader.getResourceAsStream(resource) match {
+              case null => throw new MessageOnlyException(s"resource $resource not found in classpath")
+              case in => Using.bufferedInputStream(in)(XML.load)
+            }
+          })
+      }
+    val config = jooqCodegenConfig.value
+    val transform = jooqCodegenConfigTransformer.value
+    config.toSeq.map(load(_).map(transform)).joinWith(_.join)
+  }
+
+  private def configFilesTask: Initialize[Task[Seq[File]]] = Def.task {
+    val configs = jooqCodegenTransformedConfigs.value
+    val dir = streams.value.cacheDirectory
+    configs.zipWithIndex.map {
+      case (xml, idx) =>
+        val file = dir / s"$idx.xml"
+        XML.save(file.toString, xml, "UTF-8", xmlDecl = true)
+        file
     }
   }
 
