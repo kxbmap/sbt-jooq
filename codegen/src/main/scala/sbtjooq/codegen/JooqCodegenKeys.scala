@@ -1,7 +1,7 @@
 package sbtjooq.codegen
 
 import sbt._
-import scala.xml.Node
+import scala.xml.{Node, NodeSeq}
 
 trait JooqCodegenKeys {
 
@@ -30,6 +30,7 @@ trait JooqCodegenInternalKeys {
 
   // For internal use
   val jooqCodegenConfigTransformer = settingKey[Node => Node]("jOOQ-codegen configuration transform function")
+  val jooqCodegenConfigVariableExpander = settingKey[PartialFunction[Any, NodeSeq]]("Partial function to expand variables")
   val jooqCodegenTransformedConfigs = taskKey[Seq[Node]]("Transformed jOOQ-codegen configurations")
   val jooqCodegenGeneratorTargets = taskKey[Seq[(File, File)]]("jOOQ-codegen generator target directory")
   val jooqCodegenGeneratedSourcesFinders = taskKey[Seq[(File, PathFinder)]]("PathFinders for generated sources")

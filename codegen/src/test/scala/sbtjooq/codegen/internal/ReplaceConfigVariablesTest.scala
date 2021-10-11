@@ -1,5 +1,6 @@
 package sbtjooq.codegen.internal
 
+import java.util.Properties
 import sbtjooq.codegen.UnitSpec
 
 class ReplaceConfigVariablesTest extends UnitSpec {
@@ -9,8 +10,15 @@ class ReplaceConfigVariablesTest extends UnitSpec {
     val vars = Map[String, Any](
       "STRING" -> "foo",
       "FILE" -> new java.io.File("xxx.txt"),
+      "PROPS" -> {
+        val props = new Properties()
+        props.setProperty("key1", "value1")
+        props.setProperty("key2", "value2")
+        props
+      }
     )
-    val transform = Codegen.replaceConfigVariables(vars)
+    val transform =
+      Codegen.replaceConfigVariables(vars, Codegen.expandVariable.applyOrElse(_, Codegen.expandVariableFallback))
 
     "configuration has no placeholders" should {
       "do nothing" in {
@@ -31,6 +39,26 @@ class ReplaceConfigVariablesTest extends UnitSpec {
       "replace with File.toString value" in {
         val x = <configuration>${{FILE}}</configuration>
         val e = <configuration>xxx.txt</configuration>
+        assertXML(e)(transform(x))
+      }
+    }
+
+    "configuration contains placeholder that refer Properties variable" should {
+      "replace with property elements that contains key/value" in {
+        val x = <configuration><properties>${{PROPS}}</properties></configuration>
+        val e =
+          <configuration>
+            <properties>
+              <property>
+                <key>key1</key>
+                <value>value1</value>
+              </property>
+              <property>
+                <key>key2</key>
+                <value>value2</value>
+              </property>
+            </properties>
+          </configuration>
         assertXML(e)(transform(x))
       }
     }

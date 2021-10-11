@@ -181,6 +181,8 @@ ___
 ### Rewriting configurations
 
 The plugin replaces placeholders like `${KEY}` in configurations to variables value.
+If value is `java.util.Properties`, it expands to property elements that contains key and value elements,
+otherwise to string.
 
 And inserts a generator target directory element if it is not configured.
 
@@ -190,17 +192,26 @@ For example, add variables in build:
 jooqCodegenVariables ++= Map(
   "JDBC_DRIVER" -> "org.h2.Driver",
   "JDBC_URL" -> "jdbc:h2:path/to/database",
+  "JDBC_PROPS" -> {
+    val props = new java.util.Properties()
+    props.setProperty("user", "root")
+    props.setProperty("password", "secret")
+    props
+  },
 )
 ```
 
 and configuration is below:
 
 ```scala mdoc:invisible
+import sbtjooq.codegen.internal._
+
 val xml = 
   <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-@JOOQ_MINOR_VERSION@.0.xsd">
       <jdbc>
           <driver>${{JDBC_DRIVER}}</driver>
           <url>${{JDBC_URL}}</url>
+          <properties>${{JDBC_PROPS}}</properties>
       </jdbc>
       <generator>
           <target>
@@ -214,24 +225,32 @@ val target = file("/path/to/target/scala-2.13/src_managed/main")
 val vars = Map(
   "JDBC_DRIVER" -> "org.h2.Driver",
   "JDBC_URL" -> "jdbc:h2:path/to/database",
+  "JDBC_PROPS" -> {
+    val props = new java.util.Properties()
+    props.setProperty("user", "root")
+    props.setProperty("password", "secret")
+    props
+  },
 )
 
-val p = new scala.xml.PrettyPrinter(120, 4, true)
+val transform =
+  Codegen.configTransformer(target, vars, Codegen.expandVariable.applyOrElse(_, Codegen.expandVariableFallback))
+
+val pp = new scala.xml.PrettyPrinter(120, 4, true)
 ```
 ````scala mdoc:passthrough
 println(s"""```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-${p.format(xml)}
+${pp.format(xml)}
 ```""")
 ````
 
 The plugin rewrites them before code generation:
 
 ````scala mdoc:passthrough
-import sbtjooq.codegen.internal._
 println(s"""```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-${p.format(Codegen.configTransformer(target, vars)(xml)).replace('\\', '/')}
+${pp.format(transform(xml)).replace('\\', '/')}
 ```""")
 ````
 

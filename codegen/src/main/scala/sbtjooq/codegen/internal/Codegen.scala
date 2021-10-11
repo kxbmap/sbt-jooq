@@ -1,8 +1,10 @@
 package sbtjooq.codegen.internal
 
+import java.util.Properties
 import sbt._
 import sbtjooq.codegen.BuildInfo
 import sbtjooq.codegen.internal.JavaUtil._
+import scala.collection.JavaConverters._
 import scala.xml.{Elem, Node, NodeSeq, Text}
 
 object Codegen {
@@ -90,8 +92,8 @@ object Codegen {
     }
 
 
-  def configTransformer(target: File, vars: Map[String, Any]): Node => Node =
-    appendGeneratorTargetDirectory(target).andThen(replaceConfigVariables(vars))
+  def configTransformer(target: File, vars: Map[String, Any], expand: Any => NodeSeq): Node => Node =
+    appendGeneratorTargetDirectory(target).andThen(replaceConfigVariables(vars, expand))
 
   def appendGeneratorTargetDirectory(target: File): Node => Node = {
     def append(node: Node, child: Node): Node =
@@ -116,7 +118,7 @@ object Codegen {
     append(_, elem)
   }
 
-  def replaceConfigVariables(vars: Map[String, Any]): Node => Node = {
+  def replaceConfigVariables(vars: Map[String, Any], expand: Any => NodeSeq): Node => Node = {
     def go(parents: List[Node]): Node => NodeSeq = {
       def path = parents.reverseMap(_.label).mkString("/", "/", "")
       def replace(t: String): NodeSeq = {
@@ -132,7 +134,7 @@ object Codegen {
           case (_, "") => sys.error(s" Missing closing brace `}` at '$path'")
           case (k, r) =>
             val v = vars.getOrElse(k, sys.error(s"No variables found for key '$k' at '$path'"))
-            Text(v.toString) +: replace(r.drop(1))
+            expand(v) ++ replace(r.drop(1))
         }
       locally {
         case e@Elem(p, l, a, s, xs@_*) => Elem(p, l, a, s, xs.isEmpty, xs.flatMap(go(e :: parents)): _*)
@@ -145,6 +147,19 @@ object Codegen {
       case node => node
     }
   }
+
+  def expandVariable: PartialFunction[Any, NodeSeq] = {
+    case props: Properties =>
+      props.entrySet().asScala.map { e =>
+        <property>
+          <key>{e.getKey}</key>
+          <value>{e.getValue}</value>
+        </property>
+      }.toSeq
+  }
+
+  def expandVariableFallback: Any => NodeSeq =
+    x => Text(x.toString)
 
 
   def generatorTargetDirectory(config: Node): File =
