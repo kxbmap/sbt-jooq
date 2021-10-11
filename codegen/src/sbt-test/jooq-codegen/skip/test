@@ -1,13 +1,13 @@
-> set jooqCodegen / skip := true
+> set Compile / jooqCodegen / skip := true
 > jooqCodegen
 > checkCalledNever
 -> compile
 > checkCalledNever
 
-> set jooqCodegen / skip := false
+> set Compile / jooqCodegen / skip := false
 > compile
 > checkCalledOnce
 
-> set jooqCodegen / skip := true
+> set Compile / jooqCodegen / skip := true
 > compile
 > checkCalledNever

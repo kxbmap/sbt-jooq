@@ -2,6 +2,8 @@ ThisBuild / scalaVersion := sys.props("scala.version")
 
 enablePlugins(JooqCodegenPlugin)
 
+Compile / jooqCodegen / skip := true
+
 jooqVersion := sys.props("jooq.version")
 
 addJooqCodegenSettingsTo(Test)

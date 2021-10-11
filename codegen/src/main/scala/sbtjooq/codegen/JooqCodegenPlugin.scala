@@ -77,6 +77,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         codegenJavaVersion = Codegen.javaVersion((JooqCodegen / run / javaHome).value),
       ),
     jooqCodegen := codegenTask.value,
+    jooqCodegen / skip := skip.value,
     jooqCodegenIfAbsent := codegenIfAbsentTask.value,
     jooqCodegenIfAbsent / skip := (jooqCodegen / skip).value,
     sourceGenerators ++= sourceGeneratorsSetting.value,
@@ -118,17 +119,37 @@ object JooqCodegenPlugin extends AutoPlugin {
     if ((jooqCodegen / skip).value)
       jooqCodegenGeneratedSources.value
     else
-      Def.taskDyn(runCodegen(jooqCodegenConfigFiles.value)).value
+      Def.taskDyn(Def.sequential(
+        warnIfConfigIsEmpty,
+        runCodegen(jooqCodegenConfigFiles.value),
+      )).value
   }
 
   private def codegenIfAbsentTask: Initialize[Task[Seq[File]]] = Def.task {
-    if ((jooqCodegenIfAbsent / skip).value) jooqCodegenGeneratedSources.value
-    else Def.taskDyn {
-      val configs = jooqCodegenGeneratedSourcesFinders.value.collect {
-        case (config, finder) if finder.get().isEmpty => config
-      }
-      runCodegen(configs)
-    }.value
+    if ((jooqCodegenIfAbsent / skip).value)
+      jooqCodegenGeneratedSources.value
+    else
+      Def.taskDyn {
+        val configs = jooqCodegenGeneratedSourcesFinders.value.collect {
+          case (config, finder) if finder.get().isEmpty => config
+        }
+        Def.sequential(
+          warnIfConfigIsEmpty,
+          runCodegen(configs),
+        )
+      }.value
+  }
+
+  private def warnIfConfigIsEmpty: Initialize[Task[Unit]] = Def.task {
+    if (jooqCodegenConfig.value.isEmpty) {
+      val conf = configuration.value.id
+      streams.value.log.warn(
+        s"""Skip code generation due to `$conf / jooqCodegenConfig` is empty.
+           |To turn off this warning,
+           |- `set $conf / jooqCodegenConfig := <your configuration>` or
+           |- `set $conf / jooqCodegen / skip := true`
+           |""".stripMargin)
+    }
   }
 
   private def runCodegen(configs: Seq[File]): Initialize[Task[Seq[File]]] =
