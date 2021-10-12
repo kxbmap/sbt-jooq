@@ -23,7 +23,7 @@ trait JooqCodegenKeys {
 
   // Internal use
   val jooqCodegenTransformedConfigs = taskKey[Seq[Node]]("Transformed jOOQ-codegen configurations")
-  val jooqCodegenConfigFiles = taskKey[Seq[File]]("Actual jOOQ-codegen configuration files")
+  val jooqCodegenTransformedConfigFiles = taskKey[Seq[File]]("Actual jOOQ-codegen configuration files")
   val jooqCodegenGeneratedSources = taskKey[Seq[File]]("jOOQ-codegen generated sources")
   val jooqCodegenGeneratorTargets = taskKey[Seq[(File, File)]]("jOOQ-codegen generator target directory")
   val jooqCodegenGeneratedSourcesFinders = taskKey[Seq[(File, PathFinder)]]("PathFinders for generated sources")

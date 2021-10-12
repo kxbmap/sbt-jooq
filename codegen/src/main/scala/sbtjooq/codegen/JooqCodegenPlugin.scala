@@ -108,7 +108,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       jooqCodegenVariableExpander.value.applyOrElse(_, Codegen.expandVariableFallback),
     ),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
-    jooqCodegenConfigFiles := configFilesTask.value,
+    jooqCodegenTransformedConfigFiles := transformedConfigFilesTask.value,
     jooqCodegenGeneratorTargets := generatorTargetsTask.value,
     jooqCodegenGeneratedSourcesFinders := generatedSourcesFindersTask.value,
     jooqCodegenGeneratedSources := generatedSourcesTask.value,
@@ -121,7 +121,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     else
       Def.taskDyn(Def.sequential(
         warnIfConfigIsEmpty,
-        runCodegen(jooqCodegenConfigFiles.value),
+        runCodegen(jooqCodegenTransformedConfigFiles.value),
       )).value
   }
 
@@ -185,7 +185,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     config.toSeq.map(load(_).map(transform)).joinWith(_.join)
   }
 
-  private def configFilesTask: Initialize[Task[Seq[File]]] = Def.task {
+  private def transformedConfigFilesTask: Initialize[Task[Seq[File]]] = Def.task {
     val configs = jooqCodegenTransformedConfigs.value
     val dir = (jooqCodegen / streams).value.cacheDirectory
     configs.zipWithIndex.map {
@@ -204,7 +204,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       conf -> Codegen.generatorTargetPackage(config).foldLeft(target)(_ / _)
     }
     val prev = jooqCodegenGeneratorTargets.previous.getOrElse(Seq.empty)
-    val files = jooqCodegenConfigFiles.value
+    val files = jooqCodegenTransformedConfigFiles.value
     val store = (jooqCodegen / streams).value.cacheStoreFactory.make("files")
     Tracked.diffInputs(store, FileInfo.hash)(files.toSet) { diff =>
       prev.filter(x => diff.unmodified(x._1)) ++ (diff.modified -- diff.removed).map(parse)
