@@ -131,7 +131,7 @@ object Codegen {
       }
       def value(t: String): NodeSeq =
         t.span(_ != '}') match {
-          case (_, "") => sys.error(s" Missing closing brace `}` at '$path'")
+          case (_, "") => sys.error(s"Missing closing brace `}` at '$path'")
           case (k, r) =>
             val v = vars.getOrElse(k, sys.error(s"No variables found for key '$k' at '$path'"))
             expand(v) ++ replace(r.drop(1))
