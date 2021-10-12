@@ -187,7 +187,7 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   private def configFilesTask: Initialize[Task[Seq[File]]] = Def.task {
     val configs = jooqCodegenTransformedConfigs.value
-    val dir = streams.value.cacheDirectory
+    val dir = (jooqCodegen / streams).value.cacheDirectory
     configs.zipWithIndex.map {
       case (xml, idx) =>
         val file = dir / s"$idx.xml"
@@ -205,7 +205,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     }
     val prev = jooqCodegenGeneratorTargets.previous.getOrElse(Seq.empty)
     val files = jooqCodegenConfigFiles.value
-    val store = streams.value.cacheStoreFactory.make("inputs")
+    val store = (jooqCodegen / streams).value.cacheStoreFactory.make("files")
     Tracked.diffInputs(store, FileInfo.hash)(files.toSet) { diff =>
       prev.filter(x => diff.unmodified(x._1)) ++ (diff.modified -- diff.removed).map(parse)
     }
