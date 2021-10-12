@@ -13,9 +13,6 @@
                 </property>
             </properties>
         </database>
-        <generate>
-            <deprecated>false</deprecated>
-        </generate>
         <target>
             <packageName>com.example.db</packageName>
         </target>

@@ -5,9 +5,6 @@
             <name>${DATABASE_NAME}</name>
             <properties>${DATABASE_PROPS}</properties>
         </database>
-        <generate>
-            <deprecated>false</deprecated>
-        </generate>
         <target>
             <packageName>${PACKAGE}</packageName>
         </target>

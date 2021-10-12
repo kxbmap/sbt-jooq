@@ -11,9 +11,6 @@
             <includes>.*</includes>
             <excludes>flyway_schema_history</excludes>
         </database>
-        <generate>
-            <deprecated>false</deprecated>
-        </generate>
         <target>
             <packageName>com.example.db</packageName>
         </target>

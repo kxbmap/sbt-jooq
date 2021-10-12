@@ -10,9 +10,6 @@
             <includes>.*</includes>
             <inputSchema>PUBLIC</inputSchema>
         </database>
-        <generate>
-            <deprecated>false</deprecated>
-        </generate>
         <target>
             <packageName>com.example.db2</packageName>
         </target>
