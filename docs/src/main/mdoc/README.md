@@ -16,7 +16,6 @@ import sbtjooq.codegen.JooqCodegenPlugin.autoImport._
 
 The plugin for easy use of jOOQ-codegen.
 
-___
 ### Installation
 
 Add the following to `project/plugins.sbt`:
@@ -35,20 +34,20 @@ enablePlugins(JooqCodegenPlugin)
 libraryDependencies += "com.h2database" % "h2" % "@H2_VERSION@" % JooqCodegen
 ```
 
-___
+---
 ### Tasks
 
 #### jooqCodegen
 
-Run jOOQ-codegen manually according to settings.
+Run jOOQ-codegen according to settings.
 
 #### jooqCodegenIfAbsent
 
-Run jOOQ-codegen manually according to settings if generated files absent.
+Run jOOQ-codegen according to settings if generated files absent.
 
 If generated files present, there is no effect.
 
-___
+---
 ### Settings
 
 #### jooqVersion
@@ -73,7 +72,7 @@ If you want to use the commercial version of jOOQ, set the appropriate one. For 
 the [jOOQ manual](https://www.jooq.org/doc/@JOOQ_MINOR_VERSION@/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
 
 ```scala mdoc:compile-only
-jooqOrganization := "org.jooq.trial"
+jooqOrganization := "org.jooq"
 ```
 
 #### autoJooqLibrary
@@ -96,20 +95,24 @@ autoJooqLibrary := true
 
 Mode of jOOQ-codegen execution.
 
-|Mode         |Before each compile            |Directory where generated files placed         |
+|CodegenMode  |Before each compile            |Destination directory                          |
 |-------------|-------------------------------|-----------------------------------------------|
 |`Auto`       |Run `jooqCodegenIfAbsent` task |target/scala-<SCALA_VERSION>/src_managed/main/ |
 |`Always`     |Run `jooqCodegen` task         |target/scala-<SCALA_VERSION>/src_managed/main/ |
 |`Unmanaged`  |Do nothing                     |src/main/jooq-generated/                       |
 
 `Auto` and `Always` are "Managed" mode that runs generation task before each compile and places
-generated files to managed directory.
+generated files to the managed directory.
 
-`Unmanaged` mode do nothing before compile. You should run generation task manually.
-And generated files are placed in unmanaged directory.
+`Unmanaged` mode do nothing before compile. Therefore, you need to run generation task manually.
+Also, generated files are placed in the unmanaged directory.
+
+If you want to change the destination directory, set to `Compile / jooqSource` key.
 
 ```scala mdoc:compile-only
-jooqCodegenMode := CodegenMode.Unmanaged
+jooqCodegenMode := CodegenMode.Auto
+
+Compile / jooqSource := crossTarget.value / "jooq-generated"
 ```
 
 #### jooqCodegenConfig
@@ -120,7 +123,6 @@ jooqCodegenMode := CodegenMode.Unmanaged
 Configuration of jOOQ-codegen.
 
 This is empty by default and must be set. You can set a file, classpath resource, XML directly, or multiple of them.
-
 
 ```scala mdoc:compile-only
 // Set a file
@@ -165,9 +167,9 @@ jooqCodegenConfig ++= Seq(file("append2.xml"), file("append3.xml"))
 - Optional
 - Default:
 
-  |KEY                |VALUE                                          |
-  |-------------------|-----------------------------------------------|
-  |RESOURCE_DIRECTORY |/path/to/src/main/jooq-codegen/resources       |
+  |KEY                |VALUE                                        |
+  |-------------------|---------------------------------------------|
+  |RESOURCE_DIRECTORY |/path/to/project/src/jooq-codegen/resources  |
 
 Variables for configuration placeholders replacement.
 
@@ -177,34 +179,22 @@ jooqCodegenVariables ++= Map(
 )
 ```
 
-___
+---
 ### Rewriting configurations
 
-The plugin replaces placeholders like `${KEY}` in configurations to variables value.
-If value is `java.util.Properties`, it expands to property elements that contains key and value elements,
-otherwise to string.
+The plugin rewrites configurations before code generation.
 
-And inserts a generator target directory element if it is not configured.
+#### Rewrite rules
 
-For example, add variables in build:
+- Replace placeholders like `${KEY}` in configurations to variables' value.
 
-```scala mdoc:compile-only
-jooqCodegenVariables ++= Map(
-  "JDBC_DRIVER" -> "org.h2.Driver",
-  "JDBC_URL" -> "jdbc:h2:path/to/database",
-  "JDBC_PROPS" -> {
-    val props = new java.util.Properties()
-    props.setProperty("user", "root")
-    props.setProperty("password", "secret")
-    props
-  },
-)
-```
+  - If value is `java.util.Properties`, it expands to property list of key/value pairs, otherwise to string.
 
-and configuration is below:
+- If the `generator \ target \ directory` element is not configured, append it using `jooqSource` value.
 
+#### Example
 ```scala mdoc:invisible
-import sbtjooq.codegen.internal._
+import sbtjooq.codegen.internal.Codegen._
 
 val xml = 
   <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-@JOOQ_MINOR_VERSION@.0.xsd">
@@ -220,11 +210,11 @@ val xml =
       </generator>
   </configuration>
 
-val target = file("/path/to/target/scala-2.13/src_managed/main")
+val target = file("/path/to/project/target/scala-2.13/src_managed/main")
 
 val vars = Map(
-  "JDBC_DRIVER" -> "org.h2.Driver",
-  "JDBC_URL" -> "jdbc:h2:path/to/database",
+  "JDBC_DRIVER" -> "com.mysql.cj.jdbc.Driver",
+  "JDBC_URL" -> "jdbc:mysql://localhost/testdb",
   "JDBC_PROPS" -> {
     val props = new java.util.Properties()
     props.setProperty("user", "root")
@@ -233,27 +223,43 @@ val vars = Map(
   },
 )
 
-val transform =
-  Codegen.configTransformer(target, vars, Codegen.expandVariable.applyOrElse(_, Codegen.expandVariableFallback))
+val transform = configTransformer(target, vars, expandVariable.applyOrElse(_, expandVariableFallback))
 
 val pp = new scala.xml.PrettyPrinter(120, 4, true)
 ```
+
+Define variables in build:
+
+```scala mdoc:compile-only
+jooqCodegenVariables ++= Map(
+  "JDBC_DRIVER" -> "com.mysql.cj.jdbc.Driver",
+  "JDBC_URL" -> "jdbc:mysql://localhost/testdb",
+  "JDBC_PROPS" -> {
+    val props = new java.util.Properties()
+    props.setProperty("user", "root")
+    props.setProperty("password", "secret")
+    props
+  },
+)
+```
+
+And configuration is below:
+
 ````scala mdoc:passthrough
 println(s"""```xml
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 ${pp.format(xml)}
 ```""")
 ````
 
-The plugin rewrites them before code generation:
+Then rewrites to:
 
 ````scala mdoc:passthrough
 println(s"""```xml
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 ${pp.format(transform(xml)).replace('\\', '/')}
 ```""")
 ````
 
+---
 ## License
 
 Copyright 2015-2018 Tsukasa Kitachi
