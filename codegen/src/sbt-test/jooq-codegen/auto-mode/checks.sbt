@@ -3,12 +3,9 @@ JooqCodegen / run := {
   (JooqCodegen / run).evaluated
 }
 
-TaskKey[Unit]("checkCalledOnce") := {
+InputKey[Unit]("checkCalled") := {
+  import sbt.complete.DefaultParsers._
+  val n = (Space ~> IntBasic).parsed
   val c = Counter.getAndReset()
-  require(c == 1, s"Required to called once, but called $c times")
-}
-
-TaskKey[Unit]("checkCalledTwice") := {
-  val c = Counter.getAndReset()
-  require(c == 2, s"Required to called twice, but called $c times")
+  require(c == n, s"Required to called $n times, but called $c times")
 }
