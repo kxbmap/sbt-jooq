@@ -4,21 +4,25 @@ import sbt._
 
 object JavaUtil {
 
-  def parseJavaVersion(javaHome: File): Int = {
+  def parseJavaVersion(javaHome: File): JavaVersion = {
     val releaseFile = javaHome / "release"
     val versionLine = """JAVA_VERSION="(.+)"""".r
     IO.readLines(releaseFile).collectFirst {
-      case versionLine(v) => majorVersion(v)
+      case versionLine(v) => JavaVersion(v)
     }.getOrElse {
       sys.error(s"Cannot parse JAVA_VERSION in $javaHome")
     }
   }
 
-  def majorVersion(full: String): Int =
-    full.stripPrefix("1.").takeWhile(_.isDigit).toInt
+  implicit class JavaVersionOps(javaVersion: JavaVersion) {
+    def major: Int = javaVersion.numbers match {
+      case Vector(1L, x, _*) => x.toInt
+      case Vector(x, _*) => x.toInt
+    }
 
-  def isJigsawEnabled(javaVersion: Int): Boolean = javaVersion >= 9
+    def isJigsawEnabled: Boolean = major >= 9
 
-  def isJavaEEModulesBundled(javaVersion: Int): Boolean = javaVersion <= 10
+    def isJavaEEModulesBundled: Boolean = major <= 10
+  }
 
 }
