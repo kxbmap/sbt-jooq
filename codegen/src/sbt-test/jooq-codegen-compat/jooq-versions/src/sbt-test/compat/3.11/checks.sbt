@@ -1,4 +1,4 @@
-import sbtjooq.codegen.internal.Codegen
+import sbtjooq.codegen.internal._
 
 TaskKey[Unit]("checkCodegenJavaOptions") := {
   val opts = (JooqCodegen / run / javaOptions).value
