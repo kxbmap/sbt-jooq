@@ -3,7 +3,6 @@ package sbtjooq.codegen.internal
 import java.util.Properties
 import sbt._
 import sbtjooq.codegen.BuildInfo
-import sbtjooq.codegen.internal.JavaUtil._
 import scala.collection.JavaConverters._
 import scala.xml.{Elem, Node, NodeSeq, Text}
 

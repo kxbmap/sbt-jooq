@@ -1,8 +1,9 @@
-package sbtjooq.codegen.internal
+package sbtjooq.codegen
 
 import sbt._
+import sbt.JavaVersion
 
-object JavaUtil {
+package object internal {
 
   def parseJavaVersion(javaHome: File): JavaVersion = {
     val releaseFile = javaHome / "release"
@@ -15,9 +16,9 @@ object JavaUtil {
   }
 
   implicit class JavaVersionOps(javaVersion: JavaVersion) {
-    def major: Int = javaVersion.numbers match {
-      case Vector(1L, x, _*) => x.toInt
-      case Vector(x, _*) => x.toInt
+    def major: Long = javaVersion.numbers match {
+      case Vector(1L, x, _*) => x
+      case Vector(x, _*) => x
     }
 
     def isJigsawEnabled: Boolean = major >= 9
