@@ -46,7 +46,7 @@ TaskKey[Unit]("checkJavacOptions") := {
 
 TaskKey[Unit]("checkCompileDependencies") := {
   val deps = libraryDependencies.value.filter(_.configurations.contains(Compile.name))
-  val jv = Codegen.javaVersion((Compile / compile / javaHome).value)
+  val jv = Codegen.javaVersion((Compile / compile / javaHome).value).major
   val x = "javax.annotation" % "javax.annotation-api" % "???"
   if (jv >= 11) {
     if (!deps.exists(m => x.organization == m.organization && x.name == m.name))
