@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [ compat ]
+        task: [ 4 ]
         compile-java: [ 11, 17 ]
         runtime-java:
           - 8   # baseline
@@ -17,14 +17,14 @@ jobs:
           - 11  # LTS / modules no longer bundled
           - 17  # LTS
         include:
-          - { task: codegen, compile-java: 11 }
-          - { task: codegen, compile-java: 17 }
-          - { task: it, compile-java: 11 }
-          - { task: it, compile-java: 17 }
-          - { task: checker, compile-java: 11 }
-          - { task: checker, compile-java: 17 }
-          - { task: test, compile-java: 11 }
-          - { task: test, compile-java: 17 }
+          - { task: 1, compile-java: 11 }
+          - { task: 1, compile-java: 17 }
+          - { task: 2, compile-java: 11 }
+          - { task: 2, compile-java: 17 }
+          - { task: 3, compile-java: 11 }
+          - { task: 3, compile-java: 17 }
+          - { task: 5, compile-java: 11 }
+          - { task: 5, compile-java: 17 }
     env:
       JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
     steps:
@@ -47,20 +47,20 @@ jobs:
       - name: Build and test
         run: |
           case ${{ matrix.task }} in
-            codegen)
+            1)
+              sbt -v test docs/mdoc
+              ;;
+            2)
+              sbt -v "core/scripted jooq/*" "checker/scripted jooq-checker/*"
+              ;;
+            3)
               sbt -v "codegen/scripted jooq-codegen/*"
               ;;
-            compat)
+            4)
               sbt -v "codegen/scripted jooq-codegen-compat/*"
               ;;
-            it)
+            5)
               sbt -v "codegen/scripted it-flyway-sbt/*"
-              ;;
-            checker)
-              sbt -v "checker/scripted jooq-checker/*"
-              ;;
-            test)
-              sbt -v test docs/mdoc
               ;;
             *)
               echo "unknown task"
