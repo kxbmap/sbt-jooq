@@ -1,11 +1,11 @@
-ThisBuild / scalaVersion := sys.props("scala.version")
+ThisBuild / scalaVersion := sys.props("scripted.scala.version")
 
 enablePlugins(JooqCodegenPlugin)
 
-jooqVersion := sys.props("jooq.version")
+jooqVersion := sys.props("scripted.jooq.version")
 
 jooqCodegenConfig := file("jooq-codegen.xml")
 
 libraryDependencies ++= Seq(Runtime, JooqCodegen).map { conf =>
-  "com.h2database" % "h2" % sys.props("h2.version") % conf
+  "com.h2database" % "h2" % sys.props("scripted.h2.version") % conf
 }

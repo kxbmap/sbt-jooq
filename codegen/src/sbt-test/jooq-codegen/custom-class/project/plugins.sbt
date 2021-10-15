@@ -1,1 +1,1 @@
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % sys.props("plugin.version"))
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % sys.props("scripted.plugin.version"))

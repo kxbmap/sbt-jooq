@@ -15,13 +15,13 @@ object ScriptedSettings extends AutoPlugin {
     scriptedBufferLog := false,
     scriptedLaunchOpts ++= Seq(
       "-Xmx1024M",
-      s"-Dplugin.version=${version.value}",
-      s"-Dscala.version=$scriptedScalaVersion",
-      s"-Djooq.version=$jooqVersion",
-      s"-Dh2.version=$h2Version",
-      s"-Dflywaysbt.version=$flywaySbtVersion"
+      s"-Dscripted.plugin.version=${version.value}",
+      s"-Dscripted.scala.version=$scriptedScalaVersion",
+      s"-Dscripted.jooq.version=$jooqVersion",
+      s"-Dscripted.h2.version=$h2Version",
+      s"-Dscripted.flywaysbt.version=$flywaySbtVersion"
     ) ++ jooqVersions.map { v =>
-      s"-Djooq.${minorVersion(v).replace('.', '_')}.version=$v"
+      s"-Dscripted.jooq.${minorVersion(v).replace('.', '_')}.version=$v"
     }
   )
 

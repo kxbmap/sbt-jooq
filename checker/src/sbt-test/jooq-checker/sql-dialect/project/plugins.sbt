@@ -1,1 +1,1 @@
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq-checker" % sys.props("plugin.version"))
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq-checker" % sys.props("scripted.plugin.version"))

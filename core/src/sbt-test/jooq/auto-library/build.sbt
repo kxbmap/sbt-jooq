@@ -4,13 +4,13 @@ scriptedBufferLog := false
 
 scriptedLaunchOpts ++=
   sys.props.collect {
-    case (k, v) if k.endsWith(".version") => s"-D$k=$v"
+    case (k, v) if k.startsWith("scripted.") => s"-D$k=$v"
   }.toSeq
 
 lazy val dep = project
   .settings(
     autoScalaLibrary := false,
-    libraryDependencies += "org.jooq" % "jooq" % sys.props("jooq.version"),
+    libraryDependencies += "org.jooq" % "jooq" % sys.props("scripted.jooq.version"),
   )
 
 lazy val copyLibs = taskKey[Unit]("")

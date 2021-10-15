@@ -4,7 +4,7 @@ scriptedBufferLog := false
 
 scriptedLaunchOpts ++=
   sys.props.collect {
-    case (k, v) if k.endsWith(".version") => s"-D$k=$v"
+    case (k, v) if k.startsWith("scripted.") => s"-D$k=$v"
   }.toSeq
 
 lazy val copyChanges = taskKey[Unit]("")

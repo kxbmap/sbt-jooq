@@ -1,10 +1,10 @@
-ThisBuild / scalaVersion := sys.props("scala.version")
+ThisBuild / scalaVersion := sys.props("scripted.scala.version")
 
 ThisBuild / javacOptions ++= Seq("--release", "11")
 
 enablePlugins(JooqCodegenPlugin)
 
-jooqVersion := sys.props("jooq.3_15.version")
+jooqVersion := sys.props("scripted.jooq.3_15.version")
 
 JooqCodegen / jooqModules += "jooq-meta-extensions"
 

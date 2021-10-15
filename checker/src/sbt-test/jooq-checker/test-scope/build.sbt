@@ -1,7 +1,7 @@
-ThisBuild / scalaVersion := sys.props("scala.version")
+ThisBuild / scalaVersion := sys.props("scripted.scala.version")
 
 enablePlugins(JooqCheckerPlugin)
 
-jooqVersion := sys.props("jooq.version")
+jooqVersion := sys.props("scripted.jooq.version")
 
 addJooqCheckerSettingsTo(Test, compile)
