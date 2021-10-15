@@ -35,7 +35,7 @@ jobs:
       - uses: coursier/cache-action@v6
 
       - name: Install runtime Java
-        if: ${{ matrix.task == 'compat' }}
+        if: ${{ matrix.task == 4 }}
         env:
           RUNTIME_JAVA: "zulu@1.${{ matrix.runtime-java }}"
         run: |
