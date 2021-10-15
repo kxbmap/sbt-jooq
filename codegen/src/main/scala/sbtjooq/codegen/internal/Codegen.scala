@@ -3,6 +3,7 @@ package sbtjooq.codegen.internal
 import java.util.Properties
 import sbt._
 import sbtjooq.codegen.BuildInfo
+import sbtjooq.JooqVersion
 import scala.collection.JavaConverters._
 import scala.xml.{Elem, Node, NodeSeq, Text}
 
@@ -14,28 +15,28 @@ object Codegen {
   def mainClass: String =
     "sbtjooq.codegen.tool.GenerationTool"
 
-  def dependencies(jooqVersion: String, javaVersion: JavaVersion): Seq[ModuleID] =
+  def dependencies(jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[ModuleID] =
     codegenToolDependencies ++ jaxbDependencies(jooqVersion, javaVersion)
 
-  def javaOptions(jooqVersion: String, javaVersion: JavaVersion): Seq[String] =
+  def javaOptions(jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[String] =
     jaxbAddModulesOption(jooqVersion, javaVersion)
 
-  def needsFork(jooqVersion: String, javaVersion: JavaVersion): Boolean =
+  def needsFork(jooqVersion: JooqVersion, javaVersion: JavaVersion): Boolean =
     javaOptions(jooqVersion, javaVersion).nonEmpty
 
-  def compileDependencies(javaVersion: JavaVersion, codegenJooqVersion: String, codegenJavaVersion: JavaVersion): Seq[ModuleID] =
-    javaxAnnotationDependencies(javaVersion, codegenJooqVersion, codegenJavaVersion)
+  def compileDependencies(javaVersion: JavaVersion, codegenVersions: CodegenVersions): Seq[ModuleID] =
+    javaxAnnotationDependencies(javaVersion, codegenVersions)
 
-  def javacOptions(javaVersion: JavaVersion, codegenJooqVersion: String, codegenJavaVersion: JavaVersion): Seq[String] =
-    javaxAnnotationAddModulesOption(javaVersion, codegenJooqVersion, codegenJavaVersion)
+  def javacOptions(javaVersion: JavaVersion, codegenVersions: CodegenVersions): Seq[String] =
+    javaxAnnotationAddModulesOption(javaVersion, codegenVersions)
 
 
   private def codegenToolDependencies: Seq[ModuleID] =
     Seq("com.github.kxbmap" % "sbt-jooq-codegen-tool" % BuildInfo.sbtJooqVersion)
 
   //noinspection SbtDependencyVersionInspection
-  private def jaxbDependencies(jooqVersion: String, javaVersion: JavaVersion): Seq[ModuleID] =
-    if (needsJaxbSettings(jooqVersion) && !javaVersion.isJavaEEModulesBundled)
+  private def jaxbDependencies(jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[ModuleID] =
+    if (jooqVersion.needsJaxbSettings && !javaVersion.isJavaEEModulesBundled)
       Seq(
         "javax.activation" % "activation" % BuildInfo.javaxActivationVersion,
         "javax.xml.bind" % "jaxb-api" % BuildInfo.jaxbApiVersion,
@@ -44,51 +45,28 @@ object Codegen {
     else
       Nil
 
-  private def jaxbAddModulesOption(jooqVersion: String, javaVersion: JavaVersion): Seq[String] =
-    if (needsJaxbSettings(jooqVersion) && javaVersion.isJigsawEnabled && javaVersion.isJavaEEModulesBundled)
+  private def jaxbAddModulesOption(jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[String] =
+    if (jooqVersion.needsJaxbSettings && javaVersion.isJigsawEnabled && javaVersion.isJavaEEModulesBundled)
       Seq("--add-modules", "java.xml.bind")
     else
       Nil
 
-  private def needsJaxbSettings(jooqVersion: String): Boolean =
-    CrossVersion.partialVersion(jooqVersion).forall {
-      case (x, y) => x < 3 || x == 3 && y <= 11
-    }
-
-  private def javaxAnnotationDependencies(
-      javaVersion: JavaVersion,
-      codegenJooqVersion: String,
-      codegenJavaVersion: JavaVersion,
-  ): Seq[ModuleID] =
+  private def javaxAnnotationDependencies(javaVersion: JavaVersion, codegenVersions: CodegenVersions): Seq[ModuleID] =
     if (!javaVersion.isJavaEEModulesBundled
-      && !generatedAnnotationDisabledByDefault(codegenJooqVersion)
-      && useJavaxAnnotationByDefault(codegenJooqVersion, codegenJavaVersion))
+      && !codegenVersions.jooq.generatedAnnotationDisabledByDefault
+      && codegenVersions.useJavaxAnnotationByDefault)
       Seq("javax.annotation" % "javax.annotation-api" % BuildInfo.javaxAnnotationApiVersion)
     else
       Nil
 
-  private def javaxAnnotationAddModulesOption(
-      javaVersion: JavaVersion,
-      codegenJooqVersion: String,
-      codegenJavaVersion: JavaVersion,
-  ): Seq[String] =
+  private def javaxAnnotationAddModulesOption(javaVersion: JavaVersion, codegenVersions: CodegenVersions): Seq[String] =
     if (javaVersion.isJigsawEnabled
       && javaVersion.isJavaEEModulesBundled
-      && !generatedAnnotationDisabledByDefault(codegenJooqVersion)
-      && useJavaxAnnotationByDefault(codegenJooqVersion, codegenJavaVersion))
+      && !codegenVersions.jooq.generatedAnnotationDisabledByDefault
+      && codegenVersions.useJavaxAnnotationByDefault)
       Seq("--add-modules", "java.xml.ws.annotation")
     else
       Nil
-
-  private def generatedAnnotationDisabledByDefault(jooqVersion: String): Boolean =
-    CrossVersion.partialVersion(jooqVersion).forall {
-      case (x, y) => x > 3 || x == 3 && y >= 13
-    }
-
-  private def useJavaxAnnotationByDefault(jooqVersion: String, javaVersion: JavaVersion): Boolean =
-    javaVersion.major <= 8 || CrossVersion.partialVersion(jooqVersion).forall {
-      case (x, y) => x < 3 || x == 3 && y < 12
-    }
 
 
   def configTransformer(target: File, vars: Map[String, Any], expand: Any => NodeSeq): Node => Node =

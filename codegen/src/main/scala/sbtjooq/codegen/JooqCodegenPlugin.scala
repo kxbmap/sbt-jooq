@@ -41,15 +41,20 @@ object JooqCodegenPlugin extends AutoPlugin {
   )
 
   def jooqCodegenDefaultSettings: Seq[Setting[_]] = Seq(
-    libraryDependencies ++= Codegen
-      .dependencies((JooqCodegen / jooqVersion).value, Codegen.javaVersion((JooqCodegen / run / javaHome).value))
-      .map(_ % JooqCodegen),
-    libraryDependencies ++= Classpaths.autoLibraryDependency(
-      (JooqCodegen / autoScalaLibrary).value && (JooqCodegen / scalaHome).value.isEmpty && (JooqCodegen / managedScalaInstance).value,
-      plugin = false,
-      (JooqCodegen / scalaOrganization).value,
-      (JooqCodegen / scalaVersion).value)
-      .map(_ % JooqCodegen)
+    libraryDependencies ++=
+      Codegen.dependencies(
+        (JooqCodegen / jooqVersion).value,
+        Codegen.javaVersion((JooqCodegen / run / javaHome).value),
+      ).map(_ % JooqCodegen),
+    libraryDependencies ++=
+      Classpaths.autoLibraryDependency(
+        (JooqCodegen / autoScalaLibrary).value
+          && (JooqCodegen / scalaHome).value.isEmpty
+          && (JooqCodegen / managedScalaInstance).value,
+        plugin = false,
+        (JooqCodegen / scalaOrganization).value,
+        (JooqCodegen / scalaVersion).value,
+      ).map(_ % JooqCodegen)
   ) ++
     JooqPlugin.jooqScopedSettings(JooqCodegen) ++
     inConfig(JooqCodegen)(Defaults.configSettings ++
@@ -65,16 +70,14 @@ object JooqCodegenPlugin extends AutoPlugin {
   def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++=
       Codegen.compileDependencies(
-        javaVersion = Codegen.javaVersion((config / compile / javaHome).value),
-        codegenJooqVersion = (JooqCodegen / jooqVersion).value,
-        codegenJavaVersion = Codegen.javaVersion((JooqCodegen / run / javaHome).value),
+        Codegen.javaVersion((config / compile / javaHome).value),
+        ((JooqCodegen / jooqVersion).value, Codegen.javaVersion((JooqCodegen / run / javaHome).value)),
       ).map(_ % config)
   ) ++ inConfig(config)(Seq(
     javacOptions ++=
       Codegen.javacOptions(
-        javaVersion = Codegen.javaVersion((compile / javaHome).value),
-        codegenJooqVersion = (JooqCodegen / jooqVersion).value,
-        codegenJavaVersion = Codegen.javaVersion((JooqCodegen / run / javaHome).value),
+        Codegen.javaVersion((compile / javaHome).value),
+        ((JooqCodegen / jooqVersion).value, Codegen.javaVersion((JooqCodegen / run / javaHome).value)),
       ),
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := skip.value,
