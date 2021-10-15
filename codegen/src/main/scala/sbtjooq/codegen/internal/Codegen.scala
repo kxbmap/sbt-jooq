@@ -15,20 +15,20 @@ object Codegen {
   def mainClass: String =
     "sbtjooq.codegen.tool.GenerationTool"
 
-  def dependencies(jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[ModuleID] =
-    codegenToolDependencies ++ jaxbDependencies(jooqVersion, javaVersion)
+  def dependencies(auto: Boolean, jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[ModuleID] =
+    codegenToolDependencies ++ (if (auto) jaxbDependencies(jooqVersion, javaVersion) else Nil)
 
-  def javaOptions(jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[String] =
-    jaxbAddModulesOption(jooqVersion, javaVersion)
+  def javaOptions(auto: Boolean, jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[String] =
+    if (auto) jaxbAddModulesOption(jooqVersion, javaVersion) else Nil
 
-  def needsFork(jooqVersion: JooqVersion, javaVersion: JavaVersion): Boolean =
-    javaOptions(jooqVersion, javaVersion).nonEmpty
+  def needsFork(auto: Boolean, jooqVersion: JooqVersion, javaVersion: JavaVersion): Boolean =
+    javaOptions(auto, jooqVersion, javaVersion).nonEmpty
 
-  def compileDependencies(javaVersion: JavaVersion, codegenVersions: CodegenVersions): Seq[ModuleID] =
-    javaxAnnotationDependencies(javaVersion, codegenVersions)
+  def compileDependencies(auto: Boolean, javaVersion: JavaVersion, codegenVersions: CodegenVersions): Seq[ModuleID] =
+    if (auto) javaxAnnotationDependencies(javaVersion, codegenVersions) else Nil
 
-  def javacOptions(javaVersion: JavaVersion, codegenVersions: CodegenVersions): Seq[String] =
-    javaxAnnotationAddModulesOption(javaVersion, codegenVersions)
+  def javacOptions(auto: Boolean, javaVersion: JavaVersion, codegenVersions: CodegenVersions): Seq[String] =
+    if (auto) javaxAnnotationAddModulesOption(javaVersion, codegenVersions) else Nil
 
 
   private def codegenToolDependencies: Seq[ModuleID] =
