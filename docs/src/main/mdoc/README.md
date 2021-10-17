@@ -194,7 +194,8 @@ The plugin rewrites configurations before code generation.
 
 #### Example
 ```scala mdoc:invisible
-import sbtjooq.codegen.internal.Codegen._
+import sbtjooq.codegen.internal.ConfigTransformer
+import sbtjooq.codegen.internal.VariableExpander
 
 val xml = 
   <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-@JOOQ_MINOR_VERSION@.0.xsd">
@@ -223,7 +224,7 @@ val vars = Map(
   },
 )
 
-val transform = configTransformer(target, vars, expandVariable.applyOrElse(_, expandVariableFallback))
+val transform = ConfigTransformer(target, vars, VariableExpander())
 
 val pp = new scala.xml.PrettyPrinter(120, 4, true)
 ```

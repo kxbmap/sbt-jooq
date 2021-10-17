@@ -2,7 +2,7 @@ import sbtjooq.codegen.internal._
 
 TaskKey[Unit]("checkCodegenJavaOptions") := {
   val opts = (JooqCodegen / run / javaOptions).value
-  val jv = Codegen.javaVersion((JooqCodegen / run / javaHome).value).major
+  val jv = JavaVersion.get((JooqCodegen / run / javaHome).value).major
   val xs = Seq("--add-modules", "java.xml.bind")
   if (jv >= 9 && jv < 11) {
     if (!opts.containsSlice(xs))
@@ -15,7 +15,7 @@ TaskKey[Unit]("checkCodegenJavaOptions") := {
 
 TaskKey[Unit]("checkCodegenDependencies") := {
   val deps = libraryDependencies.value.filter(_.configurations.contains(JooqCodegen.name))
-  val jv = Codegen.javaVersion((JooqCodegen / run / javaHome).value).major
+  val jv = JavaVersion.get((JooqCodegen / run / javaHome).value).major
   val xs = Seq(
     "javax.activation" % "activation" % "???",
     "javax.xml.bind" % "jaxb-api" % "???",
@@ -33,7 +33,7 @@ TaskKey[Unit]("checkCodegenDependencies") := {
 
 TaskKey[Unit]("checkJavacOptions") := {
   val opts = (Compile / javacOptions).value
-  val jv = Codegen.javaVersion((Compile / compile / javaHome).value).major
+  val jv = JavaVersion.get((Compile / compile / javaHome).value).major
   val xs = Seq("--add-modules", "java.xml.ws.annotation")
   if (jv >= 9 && jv < 11) {
     if (!opts.containsSlice(xs))
@@ -46,7 +46,7 @@ TaskKey[Unit]("checkJavacOptions") := {
 
 TaskKey[Unit]("checkCompileDependencies") := {
   val deps = libraryDependencies.value.filter(_.configurations.contains(Compile.name))
-  val jv = Codegen.javaVersion((Compile / compile / javaHome).value).major
+  val jv = JavaVersion.get((Compile / compile / javaHome).value).major
   val x = "javax.annotation" % "javax.annotation-api" % "???"
   if (jv >= 11) {
     if (!deps.exists(m => x.organization == m.organization && x.name == m.name))

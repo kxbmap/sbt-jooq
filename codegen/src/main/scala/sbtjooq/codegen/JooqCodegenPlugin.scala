@@ -7,7 +7,7 @@ import sbt.io.Using
 import sbtjooq.JooqKeys._
 import sbtjooq.JooqPlugin
 import sbtjooq.codegen.JooqCodegenKeys._
-import sbtjooq.codegen.internal.{ClasspathLoader, Codegen}
+import sbtjooq.codegen.internal._
 import scala.xml.{Node, XML}
 
 object JooqCodegenPlugin extends AutoPlugin {
@@ -36,7 +36,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenMode := CodegenMode.Auto,
     jooqCodegenConfig := CodegenConfig.empty,
     jooqCodegenVariables := Map.empty,
-    jooqCodegenVariableExpander := Codegen.expandVariable,
+    jooqCodegenVariableExpander := VariableExpander.default,
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
   )
 
@@ -46,7 +46,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         Codegen.dependencies(
           (JooqCodegen / autoJooqLibrary).value,
           (JooqCodegen / jooqVersion).value,
-          Codegen.javaVersion((JooqCodegen / run / javaHome).value),
+          JavaVersion.get((JooqCodegen / run / javaHome).value),
         ).map(_ % JooqCodegen),
       libraryDependencies ++=
         Classpaths.autoLibraryDependency(
@@ -61,24 +61,25 @@ object JooqCodegenPlugin extends AutoPlugin {
       jooqModules := Seq("jooq-codegen"),
     ) ++ inTask(run)(Seq(
       mainClass := Some(Codegen.mainClass),
-      fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, Codegen.javaVersion(javaHome.value)),
-      javaOptions ++=
-        Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, Codegen.javaVersion(javaHome.value)),
+      fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, JavaVersion.get(javaHome.value)),
+      javaOptions ++= Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, JavaVersion.get(javaHome.value)),
     )))
 
   def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++=
       Codegen.compileDependencies(
         (config / autoJooqLibrary).value,
-        Codegen.javaVersion((config / compile / javaHome).value),
-        ((JooqCodegen / jooqVersion).value, Codegen.javaVersion((JooqCodegen / run / javaHome).value)),
+        JavaVersion.get((config / compile / javaHome).value),
+        (JooqCodegen / jooqVersion).value,
+        JavaVersion.get((JooqCodegen / run / javaHome).value),
       ).map(_ % config)
   ) ++ inConfig(config)(Seq(
     javacOptions ++=
       Codegen.javacOptions(
         autoJooqLibrary.value,
-        Codegen.javaVersion((compile / javaHome).value),
-        ((JooqCodegen / jooqVersion).value, Codegen.javaVersion((JooqCodegen / run / javaHome).value)),
+        JavaVersion.get((compile / javaHome).value),
+        (JooqCodegen / jooqVersion).value,
+        JavaVersion.get((JooqCodegen / run / javaHome).value),
       ),
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := skip.value,
@@ -106,10 +107,10 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenVariables ++= Map(
       "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value,
     ),
-    jooqCodegenConfigTransformer := Codegen.configTransformer(
+    jooqCodegenConfigTransformer := ConfigTransformer(
       jooqSource.value,
       jooqCodegenVariables.value,
-      jooqCodegenVariableExpander.value.applyOrElse(_, Codegen.expandVariableFallback),
+      VariableExpander(jooqCodegenVariableExpander.value),
     ),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
     jooqCodegenTransformedConfigFiles := transformedConfigFilesTask.value,
@@ -202,11 +203,7 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   private def generatorTargetsTask: Initialize[Task[Seq[(File, File)]]] = Def.task {
     import sbt.util.CacheImplicits._
-    def parse(conf: File): (File, File) = {
-      val config = IO.reader(conf)(XML.load)
-      val target = Codegen.generatorTargetDirectory(config).getAbsoluteFile
-      conf -> Codegen.generatorTargetPackage(config).foldLeft(target)(_ / _)
-    }
+    def parse(file: File): (File, File) = file -> GeneratorTarget.get(IO.reader(file)(XML.load))
     val prev = jooqCodegenGeneratorTargets.previous.getOrElse(Seq.empty)
     val files = jooqCodegenTransformedConfigFiles.value
     val store = (jooqCodegen / streams).value.cacheStoreFactory.make("files")

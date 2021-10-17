@@ -1,18 +1,29 @@
 package sbtjooq.codegen
 
+import java.io.FileNotFoundException
 import sbt._
-import sbt.JavaVersion
-import sbtjooq.JooqVersion
 
 package object internal {
 
-  def parseJavaVersion(javaHome: File): JavaVersion = {
-    val releaseFile = javaHome / "release"
-    val versionLine = """JAVA_VERSION="(.+)"""".r
-    IO.readLines(releaseFile).collectFirst {
-      case versionLine(v) => JavaVersion(v)
-    }.getOrElse {
-      sys.error(s"Cannot parse JAVA_VERSION in $javaHome")
+  implicit class JavaVersionCompanionOps(companion: JavaVersion.type) {
+    def get(javaHome: Option[File]): JavaVersion =
+      javaHome.fold(systemDefault)(parse(_).fold(sys.error, identity))
+
+    def systemDefault: JavaVersion =
+      companion(sys.props("java.version"))
+
+    def parse(javaHome: File): Either[String, JavaVersion] = {
+      val releaseFile = javaHome / "release"
+      val versionLine = """JAVA_VERSION="(.+)"""".r
+      try
+        IO.readLines(releaseFile)
+          .collectFirst {
+            case versionLine(v) => companion(v)
+          }
+          .toRight(s"No JAVA_VERSION line in $releaseFile")
+      catch {
+        case e: FileNotFoundException => Left(e.getMessage)
+      }
     }
   }
 
@@ -25,24 +36,6 @@ package object internal {
     def isJigsawEnabled: Boolean = major >= 9
 
     def isJavaEEModulesBundled: Boolean = major <= 10
-  }
-
-  implicit class JooqVersionOps(jooqVersion: JooqVersion) {
-    def needsJaxbSettings: Boolean =
-      jooqVersion.matches("<=3.11")
-
-    def generatedAnnotationDisabledByDefault: Boolean =
-      jooqVersion.matches(">=3.13")
-  }
-
-  type CodegenVersions = (JooqVersion, JavaVersion)
-
-  implicit class CodegenVersionsOps(versions: CodegenVersions) {
-    def jooq: JooqVersion = versions._1
-    def java: JavaVersion = versions._2
-
-    def useJavaxAnnotationByDefault: Boolean =
-      java.major <= 8 || jooq.matches("<3.12")
   }
 
 }

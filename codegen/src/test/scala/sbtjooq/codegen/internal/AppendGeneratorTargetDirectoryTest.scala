@@ -5,9 +5,9 @@ import sbtjooq.codegen.UnitSpec
 
 class AppendGeneratorTargetDirectoryTest extends UnitSpec {
 
-  "Codegen.appendGeneratorTargetDirectory" when {
+  "ConfigTransformer.appendGeneratorTargetDirectory" when {
 
-    val appendTo = Codegen.appendGeneratorTargetDirectory(new java.io.File("foo"))
+    val appendTo = ConfigTransformer.appendGeneratorTargetDirectory(new java.io.File("foo"))
 
     "generator target directory is non empty" should {
       "do nothing" in {

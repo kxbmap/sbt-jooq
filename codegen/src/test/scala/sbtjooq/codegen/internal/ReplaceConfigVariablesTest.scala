@@ -5,7 +5,7 @@ import sbtjooq.codegen.UnitSpec
 
 class ReplaceConfigVariablesTest extends UnitSpec {
 
-  "Codegen.configVariableTransformer" when {
+  "ConfigTransformer.replaceConfigVariables" when {
 
     val vars = Map[String, Any](
       "STRING" -> "foo",
@@ -17,8 +17,7 @@ class ReplaceConfigVariablesTest extends UnitSpec {
         props
       }
     )
-    val transform =
-      Codegen.replaceConfigVariables(vars, Codegen.expandVariable.applyOrElse(_, Codegen.expandVariableFallback))
+    val transform = ConfigTransformer.replaceConfigVariables(vars, VariableExpander())
 
     "configuration has no placeholders" should {
       "do nothing" in {
@@ -45,7 +44,10 @@ class ReplaceConfigVariablesTest extends UnitSpec {
 
     "configuration contains placeholder that refer Properties variable" should {
       "replace with property elements that contains key/value" in {
-        val x = <configuration><properties>${{PROPS}}</properties></configuration>
+        val x =
+          <configuration>
+            <properties>${{PROPS}}</properties>
+          </configuration>
         val e =
           <configuration>
             <properties>
