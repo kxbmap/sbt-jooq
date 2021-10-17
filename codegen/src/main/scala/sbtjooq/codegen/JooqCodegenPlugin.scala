@@ -134,16 +134,20 @@ object JooqCodegenPlugin extends AutoPlugin {
     if ((jooqCodegenIfAbsent / skip).value)
       jooqCodegenGeneratedSources.value
     else
-      Def.taskDyn {
-        val configs = jooqCodegenGeneratedSourcesFinders.value.collect {
+      Def.taskDyn(Def.sequential(
+        warnIfConfigIsEmpty,
+        runCodegen(jooqCodegenGeneratedSourcesFinders.value.collect {
           case (config, finder) if finder.get().isEmpty => config
-        }
-        Def.sequential(
-          warnIfConfigIsEmpty,
-          runCodegen(configs),
-        )
-      }.value
+        }),
+      )).value
   }
+
+  private def runCodegen(configs: Seq[File]): Initialize[Task[Seq[File]]] =
+    if (configs.isEmpty) jooqCodegenGeneratedSources
+    else Def.sequential(
+      (JooqCodegen / run).toTask(configs.mkString(" ", " ", "")),
+      jooqCodegenGeneratedSources,
+    )
 
   private lazy val warnIfConfigIsEmpty: Initialize[Task[Unit]] = Def.task {
     if (jooqCodegenConfig.value.isEmpty) {
@@ -156,13 +160,6 @@ object JooqCodegenPlugin extends AutoPlugin {
            |""".stripMargin)
     }
   }
-
-  private def runCodegen(configs: Seq[File]): Initialize[Task[Seq[File]]] =
-    if (configs.isEmpty) jooqCodegenGeneratedSources
-    else Def.sequential(
-      (JooqCodegen / run).toTask(configs.mkString(" ", " ", "")),
-      jooqCodegenGeneratedSources
-    )
 
   private def sourceGeneratorsSetting: Initialize[Seq[Task[Seq[File]]]] = Def.setting {
     jooqCodegenMode.value match {
