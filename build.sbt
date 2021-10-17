@@ -1,24 +1,25 @@
+import Versions._
+
 name := "sbt-jooq"
 
 publish / skip := true
 
-inThisBuild(Seq(
-  scalacOptions ++= Seq(
-    "-deprecation",
-    "-unchecked",
-    "-feature",
-    "-Xlint"
-  ),
-))
-
-import Versions._
+ThisBuild / scalacOptions ++= Seq(
+  "-release", "8",
+  "-deprecation",
+  "-unchecked",
+  "-feature",
+  "-Xlint",
+)
 
 lazy val core = project
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-core",
-    buildInfoKeys := Seq[BuildInfoKey]("defaultJooqVersion" -> jooqVersion),
-    buildInfoPackage := "sbtjooq"
+    buildInfoKeys := Seq[BuildInfoKey](
+      "defaultJooqVersion" -> jooqVersion,
+    ),
+    buildInfoPackage := "sbtjooq",
   )
 
 lazy val codegen = project
@@ -40,7 +41,7 @@ lazy val codegen = project
       "jaxbApiVersion" -> jaxbApiVersion,
       "jaxbCoreVersion" -> jaxbCoreVersion,
       "jaxbImplVersion" -> jaxbImplVersion,
-      "javaxAnnotationApiVersion" -> javaxAnnotationApiVersion
+      "javaxAnnotationApiVersion" -> javaxAnnotationApiVersion,
     ),
     buildInfoPackage := "sbtjooq.codegen",
   )
@@ -52,9 +53,9 @@ lazy val codegenTool = project
     crossPaths := false,
     autoScalaLibrary := false,
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % logbackVersion
+      "ch.qos.logback" % "logback-classic" % logbackVersion,
     ),
-    Compile / javacOptions ++= Seq("--release", "8")
+    Compile / javacOptions ++= Seq("--release", "8"),
   )
 
 lazy val checker = project
@@ -64,8 +65,10 @@ lazy val checker = project
     name := "sbt-jooq-checker",
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
     addSbtPlugin("org.wartremover" % "sbt-wartremover" % sbtWartRemoverVersion),
-    buildInfoKeys := Seq[BuildInfoKey]("defaultJooqWartsVersion" -> jooqWartsVersion),
-    buildInfoPackage := "sbtjooq.checker"
+    buildInfoKeys := Seq[BuildInfoKey](
+      "defaultJooqWartsVersion" -> jooqWartsVersion,
+    ),
+    buildInfoPackage := "sbtjooq.checker",
   )
 
 lazy val docs = project
@@ -86,12 +89,13 @@ lazy val docs = project
     libraryDependencies += sbtDependency.value,
     libraryDependencySchemes ++= Seq(
       "org.scala-lang.modules" %% "scala-xml" % "always",
-    )
+    ),
   )
 
-val readmeFile = "README.md"
-TaskKey[Unit]("updateReadme") :=
+TaskKey[Unit]("updateReadme") := Def.taskDyn {
+  val readmeFile = "README.md"
   Def.sequential(
     (docs / mdoc).toTask(s" --include $readmeFile"),
     Def.task(IO.copyFile((docs / mdocOut).value / readmeFile, baseDirectory.value / readmeFile)),
-  ).value
+  )
+}
