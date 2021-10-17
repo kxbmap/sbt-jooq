@@ -10,6 +10,8 @@ import sbt.Keys._
 import sbtjooq.JooqPlugin.autoImport._
 import sbtjooq.codegen.JooqCodegenPlugin
 import sbtjooq.codegen.JooqCodegenPlugin.autoImport._
+import sbtjooq.codegen.internal._
+import scala.collection.JavaConverters._
 ```
 
 ## JooqCodegenPlugin
@@ -194,9 +196,6 @@ The plugin rewrites configurations before code generation.
 
 #### Example
 ```scala mdoc:invisible
-import sbtjooq.codegen.internal.ConfigTransformer
-import sbtjooq.codegen.internal.VariableExpander
-
 val xml = 
   <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-@JOOQ_MINOR_VERSION@.0.xsd">
       <jdbc>
@@ -223,6 +222,7 @@ val vars = Map(
     props
   },
 )
+jooqCodegenVariables ++= vars // check compiles
 
 val transform = ConfigTransformer(target, vars, VariableExpander())
 
@@ -231,18 +231,26 @@ val pp = new scala.xml.PrettyPrinter(120, 4, true)
 
 Define variables in build:
 
-```scala mdoc:compile-only
+````scala mdoc:passthrough
+val pairs = vars.map {
+  case (k, p: java.util.Properties) =>
+    val n = "props"
+    val ss = p.asScala.toSeq.reverse.map {
+      case (k, v) => s"""$n.setProperty("$k", "$v")"""
+    }
+    s""""$k" -> {
+       |    val $n = new java.util.Properties()
+       |    ${ss.mkString("\n    ")}
+       |    $n
+       |  }""".stripMargin
+  case (k, v) => s""""$k" -> "$v""""
+}
+println(s"""```scala
 jooqCodegenVariables ++= Map(
-  "JDBC_DRIVER" -> "com.mysql.cj.jdbc.Driver",
-  "JDBC_URL" -> "jdbc:mysql://localhost/testdb",
-  "JDBC_PROPS" -> {
-    val props = new java.util.Properties()
-    props.setProperty("user", "root")
-    props.setProperty("password", "secret")
-    props
-  },
+  ${pairs.mkString(",\n  ")},
 )
-```
+```""")
+````
 
 And configuration is below:
 
