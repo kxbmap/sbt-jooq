@@ -1,7 +1,7 @@
 package sbtjooq.checker
 
-import sbt.Keys._
 import sbt._
+import sbt.Keys._
 import sbtjooq.JooqPlugin
 import sbtjooq.checker.JooqCheckerKeys._
 import sbtjooq.checker.internal.JooqWarts
@@ -14,13 +14,7 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   object autoImport extends JooqCheckerKeys {
 
-    val CheckerLevel = sbtjooq.checker.CheckerLevel
-
-    def addJooqCheckerSettingsTo(config: Configuration): Seq[Setting[_]] =
-      jooqCheckerScopedSettings(config)
-
-    def addJooqCheckerSettingsTo(config: Configuration, task: Scoped): Seq[Setting[_]] =
-      jooqCheckerScopedSettings(config, task)
+    final val CheckerLevel = sbtjooq.checker.CheckerLevel
 
   }
 
@@ -32,24 +26,22 @@ object JooqCheckerPlugin extends AutoPlugin {
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)
 
   override def projectSettings: Seq[Setting[_]] =
-    jooqCheckerDefaultSettings ++ jooqCheckerScopedSettings(Compile, compile)
+    jooqCheckerDefaultSettings ++
+      inConfig(Compile)(inTask(compile)(jooqCheckerSettings))
 
-  def jooqCheckerDefaultSettings: Seq[Setting[_]] = Seq(
-    libraryDependencies += ("com.github.kxbmap" %% "jooq-warts" % jooqCheckerJooqWartsVersion.value % JooqChecker).intransitive(),
+  private def jooqCheckerDefaultSettings: Seq[Setting[_]] = Seq(
+    libraryDependencies +=
+      ("com.github.kxbmap" %% "jooq-warts" % jooqCheckerJooqWartsVersion.value % JooqChecker).intransitive(),
   ) ++
-    JooqPlugin.jooqScopedSettings(JooqChecker) ++
+    JooqPlugin.jooqDependencies(JooqChecker) ++
     inConfig(JooqChecker)(Seq(
       managedClasspath := Classpaths.managedJars(JooqChecker, classpathTypes.value, update.value)
     ))
 
-  def jooqCheckerScopedSettings(config: Configuration): Seq[Setting[_]] =
-    inConfig(config)(Seq(
-      wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
-      wartremoverErrors := wartremoverErrors.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.errors,
-      wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings
-    ))
-
-  def jooqCheckerScopedSettings(config: Configuration, task: Scoped): Seq[Setting[_]] =
-    inTask(task)(jooqCheckerScopedSettings(config))
+  lazy val jooqCheckerSettings: Seq[Setting[_]] = Seq(
+    wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
+    wartremoverErrors := wartremoverErrors.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.errors,
+    wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings
+  )
 
 }

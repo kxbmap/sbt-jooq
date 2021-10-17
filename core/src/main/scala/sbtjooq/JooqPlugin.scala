@@ -6,12 +6,7 @@ import sbtjooq.JooqKeys._
 
 object JooqPlugin extends AutoPlugin {
 
-  object autoImport extends JooqKeys {
-
-    def addJooqSettingsTo(config: Configuration): Seq[Setting[_]] =
-      jooqScopedSettings(config)
-
-  }
+  object autoImport extends JooqKeys
 
   override def globalSettings: Seq[Setting[_]] = Seq(
     jooqVersion := BuildInfo.defaultJooqVersion,
@@ -20,9 +15,10 @@ object JooqPlugin extends AutoPlugin {
     autoJooqLibrary := true
   )
 
-  override def projectSettings: Seq[Setting[_]] = jooqScopedSettings(Compile)
+  override def projectSettings: Seq[Setting[_]] =
+    jooqDependencies(Compile)
 
-  def jooqScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
+  def jooqDependencies(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++= {
       if ((config / autoJooqLibrary).value)
         (config / jooqModules).value.map((config / jooqOrganization).value % _ % (config / jooqVersion).value % config)

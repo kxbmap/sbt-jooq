@@ -4,4 +4,4 @@ enablePlugins(JooqCheckerPlugin)
 
 jooqVersion := sys.props("scripted.jooq.version")
 
-addJooqCheckerSettingsTo(Test, compile)
+inConfig(Test)(inTask(compile)(JooqCheckerPlugin.jooqCheckerSettings))

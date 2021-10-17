@@ -22,15 +22,14 @@ object JooqCodegenPlugin extends AutoPlugin {
     type CodegenConfig = sbtjooq.codegen.CodegenConfig
     final val CodegenConfig = sbtjooq.codegen.CodegenConfig
 
-    def addJooqCodegenSettingsTo(config: Configuration): Seq[Setting[_]] =
-      jooqCodegenScopedSettings(config)
-
   }
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqCodegen)
 
   override def projectSettings: Seq[Setting[_]] =
-    jooqCodegenDefaultSettings ++ jooqCodegenScopedSettings(Compile)
+    jooqCodegenDefaultSettings ++
+      inConfig(Compile)(jooqCodegenSettings) ++
+      jooqCodegenDependencies(Compile)
 
   override def globalSettings: Seq[Setting[_]] = Seq(
     jooqCodegenMode := CodegenMode.Auto,
@@ -40,32 +39,39 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
   )
 
-  def jooqCodegenDefaultSettings: Seq[Setting[_]] =
-    JooqPlugin.jooqScopedSettings(JooqCodegen) ++ Seq(
-      libraryDependencies ++=
-        Codegen.dependencies(
-          (JooqCodegen / autoJooqLibrary).value,
-          (JooqCodegen / jooqVersion).value,
-          JavaVersion.get((JooqCodegen / run / javaHome).value),
-        ).map(_ % JooqCodegen),
-      libraryDependencies ++=
-        Classpaths.autoLibraryDependency(
-          (JooqCodegen / autoScalaLibrary).value
-            && (JooqCodegen / scalaHome).value.isEmpty
-            && (JooqCodegen / managedScalaInstance).value,
-          plugin = false,
-          (JooqCodegen / scalaOrganization).value,
-          (JooqCodegen / scalaVersion).value,
-        ).map(_ % JooqCodegen)
-    ) ++ inConfig(JooqCodegen)(Defaults.configSettings ++ Seq(
-      jooqModules := Seq("jooq-codegen"),
-    ) ++ inTask(run)(Seq(
-      mainClass := Some(Codegen.mainClass),
-      fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, JavaVersion.get(javaHome.value)),
-      javaOptions ++= Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, JavaVersion.get(javaHome.value)),
-    )))
+  private def jooqCodegenDefaultSettings: Seq[Setting[_]] =
+    inConfig(JooqCodegen)(
+      Defaults.configSettings ++
+        Seq(
+          jooqModules := Seq("jooq-codegen"),
+        ) ++
+        inTask(run)(Seq(
+          mainClass := Some(Codegen.mainClass),
+          fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, JavaVersion.get(javaHome.value)),
+          javaOptions ++=
+            Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, JavaVersion.get(javaHome.value)),
+        ))
+    ) ++
+      JooqPlugin.jooqDependencies(JooqCodegen) ++
+      Seq(
+        libraryDependencies ++=
+          Codegen.dependencies(
+            (JooqCodegen / autoJooqLibrary).value,
+            (JooqCodegen / jooqVersion).value,
+            JavaVersion.get((JooqCodegen / run / javaHome).value),
+          ).map(_ % JooqCodegen),
+        libraryDependencies ++=
+          Classpaths.autoLibraryDependency(
+            (JooqCodegen / autoScalaLibrary).value
+              && (JooqCodegen / scalaHome).value.isEmpty
+              && (JooqCodegen / managedScalaInstance).value,
+            plugin = false,
+            (JooqCodegen / scalaOrganization).value,
+            (JooqCodegen / scalaVersion).value,
+          ).map(_ % JooqCodegen),
+      )
 
-  def jooqCodegenScopedSettings(config: Configuration): Seq[Setting[_]] = Seq(
+  def jooqCodegenDependencies(config: Configuration): Seq[Setting[_]] = Seq(
     libraryDependencies ++=
       Codegen.compileDependencies(
         (config / autoJooqLibrary).value,
@@ -73,7 +79,9 @@ object JooqCodegenPlugin extends AutoPlugin {
         (JooqCodegen / jooqVersion).value,
         JavaVersion.get((JooqCodegen / run / javaHome).value),
       ).map(_ % config)
-  ) ++ inConfig(config)(Seq(
+  )
+
+  lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
     javacOptions ++=
       Codegen.javacOptions(
         autoJooqLibrary.value,
@@ -117,7 +125,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenGeneratorTargets := generatorTargetsTask.value,
     jooqCodegenGeneratedSourcesFinders := generatedSourcesFindersTask.value,
     jooqCodegenGeneratedSources := generatedSourcesTask.value,
-  ))
+  )
 
 
   private def codegenTask: Initialize[Task[Seq[File]]] = Def.task {
