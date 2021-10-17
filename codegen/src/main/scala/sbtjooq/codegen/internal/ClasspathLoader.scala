@@ -1,52 +1,13 @@
 package sbtjooq.codegen.internal
 
-import java.io.InputStream
-import java.net.{URL, URLClassLoader}
-import java.util.Collections
-import sbt.Def.Classpath
+import java.net.URLClassLoader
 import sbt._
+import sbt.Def.Classpath
 import sbt.io.Using
 
-class ClasspathLoader(classpath: Classpath) extends URLClassLoader(
-  classpath.files.map(_.asURL).toArray,
-  ClasspathLoader.EmptyLoader)
+class ClasspathLoader(classpath: Classpath)
+  extends URLClassLoader(classpath.files.map(_.asURL).toArray, null)
 
 object ClasspathLoader {
-
   val using: Using[Classpath, ClasspathLoader] = Using.resource(new ClasspathLoader(_))
-
-
-  private object EmptyLoader extends ClassLoader {
-
-    override def getResource(name: String): URL = null
-
-    override def setClassAssertionStatus(className: String, enabled: Boolean): Unit = ()
-
-    override def clearAssertionStatus(): Unit = ()
-
-    override def getPackage(name: String): Package = null
-
-    override def setDefaultAssertionStatus(enabled: Boolean): Unit = ()
-
-    override def setPackageAssertionStatus(packageName: String, enabled: Boolean): Unit = ()
-
-    override def definePackage(
-        name: String, specTitle: String, specVersion: String, specVendor: String, implTitle: String,
-        implVersion: String, implVendor: String, sealBase: URL): Package =
-      throw new IllegalArgumentException(name)
-
-    override def getResources(name: String): java.util.Enumeration[URL] = Collections.emptyEnumeration()
-
-    override def getResourceAsStream(name: String): InputStream = null
-
-    override def loadClass(name: String): Class[_] = throw new ClassNotFoundException(name)
-
-    override def loadClass(name: String, resolve: Boolean): Class[_] = throw new ClassNotFoundException(name)
-
-    override def getPackages: Array[Package] = Array.empty
-
-    override def getClassLoadingLock(className: String): AnyRef = this
-
-  }
-
 }
