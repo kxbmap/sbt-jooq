@@ -16,7 +16,7 @@ object Codegen {
     if (auto) jaxbAddModulesOption(jooqVersion, JavaVersion.get(javaHome)) else Nil
 
   def needsFork(auto: Boolean, jooqVersion: JooqVersion, javaHome: Option[File]): Boolean =
-    javaOptions(auto, jooqVersion, javaHome).nonEmpty
+    javaHome.nonEmpty || javaOptions(auto, jooqVersion, javaHome).nonEmpty
 
   def compileDependencies(
       auto: Boolean,
