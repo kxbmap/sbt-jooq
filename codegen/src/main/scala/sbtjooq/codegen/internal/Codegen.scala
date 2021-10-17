@@ -8,30 +8,37 @@ object Codegen {
 
   def mainClass: String = "sbtjooq.codegen.tool.GenerationTool"
 
-  def dependencies(auto: Boolean, jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[ModuleID] =
-    codegenToolDependencies ++ (if (auto) jaxbDependencies(jooqVersion, javaVersion) else Nil)
+  def dependencies(auto: Boolean, jooqVersion: JooqVersion, javaHome: Option[File]): Seq[ModuleID] =
+    codegenToolDependencies ++
+      (if (auto) jaxbDependencies(jooqVersion, JavaVersion.get(javaHome)) else Nil)
 
-  def javaOptions(auto: Boolean, jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[String] =
-    if (auto) jaxbAddModulesOption(jooqVersion, javaVersion) else Nil
+  def javaOptions(auto: Boolean, jooqVersion: JooqVersion, javaHome: Option[File]): Seq[String] =
+    if (auto) jaxbAddModulesOption(jooqVersion, JavaVersion.get(javaHome)) else Nil
 
-  def needsFork(auto: Boolean, jooqVersion: JooqVersion, javaVersion: JavaVersion): Boolean =
-    javaOptions(auto, jooqVersion, javaVersion).nonEmpty
+  def needsFork(auto: Boolean, jooqVersion: JooqVersion, javaHome: Option[File]): Boolean =
+    javaOptions(auto, jooqVersion, javaHome).nonEmpty
 
   def compileDependencies(
       auto: Boolean,
-      javaVersion: JavaVersion,
+      javaHome: Option[File],
       codegenJooqVersion: JooqVersion,
-      codegenJavaVersion: JavaVersion,
+      codegenJavaHome: Option[File],
   ): Seq[ModuleID] =
-    if (auto) javaxAnnotationDependencies(javaVersion, codegenJooqVersion, codegenJavaVersion) else Nil
+    if (auto)
+      javaxAnnotationDependencies(JavaVersion.get(javaHome), codegenJooqVersion, JavaVersion.get(codegenJavaHome))
+    else
+      Nil
 
   def javacOptions(
       auto: Boolean,
-      javaVersion: JavaVersion,
+      javaHome: Option[File],
       codegenJooqVersion: JooqVersion,
-      codegenJavaVersion: JavaVersion,
+      codegenJavaHome: Option[File],
   ): Seq[String] =
-    if (auto) javaxAnnotationAddModulesOption(javaVersion, codegenJooqVersion, codegenJavaVersion) else Nil
+    if (auto)
+      javaxAnnotationAddModulesOption(JavaVersion.get(javaHome), codegenJooqVersion, JavaVersion.get(codegenJavaHome))
+    else
+      Nil
 
 
   private def codegenToolDependencies: Seq[ModuleID] =

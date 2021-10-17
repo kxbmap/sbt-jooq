@@ -47,9 +47,8 @@ object JooqCodegenPlugin extends AutoPlugin {
         ) ++
         inTask(run)(Seq(
           mainClass := Some(Codegen.mainClass),
-          fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, JavaVersion.get(javaHome.value)),
-          javaOptions ++=
-            Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, JavaVersion.get(javaHome.value)),
+          fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, javaHome.value),
+          javaOptions ++= Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, javaHome.value),
         ))
     ) ++
       JooqPlugin.jooqDependencies(JooqCodegen) ++
@@ -58,7 +57,7 @@ object JooqCodegenPlugin extends AutoPlugin {
           Codegen.dependencies(
             (JooqCodegen / autoJooqLibrary).value,
             (JooqCodegen / jooqVersion).value,
-            JavaVersion.get((JooqCodegen / run / javaHome).value),
+            (JooqCodegen / run / javaHome).value,
           ).map(_ % JooqCodegen),
         libraryDependencies ++=
           Classpaths.autoLibraryDependency(
@@ -75,9 +74,9 @@ object JooqCodegenPlugin extends AutoPlugin {
     libraryDependencies ++=
       Codegen.compileDependencies(
         (config / autoJooqLibrary).value,
-        JavaVersion.get((config / compile / javaHome).value),
+        (config / compile / javaHome).value,
         (JooqCodegen / jooqVersion).value,
-        JavaVersion.get((JooqCodegen / run / javaHome).value),
+        (JooqCodegen / run / javaHome).value,
       ).map(_ % config)
   )
 
@@ -85,9 +84,9 @@ object JooqCodegenPlugin extends AutoPlugin {
     javacOptions ++=
       Codegen.javacOptions(
         autoJooqLibrary.value,
-        JavaVersion.get((compile / javaHome).value),
+        (compile / javaHome).value,
         (JooqCodegen / jooqVersion).value,
-        JavaVersion.get((JooqCodegen / run / javaHome).value),
+        (JooqCodegen / run / javaHome).value,
       ),
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := skip.value,
