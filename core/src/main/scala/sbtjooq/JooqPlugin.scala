@@ -12,7 +12,7 @@ object JooqPlugin extends AutoPlugin {
     jooqVersion := BuildInfo.defaultJooqVersion,
     jooqOrganization := "org.jooq",
     jooqModules := Seq("jooq"),
-    autoJooqLibrary := true
+    autoJooqLibrary := true,
   )
 
   override def projectSettings: Seq[Setting[_]] =

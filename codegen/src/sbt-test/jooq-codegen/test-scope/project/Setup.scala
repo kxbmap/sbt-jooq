@@ -14,19 +14,17 @@ object Setup extends AutoPlugin {
   import autoImport._
 
   override def globalSettings: Seq[Setting[_]] = Seq(
-    setup := setupTask.value,
-//    onLoad ~= { _.andThen("setup" :: _) }
+    setup := setupTask.value
   )
 
   private def setupTask = Def.task {
     Class.forName("org.h2.Driver")
     val conn = DriverManager.getConnection("jdbc:h2:./test")
-    try
+    try {
       IO.reader(file("setup.sql")) {
         RunScript.execute(conn, _)
       }
-    finally
-      conn.close()
+    } finally conn.close()
   }
 
 }

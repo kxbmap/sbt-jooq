@@ -3,7 +3,7 @@ package sbtjooq
 import sbt.librarymanagement.{DependencyBuilders, ModuleID, SemanticSelector, VersionNumber}
 import scala.language.implicitConversions
 
-final class JooqVersion private(
+final class JooqVersion private (
     private val version: VersionNumber
 ) {
 

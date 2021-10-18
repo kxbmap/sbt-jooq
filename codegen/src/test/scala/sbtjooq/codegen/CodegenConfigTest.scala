@@ -2,7 +2,6 @@ package sbtjooq.codegen
 
 import sbt._
 
-
 class CodegenConfigTest extends UnitSpec {
 
   val key = settingKey[CodegenConfig]("")
@@ -123,7 +122,8 @@ class CodegenConfigTest extends UnitSpec {
             |  <configuration>1</configuration>
             |  <configuration>2</configuration>
             |  <configuration>3</configuration>
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "+=" should {
@@ -133,7 +133,8 @@ class CodegenConfigTest extends UnitSpec {
             |  <configuration>1</configuration>
             |  <configuration>2</configuration>
             |  <configuration>3</configuration>
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "++=" should {
@@ -143,7 +144,8 @@ class CodegenConfigTest extends UnitSpec {
             |  <configuration>1</configuration>
             |  <configuration>2</configuration>
             |  <configuration>3</configuration>
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
   }
@@ -157,7 +159,8 @@ class CodegenConfigTest extends UnitSpec {
             |  uri("classpath:foo.xml"),
             |  <configuration></configuration>,
             |)
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "+=" should {
@@ -167,7 +170,8 @@ class CodegenConfigTest extends UnitSpec {
             |  file("foo.xml"),
             |  uri("classpath:foo.xml"),
             |  <configuration></configuration>
-            |)""".stripMargin)
+            |)""".stripMargin
+        )
       }
     }
     "++=" should {
@@ -177,7 +181,8 @@ class CodegenConfigTest extends UnitSpec {
             |  file("foo.xml"),
             |  uri("classpath:foo.xml"),
             |  <configuration></configuration>
-            |)""".stripMargin)
+            |)""".stripMargin
+        )
       }
     }
   }
@@ -188,7 +193,8 @@ class CodegenConfigTest extends UnitSpec {
         assertCompiles(
           """val config: CodegenConfig = ???
             |key := config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "+=" should {
@@ -196,7 +202,8 @@ class CodegenConfigTest extends UnitSpec {
         assertTypeError(
           """val config: CodegenConfig = ???
             |key += config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "++=" should {
@@ -204,7 +211,8 @@ class CodegenConfigTest extends UnitSpec {
         assertCompiles(
           """val config: CodegenConfig = ???
             |key ++= config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
   }
@@ -215,7 +223,8 @@ class CodegenConfigTest extends UnitSpec {
         assertCompiles(
           """val config: CodegenConfig.Single = ???
             |key := config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "+=" should {
@@ -223,7 +232,8 @@ class CodegenConfigTest extends UnitSpec {
         assertCompiles(
           """val config: CodegenConfig.Single = ???
             |key += config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "++=" should {
@@ -231,7 +241,8 @@ class CodegenConfigTest extends UnitSpec {
         assertCompiles(
           """val config: CodegenConfig.Single = ???
             |key ++= config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
   }
@@ -242,7 +253,8 @@ class CodegenConfigTest extends UnitSpec {
         assertCompiles(
           """val config: CodegenConfig.Sequence = ???
             |key := config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "+=" should {
@@ -250,7 +262,8 @@ class CodegenConfigTest extends UnitSpec {
         assertTypeError(
           """val config: CodegenConfig.Sequence = ???
             |key += config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
     "++=" should {
@@ -258,11 +271,11 @@ class CodegenConfigTest extends UnitSpec {
         assertCompiles(
           """val config: CodegenConfig.Sequence = ???
             |key ++= config
-            |""".stripMargin)
+            |""".stripMargin
+        )
       }
     }
   }
-
 
   def dummy(): Unit = {
     <dummy></dummy>

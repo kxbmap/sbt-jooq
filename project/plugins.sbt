@@ -2,7 +2,7 @@ scalacOptions ++= Seq(
   "-deprecation",
   "-unchecked",
   "-feature",
-  "-Xlint:-unused,_"
+  "-Xlint:-unused,_",
 )
 
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.10")

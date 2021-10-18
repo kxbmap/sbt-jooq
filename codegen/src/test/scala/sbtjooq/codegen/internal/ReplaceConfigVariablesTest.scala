@@ -15,7 +15,7 @@ class ReplaceConfigVariablesTest extends UnitSpec {
         props.setProperty("key1", "value1")
         props.setProperty("key2", "value2")
         props
-      }
+      },
     )
     val transform = ConfigTransformer.replaceConfigVariables(vars, VariableExpander())
 

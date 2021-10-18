@@ -40,7 +40,6 @@ object Codegen {
     else
       Nil
 
-
   private def codegenToolDependencies: Seq[ModuleID] =
     Seq("com.github.kxbmap" % "sbt-jooq-codegen-tool" % BuildInfo.sbtJooqVersion)
 
@@ -51,7 +50,8 @@ object Codegen {
         "javax.activation" % "activation" % BuildInfo.javaxActivationVersion,
         "javax.xml.bind" % "jaxb-api" % BuildInfo.jaxbApiVersion,
         "com.sun.xml.bind" % "jaxb-core" % BuildInfo.jaxbCoreVersion,
-        "com.sun.xml.bind" % "jaxb-impl" % BuildInfo.jaxbImplVersion)
+        "com.sun.xml.bind" % "jaxb-impl" % BuildInfo.jaxbImplVersion,
+      )
     else
       Nil
 
@@ -66,9 +66,11 @@ object Codegen {
       codegenJooqVersion: JooqVersion,
       codegenJavaVersion: JavaVersion,
   ): Seq[ModuleID] =
-    if (!javaVersion.isJavaEEModulesBundled
+    if (
+      !javaVersion.isJavaEEModulesBundled
       && !codegenJooqVersion.generatedAnnotationDisabledByDefault
-      && (codegenJooqVersion, codegenJavaVersion).useJavaxAnnotationByDefault)
+      && (codegenJooqVersion, codegenJavaVersion).useJavaxAnnotationByDefault
+    )
       Seq("javax.annotation" % "javax.annotation-api" % BuildInfo.javaxAnnotationApiVersion)
     else
       Nil
@@ -78,10 +80,12 @@ object Codegen {
       codegenJooqVersion: JooqVersion,
       codegenJavaVersion: JavaVersion,
   ): Seq[String] =
-    if (javaVersion.isJigsawEnabled
+    if (
+      javaVersion.isJigsawEnabled
       && javaVersion.isJavaEEModulesBundled
       && !codegenJooqVersion.generatedAnnotationDisabledByDefault
-      && (codegenJooqVersion, codegenJavaVersion).useJavaxAnnotationByDefault)
+      && (codegenJooqVersion, codegenJavaVersion).useJavaxAnnotationByDefault
+    )
       Seq("--add-modules", "java.xml.ws.annotation")
     else
       Nil

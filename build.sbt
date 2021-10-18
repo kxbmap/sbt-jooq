@@ -5,7 +5,8 @@ name := "sbt-jooq"
 publish / skip := true
 
 ThisBuild / scalacOptions ++= Seq(
-  "-release", "8",
+  "-release",
+  "8",
   "-deprecation",
   "-unchecked",
   "-feature",
@@ -17,7 +18,7 @@ lazy val core = project
   .settings(
     name := "sbt-jooq-core",
     buildInfoKeys := Seq[BuildInfoKey](
-      "defaultJooqVersion" -> jooqVersion,
+      "defaultJooqVersion" -> jooqVersion
     ),
     buildInfoPackage := "sbtjooq",
   )
@@ -53,7 +54,7 @@ lazy val codegenTool = project
     crossPaths := false,
     autoScalaLibrary := false,
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % logbackVersion,
+      "ch.qos.logback" % "logback-classic" % logbackVersion
     ),
     Compile / javacOptions ++= Seq("--release", "8"),
   )
@@ -66,7 +67,7 @@ lazy val checker = project
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
     addSbtPlugin("org.wartremover" % "sbt-wartremover" % sbtWartRemoverVersion),
     buildInfoKeys := Seq[BuildInfoKey](
-      "defaultJooqWartsVersion" -> jooqWartsVersion,
+      "defaultJooqWartsVersion" -> jooqWartsVersion
     ),
     buildInfoPackage := "sbtjooq.checker",
   )
@@ -84,11 +85,11 @@ lazy val docs = project
       "H2_VERSION" -> h2Version,
     ),
     scalacOptions ++= Seq(
-      "-Wconf:cat=unused-nowarn:s",
+      "-Wconf:cat=unused-nowarn:s"
     ),
     libraryDependencies += sbtDependency.value,
     libraryDependencySchemes ++= Seq(
-      "org.scala-lang.modules" %% "scala-xml" % "always",
+      "org.scala-lang.modules" %% "scala-xml" % "always"
     ),
   )
 

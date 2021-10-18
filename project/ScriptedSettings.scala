@@ -19,10 +19,10 @@ object ScriptedSettings extends AutoPlugin {
       s"-Dscripted.scala.version=$scriptedScalaVersion",
       s"-Dscripted.jooq.version=$jooqVersion",
       s"-Dscripted.h2.version=$h2Version",
-      s"-Dscripted.flywaysbt.version=$flywaySbtVersion"
+      s"-Dscripted.flywaysbt.version=$flywaySbtVersion",
     ) ++ jooqVersions.map { v =>
       s"-Dscripted.jooq.${minorVersion(v).replace('.', '_')}.version=$v"
-    }
+    },
   )
 
 }

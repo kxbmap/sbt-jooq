@@ -20,7 +20,7 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   override def globalSettings: Seq[Setting[_]] = Seq(
     jooqCheckerLevels := CheckerLevels.default,
-    jooqCheckerJooqWartsVersion := BuildInfo.defaultJooqWartsVersion
+    jooqCheckerJooqWartsVersion := BuildInfo.defaultJooqWartsVersion,
   )
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)
@@ -31,17 +31,19 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   private def jooqCheckerDefaultSettings: Seq[Setting[_]] = Seq(
     libraryDependencies +=
-      ("com.github.kxbmap" %% "jooq-warts" % jooqCheckerJooqWartsVersion.value % JooqChecker).intransitive(),
+      ("com.github.kxbmap" %% "jooq-warts" % jooqCheckerJooqWartsVersion.value % JooqChecker).intransitive()
   ) ++
     JooqPlugin.jooqDependencies(JooqChecker) ++
-    inConfig(JooqChecker)(Seq(
-      managedClasspath := Classpaths.managedJars(JooqChecker, classpathTypes.value, update.value)
-    ))
+    inConfig(JooqChecker)(
+      Seq(
+        managedClasspath := Classpaths.managedJars(JooqChecker, classpathTypes.value, update.value)
+      )
+    )
 
   lazy val jooqCheckerSettings: Seq[Setting[_]] = Seq(
     wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
     wartremoverErrors := wartremoverErrors.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.errors,
-    wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings
+    wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings,
   )
 
 }

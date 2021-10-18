@@ -23,7 +23,7 @@ object PublishSettings extends AutoPlugin {
     publishMavenStyle := true,
     publishTo := sonatypePublishToBundle.value,
     sonatypeProjectHosting := Some(GitHubHosting("kxbmap", "sbt-jooq", "Tsukasa Kitachi", "kxbmap@gmail.com")),
-    pomIncludeRepository := { _ => false }
+    pomIncludeRepository := { _ => false },
   )
 
 }

@@ -10,7 +10,10 @@
             <inputSchema>PUBLIC</inputSchema>
             <includes>.*</includes>
             <excludes>flyway_schema_history</excludes>
-            <schemaVersionProvider>SELECT :schema_name || '_' || MAX("installed_rank") || '_' || SUM("checksum") FROM "flyway_schema_history"</schemaVersionProvider>
+            <schemaVersionProvider>
+                SELECT :schema_name || '_' || MAX("installed_rank") || '_' || SUM("checksum")
+                FROM "flyway_schema_history"
+            </schemaVersionProvider>
         </database>
         <target>
             <packageName>com.example.db</packageName>

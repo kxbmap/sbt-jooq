@@ -17,8 +17,8 @@ lazy val copyLibs = taskKey[Unit]("")
 lazy val cleanup = taskKey[Unit]("")
 
 copyLibs := {
-  val jars = (dep / Compile / managedClasspath).value.files.map {
-    f => f -> sbtTestDirectory.value / "jooq" / "auto-library" / "lib" / f.getName
+  val jars = (dep / Compile / managedClasspath).value.files.map { f =>
+    f -> sbtTestDirectory.value / "jooq" / "auto-library" / "lib" / f.getName
   }
   IO.copy(jars)
 }

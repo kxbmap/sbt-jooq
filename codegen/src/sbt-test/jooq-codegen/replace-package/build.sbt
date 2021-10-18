@@ -5,5 +5,5 @@ lazy val core = project
   .settings(
     jooqVersion := sys.props("scripted.jooq.version"),
     JooqCodegen / jooqModules += "jooq-meta-extensions",
-    jooqCodegenConfig := uri("classpath:jooq-codegen.xml")
+    jooqCodegenConfig := uri("classpath:jooq-codegen.xml"),
   )

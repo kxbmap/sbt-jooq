@@ -12,7 +12,7 @@ object Versions {
     "3.13.6",
     "3.12.4",
     "3.11.12",
-    "3.10.8"
+    "3.10.8",
   )
 
   final val scalaXMLVersion = "2.0.1"
@@ -38,7 +38,6 @@ object Versions {
   final val flywaySbtVersion = "7.4.0"
 
   final val scalaTestVersion = "3.2.10"
-
 
   def minorVersion(version: String): String =
     version match {

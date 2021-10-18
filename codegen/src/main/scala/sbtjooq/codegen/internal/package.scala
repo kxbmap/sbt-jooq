@@ -15,13 +15,13 @@ package object internal {
     def parse(javaHome: File): Either[String, JavaVersion] = {
       val releaseFile = javaHome / "release"
       val versionLine = """JAVA_VERSION="(.+)"""".r
-      try
+      try {
         IO.readLines(releaseFile)
           .collectFirst {
             case versionLine(v) => companion(v)
           }
           .toRight(s"No JAVA_VERSION line in $releaseFile")
-      catch {
+      } catch {
         case e: FileNotFoundException => Left(e.getMessage)
       }
     }

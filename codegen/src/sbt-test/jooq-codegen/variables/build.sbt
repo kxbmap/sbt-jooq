@@ -15,5 +15,5 @@ jooqCodegenVariables ++= Map(
     val props = new java.util.Properties()
     props.setProperty("scripts", ((JooqCodegen / resourceDirectory).value / "database.sql").toString)
     props
-  }
+  },
 )

@@ -13,7 +13,7 @@ TaskKey[Unit]("checkCodegenDependencies") := {
     "javax.activation" % "activation" % "???",
     "javax.xml.bind" % "jaxb-api" % "???",
     "com.sun.xml.bind" % "jaxb-core" % "???",
-    "com.sun.xml.bind" % "jaxb-impl" % "???"
+    "com.sun.xml.bind" % "jaxb-impl" % "???",
   )
   if (xs.exists(x => deps.exists(m => x.organization == m.organization && x.name == m.name)))
     sys.error(s"libraryDependencies should not contains JAXB libraries")
@@ -36,6 +36,8 @@ TaskKey[Unit]("checkCompileDependencies") := {
       sys.error(s"libraryDependencies should contains javax.annotation (Java compile: $jv, codegen: $cjv)")
   } else {
     if (deps.exists(m => x.organization == m.organization && x.name == m.name))
-      sys.error(s"libraryDependencies should not contains javax.annotation libraries (Java compile: $jv, codegen: $cjv)")
+      sys.error(
+        s"libraryDependencies should not contains javax.annotation libraries (Java compile: $jv, codegen: $cjv)"
+      )
   }
 }

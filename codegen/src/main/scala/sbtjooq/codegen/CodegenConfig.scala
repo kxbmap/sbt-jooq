@@ -38,7 +38,6 @@ object CodegenConfig {
       Sequence(toSeq ++ other.toSeq)
   }
 
-
   def empty: CodegenConfig = Sequence(Seq.empty)
 
   def fromURI(uri: URI): Single =
@@ -49,7 +48,6 @@ object CodegenConfig {
     }
 
   def fromURIString(uri: String): Single = fromURI(sbt.uri(uri))
-
 
   implicit def fileToCodegenConfig(file: File): Single = FromFile(file)
 
@@ -62,7 +60,6 @@ object CodegenConfig {
 
   implicit def nodeBufferToCodegenConfig(buffer: NodeBuffer): Sequence =
     Sequence(buffer.map(FromXML))
-
 
   implicit val appendCodegenConfigToCodegenConfig: Append.Values[CodegenConfig, CodegenConfig] = _ ++ _
 

@@ -43,13 +43,15 @@ object JooqCodegenPlugin extends AutoPlugin {
     inConfig(JooqCodegen)(
       Defaults.configSettings ++
         Seq(
-          jooqModules := Seq("jooq-codegen"),
+          jooqModules := Seq("jooq-codegen")
         ) ++
-        inTask(run)(Seq(
-          mainClass := Some(Codegen.mainClass),
-          fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, javaHome.value),
-          javaOptions ++= Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, javaHome.value),
-        ))
+        inTask(run)(
+          Seq(
+            mainClass := Some(Codegen.mainClass),
+            fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, javaHome.value),
+            javaOptions ++= Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, javaHome.value),
+          )
+        )
     ) ++
       JooqPlugin.jooqDependencies(JooqCodegen) ++
       Seq(
@@ -112,7 +114,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         (managedSourceDirectories.value :+ jooqSource.value).distinct
     },
     jooqCodegenVariables ++= Map(
-      "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value,
+      "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value
     ),
     jooqCodegenConfigTransformer := ConfigTransformer(
       jooqSource.value,
@@ -126,35 +128,39 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenGeneratedSources := generatedSourcesTask.value,
   )
 
-
   private def codegenTask: Initialize[Task[Seq[File]]] = Def.task {
     if ((jooqCodegen / skip).value)
       jooqCodegenGeneratedSources.value
     else
-      Def.taskDyn(Def.sequential(
-        warnIfConfigIsEmpty,
-        runCodegen(jooqCodegenTransformedConfigFiles.value),
-      )).value
+      Def.taskDyn(
+        Def.sequential(
+          warnIfConfigIsEmpty,
+          runCodegen(jooqCodegenTransformedConfigFiles.value),
+        )
+      ).value
   }
 
   private def codegenIfAbsentTask: Initialize[Task[Seq[File]]] = Def.task {
     if ((jooqCodegenIfAbsent / skip).value)
       jooqCodegenGeneratedSources.value
     else
-      Def.taskDyn(Def.sequential(
-        warnIfConfigIsEmpty,
-        runCodegen(jooqCodegenGeneratedSourcesFinders.value.collect {
-          case (config, finder) if finder.get().isEmpty => config
-        }),
-      )).value
+      Def.taskDyn(
+        Def.sequential(
+          warnIfConfigIsEmpty,
+          runCodegen(jooqCodegenGeneratedSourcesFinders.value.collect {
+            case (config, finder) if finder.get().isEmpty => config
+          }),
+        )
+      ).value
   }
 
   private def runCodegen(configs: Seq[File]): Initialize[Task[Seq[File]]] =
     if (configs.isEmpty) jooqCodegenGeneratedSources
-    else Def.sequential(
-      (JooqCodegen / run).toTask(configs.mkString(" ", " ", "")),
-      jooqCodegenGeneratedSources,
-    )
+    else
+      Def.sequential(
+        (JooqCodegen / run).toTask(configs.mkString(" ", " ", "")),
+        jooqCodegenGeneratedSources,
+      )
 
   private lazy val warnIfConfigIsEmpty: Initialize[Task[Unit]] = Def.task {
     if (jooqCodegenConfig.value.isEmpty) {
@@ -164,7 +170,8 @@ object JooqCodegenPlugin extends AutoPlugin {
            |To turn off this warning,
            |- `set $conf / jooqCodegenConfig := <your configuration>` or
            |- `set $conf / jooqCodegen / skip := true`
-           |""".stripMargin)
+           |""".stripMargin
+      )
     }
   }
 
@@ -218,9 +225,11 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   private def generatedSourcesFindersTask: Initialize[Task[Seq[(File, PathFinder)]]] = Def.task {
     jooqCodegenGeneratorTargets.value.map {
-      case (conf, target) => conf -> target.descendantsExcept(
-        (jooqCodegenGeneratedSources / includeFilter).value,
-        (jooqCodegenGeneratedSources / excludeFilter).value)
+      case (conf, target) =>
+        conf -> target.descendantsExcept(
+          (jooqCodegenGeneratedSources / includeFilter).value,
+          (jooqCodegenGeneratedSources / excludeFilter).value,
+        )
     }
   }
 

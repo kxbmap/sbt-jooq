@@ -2,7 +2,6 @@ package sbtjooq.codegen.internal
 
 import sbtjooq.codegen.UnitSpec
 
-
 class AppendGeneratorTargetDirectoryTest extends UnitSpec {
 
   "ConfigTransformer.appendGeneratorTargetDirectory" when {
