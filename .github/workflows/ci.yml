@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [ 4 ]
+        jobtype: [ 4 ]
         compile-java: [ 11, 17 ]
         runtime-java:
           - 8   # baseline
@@ -17,14 +17,14 @@ jobs:
           - 11  # LTS / modules no longer bundled
           - 17  # LTS
         include:
-          - { task: 1, compile-java: 11 }
-          - { task: 1, compile-java: 17 }
-          - { task: 2, compile-java: 11 }
-          - { task: 2, compile-java: 17 }
-          - { task: 3, compile-java: 11 }
-          - { task: 3, compile-java: 17 }
-          - { task: 5, compile-java: 11 }
-          - { task: 5, compile-java: 17 }
+          - { jobtype: 1, compile-java: 11 }
+          - { jobtype: 1, compile-java: 17 }
+          - { jobtype: 2, compile-java: 11 }
+          - { jobtype: 2, compile-java: 17 }
+          - { jobtype: 3, compile-java: 11 }
+          - { jobtype: 3, compile-java: 17 }
+          - { jobtype: 5, compile-java: 11 }
+          - { jobtype: 5, compile-java: 17 }
     env:
       JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
     steps:
@@ -35,7 +35,7 @@ jobs:
       - uses: coursier/cache-action@v6
 
       - name: Install runtime Java
-        if: ${{ matrix.task == 4 }}
+        if: ${{ matrix.jobtype == 4 }}
         env:
           RUNTIME_JAVA: "zulu@1.${{ matrix.runtime-java }}"
         run: |
@@ -46,9 +46,9 @@ jobs:
 
       - name: Build and test
         run: |
-          case ${{ matrix.task }} in
+          case ${{ matrix.jobtype }} in
             1)
-              sbt -v test docs/mdoc
+              sbt -v test docs/mdoc scalafmtCheckAll scalafmtSbtCheck
               ;;
             2)
               sbt -v "core/scripted jooq/*" "checker/scripted jooq-checker/*"
@@ -63,11 +63,11 @@ jobs:
               sbt -v "codegen/scripted it-flyway-sbt/*"
               ;;
             *)
-              echo "unknown task"
+              echo "unknown jobtype"
               exit 1
           esac
 
-      - name: Delete non-cached files
+      - name: Cleanup
         run: |
           rm -rf "$HOME/.ivy2/local" || true
           find $HOME/.sbt             -name "*.lock"                -delete || true
