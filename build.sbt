@@ -4,6 +4,8 @@ name := "sbt-jooq"
 
 publish / skip := true
 
+enablePlugins(ReleaseSettings)
+
 ThisBuild / scalacOptions ++= Seq(
   "-release",
   "8",
@@ -92,11 +94,3 @@ lazy val docs = project
       "org.scala-lang.modules" %% "scala-xml" % "always"
     ),
   )
-
-TaskKey[Unit]("updateReadme") := Def.taskDyn {
-  val readmeFile = "README.md"
-  Def.sequential(
-    (docs / mdoc).toTask(s" --include $readmeFile"),
-    Def.task(IO.copyFile((docs / mdocOut).value / readmeFile, baseDirectory.value / readmeFile)),
-  )
-}

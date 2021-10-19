@@ -1,12 +1,16 @@
+import com.jsuereth.sbtpgp.PgpKeys._
+import com.jsuereth.sbtpgp.SbtPgp
 import sbt._
 import sbt.Keys._
+import sbtrelease.ReleasePlugin
+import sbtrelease.ReleasePlugin.autoImport._
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.GitHubHosting
 import xerial.sbt.Sonatype.SonatypeKeys._
 
 object PublishSettings extends AutoPlugin {
 
-  override def requires: Plugins = Sonatype
+  override def requires: Plugins = Sonatype && SbtPgp && ReleasePlugin
 
   override def trigger: PluginTrigger = allRequirements
 
@@ -24,6 +28,7 @@ object PublishSettings extends AutoPlugin {
     publishTo := sonatypePublishToBundle.value,
     sonatypeProjectHosting := Some(GitHubHosting("kxbmap", "sbt-jooq", "Tsukasa Kitachi", "kxbmap@gmail.com")),
     pomIncludeRepository := { _ => false },
+    releasePublishArtifactsAction := publishSigned.value,
   )
 
 }
