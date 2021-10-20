@@ -165,6 +165,6 @@ Plugin replace placeholders to substitution values:
 
 ## License
 
-Copyright 2015-2018 Tsukasa Kitachi
+Copyright 2015 Tsukasa Kitachi
 
 Apache License, Version 2.0

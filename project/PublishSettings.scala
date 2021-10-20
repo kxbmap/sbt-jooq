@@ -17,10 +17,12 @@ object PublishSettings extends AutoPlugin {
   override def buildSettings: Seq[Setting[_]] = Seq(
     description := "jOOQ plugin for sbt 1.3+",
     organization := "com.github.kxbmap",
-    versionScheme := Some("early-semver"),
+    organizationName := "Tsukasa Kitachi",
+    startYear := Some(2015),
     licenses := Seq(
-      "Apache License, Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")
+      "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")
     ),
+    versionScheme := Some("early-semver"),
   )
 
   override def projectSettings: Seq[Setting[_]] = Seq(

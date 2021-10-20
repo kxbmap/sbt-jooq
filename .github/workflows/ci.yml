@@ -48,7 +48,7 @@ jobs:
         run: |
           case ${{ matrix.jobtype }} in
             1)
-              sbt -v test docs/mdoc scalafmtCheckAll scalafmtSbtCheck
+              sbt -v test docs/mdoc scalafmtCheckAll scalafmtSbtCheck headerCheckAll
               ;;
             2)
               sbt -v "core/scripted jooq/*" "checker/scripted jooq-checker/*"
