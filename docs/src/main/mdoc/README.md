@@ -90,33 +90,6 @@ If you want to manage jOOQ dependencies yourself, set this flag to false.
 autoJooqLibrary := true
 ```
 
-#### jooqCodegenMode
-
-- Optional
-- Default: `CodegenMode.Auto`
-
-Mode of jOOQ-codegen execution.
-
-|CodegenMode  |Before each compile            |Destination directory                          |
-|-------------|-------------------------------|-----------------------------------------------|
-|`Auto`       |Run `jooqCodegenIfAbsent` task |target/scala-<SCALA_VERSION>/src_managed/main/ |
-|`Always`     |Run `jooqCodegen` task         |target/scala-<SCALA_VERSION>/src_managed/main/ |
-|`Unmanaged`  |Do nothing                     |src/main/jooq-generated/                       |
-
-`Auto` and `Always` are "Managed" mode that runs generation task before each compile and places
-generated files to the managed directory.
-
-`Unmanaged` mode do nothing before compile. Therefore, you need to run generation task manually.
-Also, generated files are placed in the unmanaged directory.
-
-If you want to change the destination directory, set to `Compile / jooqSource` key.
-
-```scala mdoc:compile-only
-jooqCodegenMode := CodegenMode.Auto
-
-Compile / jooqSource := crossTarget.value / "jooq-generated"
-```
-
 #### jooqCodegenConfig
 
 - Required
@@ -167,18 +140,39 @@ jooqCodegenConfig ++= Seq(file("append2.xml"), file("append3.xml"))
 #### jooqCodegenVariables
 
 - Optional
-- Default:
-
-  |KEY                |VALUE                                        |
-  |-------------------|---------------------------------------------|
-  |RESOURCE_DIRECTORY |/path/to/project/src/jooq-codegen/resources  |
+- Default: `empty`
 
 Variables for configuration placeholders replacement.
 
 ```scala mdoc:compile-only
-jooqCodegenVariables ++= Map(
-  "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value
-)
+jooqCodegenVariables := Map.empty
+```
+
+#### jooqCodegenMode
+
+- Optional
+- Default: `CodegenMode.Auto`
+
+Mode of jOOQ-codegen execution.
+
+|CodegenMode  |Before each compile            |Destination directory                          |
+|-------------|-------------------------------|-----------------------------------------------|
+|`Auto`       |Run `jooqCodegenIfAbsent` task |target/scala-<SCALA_VERSION>/src_managed/main/ |
+|`Always`     |Run `jooqCodegen` task         |target/scala-<SCALA_VERSION>/src_managed/main/ |
+|`Unmanaged`  |Do nothing                     |src/main/jooq-generated/                       |
+
+`Auto` and `Always` are "Managed" mode that runs generation task before each compile and places
+generated files to the managed directory.
+
+`Unmanaged` mode do nothing before compile. Therefore, you need to run generation task manually.
+Also, generated files are placed in the unmanaged directory.
+
+If you want to change the destination directory, set to `Compile / jooqSource` key.
+
+```scala mdoc:compile-only
+jooqCodegenMode := CodegenMode.Auto
+
+Compile / jooqSource := crossTarget.value / "jooq-generated"
 ```
 
 ---

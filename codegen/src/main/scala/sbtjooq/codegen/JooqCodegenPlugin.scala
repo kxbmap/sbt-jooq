@@ -129,9 +129,6 @@ object JooqCodegenPlugin extends AutoPlugin {
       else
         (managedSourceDirectories.value :+ jooqSource.value).distinct
     },
-    jooqCodegenVariables ++= Map(
-      "RESOURCE_DIRECTORY" -> (JooqCodegen / resourceDirectory).value
-    ),
     jooqCodegenConfigTransformer := ConfigTransformer(
       jooqSource.value,
       jooqCodegenVariables.value,
