@@ -1,6 +1,7 @@
 enablePlugins(SbtPlugin)
 
-scriptedBufferLog := false
+scriptedBatchExecution := true
+scriptedParallelInstances := 2
 
 scriptedLaunchOpts ++=
   sys.props.collect {
