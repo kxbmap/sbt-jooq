@@ -1,0 +1,16 @@
+> setup
+
+-> compile
+
+> show jooqCodegen
+$ exists src/main/jooq-generated/com/example/db/Tables.java
+> run
+
+> clean
+> run
+
+$ delete src/main/jooq-generated
+> set Compile / jooqSource := (Compile / javaSource).value
+> jooqCodegen
+$ exists src/main/java/com/example/db/Tables.java
+> run

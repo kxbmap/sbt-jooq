@@ -54,10 +54,10 @@ jobs:
               sbt -v "core/scripted jooq/*" "checker/scripted jooq-checker/*"
               ;;
             3)
-              sbt -v "codegen/scripted jooq-codegen/*"
+              sbt -v "codegen/scripted jooq-codegen/features"
               ;;
             4)
-              sbt -v "codegen/scripted jooq-codegen-compat/*"
+              sbt -v "codegen/scripted jooq-codegen/jooq-versions"
               ;;
             5)
               sbt -v "codegen/scripted it-flyway-sbt/*"

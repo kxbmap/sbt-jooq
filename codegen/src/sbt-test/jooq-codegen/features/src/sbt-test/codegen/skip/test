@@ -1,0 +1,14 @@
+> setup
+
+> set Compile / jooqCodegen / skip := true
+> jooqCodegen
+-> compile
+> checkCalled 0
+
+> set Compile / jooqCodegen / skip := false
+> compile
+> checkCalled 1
+
+> set Compile / jooqCodegen / skip := true
+> compile
+> checkCalled 0

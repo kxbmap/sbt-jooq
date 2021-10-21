@@ -34,6 +34,10 @@ lazy val codegen = project
       core / publishLocal,
       codegenTool / publishLocal,
     ).evaluated,
+    scriptedLaunchOpts ++= Seq(
+      s"-Dscripted.template.plugin=${baseDirectory.value / "changes" / "Template.scala"}",
+      s"-Dscripted.template.dir=${baseDirectory.value / "changes" / "template"}",
+    ),
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
       "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
