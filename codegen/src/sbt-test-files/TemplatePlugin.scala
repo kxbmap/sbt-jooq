@@ -4,10 +4,11 @@ import java.util.stream.Stream
 import sbt._
 import sbt.Keys._
 import sbt.ScriptedPlugin.autoImport._
+import sbt.io.Using
 import sbt.plugins.SbtPlugin
 import scala.collection.JavaConverters._
 
-object Template extends AutoPlugin {
+object TemplatePlugin extends AutoPlugin {
 
   override def requires: Plugins = SbtPlugin
 
@@ -39,26 +40,23 @@ object Template extends AutoPlugin {
     IO.copy(copies)
   }
 
-  private def listFiles(dir: File): List[(File, File)] = {
-    def traverse(path: Path): Stream[File] =
-      Files.list(path).flatMap[File] {
-        case p if Files.isDirectory(p) => traverse(p)
-        case p => Stream.of(Seq(p.toFile): _*)
-      }
-    if (!dir.exists()) Nil
-    else
-      traverse(dir.toPath).collect(toList()).asScala
-        .flatMap(f => IO.relativizeFile(dir, f).map(f -> _))
-        .toList
+  implicit class StreamOps[A](s: Stream[A]) {
+    def mapL[B](f: A => B): List[B] = s.map[B](f(_)).collect(toList()).asScala.toList
   }
 
+  private val walk = Using.resource(Files.walk(_: Path))
+
+  private def listFiles(dir: File): List[(File, File)] =
+    if (!dir.exists()) Nil
+    else {
+      val base = dir.toPath
+      walk(base)(_.filter(Files.isRegularFile(_)).mapL(p => (p.toFile, base.relativize(p).toFile)))
+    }
+
+  private val listDir = Using.resource(Files.list(_: Path).filter(Files.isDirectory(_)))
+
   private def listTests(dir: File): List[File] =
-    Files.list(dir.toPath)
-      .filter(Files.isDirectory(_))
-      .flatMap[Path](Files.list(_))
-      .filter(Files.isDirectory(_))
-      .map[File](_.toFile)
-      .collect(toList()).asScala.toList
+    listDir(dir.toPath)(_.mapL(listDir(_)(_.mapL(_.toFile))).flatten)
 
   private def readSet(f: File): Set[File] = {
     if (f.exists())

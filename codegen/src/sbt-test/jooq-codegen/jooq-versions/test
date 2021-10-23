@@ -1,4 +1,4 @@
-> copyTemplatePlugin
+> enableTemplatePlugin
 > disableIncompatibleTests
 > scripted
 > cleanup
