@@ -21,10 +21,10 @@ import scala.xml.{Elem, Node, NodeSeq, Text}
 
 object ConfigTransformer {
 
-  def apply(target: File, vars: Map[String, Any], expand: Any => NodeSeq): Node => Node =
-    appendGeneratorTargetDirectory(target).andThen(replaceConfigVariables(vars, expand))
+  def apply(target: File, expander: VariableExpander): ConfigTransformer =
+    appendGeneratorTargetDirectory(target).andThen(replaceConfigVariables(expander))
 
-  def appendGeneratorTargetDirectory(target: File): Node => Node = {
+  def appendGeneratorTargetDirectory(target: File): ConfigTransformer = {
     def append(node: Node, child: Node): Node =
       (node, child) match {
         case (e @ Elem(p, l, a, s, xs @ _*), x) if x.isAtom && e.text.trim.isEmpty =>
@@ -47,9 +47,10 @@ object ConfigTransformer {
     append(_, elem)
   }
 
-  def replaceConfigVariables(vars: Map[String, Any], expand: Any => NodeSeq): Node => Node = {
+  def replaceConfigVariables(expander: VariableExpander): ConfigTransformer = {
     def go(parents: List[Node]): Node => NodeSeq = {
       def path = parents.reverseMap(_.label).mkString("/", "/", "")
+      def expand(k: String): NodeSeq = expander(k).getOrElse(sys.error(s"$path: No variables found for key '$k'"))
       def replace(t: String): NodeSeq =
         t.span(_ != '$') match {
           case (_, "") => Text(t)
@@ -59,10 +60,8 @@ object ConfigTransformer {
         }
       def value(t: String): NodeSeq =
         t.span(_ != '}') match {
-          case (_, "") => sys.error(s"Missing closing brace `}` at '$path'")
-          case (k, r) =>
-            val v = vars.getOrElse(k, sys.error(s"No variables found for key '$k' at '$path'"))
-            expand(v) ++ replace(r.drop(1))
+          case (_, "") => sys.error(s"$path: Missing closing brace `}`")
+          case (k, r) => expand(k) ++ replace(r.drop(1))
         }
       locally {
         case e @ Elem(p, l, a, s, xs @ _*) => Elem(p, l, a, s, xs.isEmpty, xs.flatMap(go(e :: parents)): _*)

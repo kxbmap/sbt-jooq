@@ -18,8 +18,13 @@ package sbtjooq.codegen
 
 import java.io.FileNotFoundException
 import sbt._
+import scala.xml.{Node, NodeSeq}
 
 package object internal {
+
+  type ConfigTransformer = Node => Node
+
+  type VariableExpander = String => Option[NodeSeq]
 
   implicit class JavaVersionCompanionOps(companion: JavaVersion.type) {
     def get(javaHome: Option[File]): JavaVersion =

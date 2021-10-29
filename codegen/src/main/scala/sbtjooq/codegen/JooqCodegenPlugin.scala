@@ -51,7 +51,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenMode := CodegenMode.Auto,
     jooqCodegenConfig := CodegenConfig.empty,
     jooqCodegenVariables := Map.empty,
-    jooqCodegenVariableExpander := VariableExpander.default,
+    jooqCodegenVariableHandler := VariableExpander.defaultHandler,
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
   )
 
@@ -131,8 +131,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     },
     jooqCodegenConfigTransformer := ConfigTransformer(
       jooqSource.value,
-      jooqCodegenVariables.value,
-      VariableExpander(jooqCodegenVariableExpander.value),
+      VariableExpander(jooqCodegenVariables.value, jooqCodegenVariableHandler.value),
     ),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
     jooqCodegenTransformedConfigFiles := transformedConfigFilesTask.value,

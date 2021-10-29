@@ -33,7 +33,7 @@ class ReplaceConfigVariablesTest extends UnitSpec {
         props
       },
     )
-    val transform = ConfigTransformer.replaceConfigVariables(vars, VariableExpander())
+    val transform = ConfigTransformer.replaceConfigVariables(VariableExpander(vars))
 
     "configuration has no placeholders" should {
       "do nothing" in {

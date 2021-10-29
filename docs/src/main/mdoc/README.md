@@ -218,7 +218,7 @@ val vars = Map(
 )
 jooqCodegenVariables ++= vars // check compiles
 
-val transform = ConfigTransformer(target, vars, VariableExpander())
+val transform = ConfigTransformer(target, VariableExpander(vars))
 
 val pp = new scala.xml.PrettyPrinter(120, 4, true)
 ```

@@ -22,10 +22,12 @@ import scala.xml.{NodeSeq, Text}
 
 object VariableExpander {
 
-  def apply(expand: PartialFunction[Any, NodeSeq] = default): Any => NodeSeq =
-    expand.applyOrElse(_, fallback)
+  type Handler = PartialFunction[Any, NodeSeq]
 
-  def default: PartialFunction[Any, NodeSeq] = {
+  def apply(vars: Map[String, Any], handler: Handler = defaultHandler): VariableExpander =
+    vars.get(_).map(handler.applyOrElse(_, fallback))
+
+  def defaultHandler: Handler = {
     case props: Properties =>
       props.entrySet().asScala.map { e =>
         <property>
@@ -35,7 +37,7 @@ object VariableExpander {
       }.toSeq
   }
 
-  def fallback: Any => NodeSeq =
+  private def fallback: Any => NodeSeq =
     x => Text(x.toString)
 
 }

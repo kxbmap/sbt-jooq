@@ -35,7 +35,7 @@ trait JooqCodegenKeys {
   // Customizable
   val jooqSource = settingKey[File]("Default generated jOOQ source directory")
   val jooqCodegenConfigTransformer = settingKey[Node => Node]("jOOQ-codegen configuration transform function")
-  val jooqCodegenVariableExpander = settingKey[PartialFunction[Any, NodeSeq]]("Partial function to expand variables")
+  val jooqCodegenVariableHandler = settingKey[PartialFunction[Any, NodeSeq]]("Handler for variables to be XML")
 
   // Internal use
   val jooqCodegenTransformedConfigs = taskKey[Seq[Node]]("Transformed jOOQ-codegen configurations")
