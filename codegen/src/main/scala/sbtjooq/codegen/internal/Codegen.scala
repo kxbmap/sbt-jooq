@@ -59,7 +59,7 @@ object Codegen {
   private def codegenToolDependencies: Seq[ModuleID] =
     Seq("com.github.kxbmap" % "sbt-jooq-codegen-tool" % BuildInfo.sbtJooqVersion)
 
-  //noinspection SbtDependencyVersionInspection
+  // noinspection SbtDependencyVersionInspection
   private def jaxbDependencies(jooqVersion: JooqVersion, javaVersion: JavaVersion): Seq[ModuleID] =
     if (jooqVersion.needsJaxbSettings && !javaVersion.isJavaEEModulesBundled)
       Seq(
