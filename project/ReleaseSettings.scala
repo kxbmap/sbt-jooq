@@ -27,12 +27,12 @@ object ReleaseSettings extends AutoPlugin {
     releaseProcess := Seq(
       checkSnapshotDependencies,
       inquireVersions,
+      setReleaseVersion,
       runClean,
       releaseStepCommand("headerCheckAll"),
       releaseStepCommand("scalafmtCheckAll;scalafmtSbtCheck"),
       runTest,
       releaseStepCommand("scripted"),
-      setReleaseVersion,
       releaseStepTask(updateReadme),
       commitReadme,
       commitReleaseVersion,
