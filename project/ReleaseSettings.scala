@@ -28,6 +28,8 @@ object ReleaseSettings extends AutoPlugin {
       checkSnapshotDependencies,
       inquireVersions,
       runClean,
+      releaseStepCommand("headerCheckAll"),
+      releaseStepCommand("scalafmtCheckAll;scalafmtSbtCheck"),
       runTest,
       releaseStepCommand("scripted"),
       setReleaseVersion,
