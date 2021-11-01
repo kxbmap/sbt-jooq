@@ -2,167 +2,245 @@
 
 [![CI](https://github.com/kxbmap/sbt-jooq/actions/workflows/ci.yml/badge.svg)](https://github.com/kxbmap/sbt-jooq/actions/workflows/ci.yml)
 
-jOOQ plugin for sbt 1.0+
+jOOQ plugin for sbt 1.3+
 
 
 ## JooqCodegenPlugin
 
+The plugin for easy use of jOOQ-codegen.
+
 ### Installation
 
-Add the following to your `project/plugins.sbt`:
+Add the following to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.6.1")
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.7.0")
 ```
 
-Then in your `build.sbt`:
+Then in `build.sbt`:
 
 ```scala
 // Enable the plugin
 enablePlugins(JooqCodegenPlugin)
 
-// Add your database driver dependency to `jooq-codegen` scope
+// Add a driver dependency for the database you are using to "jooq-codegen" scope
 libraryDependencies += "com.h2database" % "h2" % "1.4.200" % JooqCodegen
 ```
 
-### Configuration
+---
+### Tasks
+
+#### jooqCodegen
+
+Run jOOQ-codegen according to settings.
+
+#### jooqCodegenIfAbsent
+
+Run jOOQ-codegen according to settings if generated files absent.
+
+If generated files present, there is no effect.
+
+---
+### Settings
 
 #### jooqVersion
-Version of jOOQ library.
 
-Default: `"3.15.2"`
+- Optional (but recommended)
+- Default: `"3.15.4"`
+
+Version of the jOOQ libraries to be used.
 
 ```scala
-jooqVersion := "3.15.2"
+jooqVersion := "3.15.4"
 ```
 
 #### jooqOrganization
-jOOQ organization/group ID.
 
-If you want to use a commercial version of jOOQ, set appropriate one.
-For details, please refer to the [jOOQ manual](https://www.jooq.org/doc/3.15/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
+- Optional
+- Default: `"org.jooq"`
 
-Default: `"org.jooq"`
+Organization/GroupID of jOOQ libraries.
+
+If you want to use the commercial version of jOOQ, set the appropriate one. For details, please refer to
+the [jOOQ manual](https://www.jooq.org/doc/3.15/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
 
 ```scala
 jooqOrganization := "org.jooq"
 ```
 
 #### autoJooqLibrary
+
+- Optional
+- Default: `true`
+
 Add jOOQ dependencies automatically if true.
 
-If you want to manage jOOQ dependencies manually, set this flag to false.
-
-Default: `true`
+If you want to manage jOOQ dependencies yourself, set this flag to false.
 
 ```scala
 autoJooqLibrary := true
 ```
 
 #### jooqCodegenConfig
-jOOQ-codegen configuration. This is empty by default and must be set. You can set a file, classpath resource, or XML directly.
+
+- Required
+- Default: `empty`
+
+Configuration of jOOQ-codegen.
+
+This is empty by default and must be set. You can set a file, classpath resource, XML directly, or multiple of them.
 
 ```scala
-// Set file path
-jooqCodegenConfig := file("jooq-codegen.xml")
+// Set a file
+// Note: Relative path is resolved from the root of the project.
+jooqCodegenConfig := file("path/to/jooq-codegen.xml")
 ```
 
 ```scala
-// Set URI of classpath resource
-jooqCodegenConfig := uri("classpath:jooq-codegen.xml")
+// Set a URI of classpath resource
+// Note: Resources are loaded from the `jooq-codegen` scope.
+//       (e.g. resources under the `./src/jooq-codegen/resources/` directory)
+jooqCodegenConfig := uri("classpath:path/to/jooq-codegen.xml")
 ```
 
 ```scala
-// Set XML configuration
+// Set XML directly using XML literal
 jooqCodegenConfig :=
   <configuration>
     <!-- Your configurations -->
   </configuration>
 ```
 
-#### jooqCodegenStrategy
-jOOQ-codegen auto execution strategy.
-
-|Value      |Description                                              |
-|-----------|---------------------------------------------------------|
-|`IfAbsent` |Execute if absent files in jOOQ-codegen target directory |
-|`Always`   |Always execute                                           |
-|`Never`    |Never execute                                            |
-
-Default: `CodegenStrategy.IfAbsent`
-
 ```scala
-jooqCodegenStrategy := CodegenStrategy.IfAbsent
+// Set multiple configurations
+jooqCodegenConfig := Seq[CodegenConfig](
+  file("path/to/jooq-codegen.xml"),
+  uri("classpath:path/to/jooq-codegen.xml"),
+  <configuration>
+    <!-- Your configurations -->
+  </configuration>
+)
+
+// Append a configuration
+jooqCodegenConfig += file("append1.xml")
+
+// Append configurations
+jooqCodegenConfig ++= Seq(file("append2.xml"), file("append3.xml"))
 ```
 
-#### jooqCodegenKeys
-Keys for jOOQ-codegen configuration text substitution.
+#### jooqCodegenVariables
 
-For details, please refer the below section.
+- Optional
+- Default: `empty`
 
-Default: `sys.env ++ Seq(baseDirectory, sourceManaged in Compile)`
+Variables for configuration placeholders replacement.
 
 ```scala
-jooqCodegenKeys ++= Seq[CodegenKey](
-  scalaVersion,     // Setting key
-  publish / skip,   // Task key
-  "Answer" -> 42    // constant  
+jooqCodegenVariables := Map.empty
+```
+
+#### jooqCodegenMode
+
+- Optional
+- Default: `CodegenMode.Auto`
+
+Mode of jOOQ-codegen execution.
+
+|CodegenMode  |Before each compile            |Destination directory                          |
+|-------------|-------------------------------|-----------------------------------------------|
+|`Auto`       |Run `jooqCodegenIfAbsent` task |target/scala-<SCALA_VERSION>/src_managed/main/ |
+|`Always`     |Run `jooqCodegen` task         |target/scala-<SCALA_VERSION>/src_managed/main/ |
+|`Unmanaged`  |Do nothing                     |src/main/jooq-generated/                       |
+
+`Auto` and `Always` are "Managed" mode that runs generation task before each compile and places
+generated files to the managed directory.
+
+`Unmanaged` mode do nothing before compile. Therefore, you need to run generation task manually.
+Also, generated files are placed in the unmanaged directory.
+
+If you want to change the destination directory, set to `Compile / jooqSource` key.
+
+```scala
+jooqCodegenMode := CodegenMode.Auto
+
+Compile / jooqSource := crossTarget.value / "jooq-generated"
+```
+
+---
+### Rewriting configurations
+
+The plugin rewrites configurations before code generation.
+
+#### Rewrite rules
+
+- Replace placeholders like `${KEY}` in configurations to variables' value.
+
+  - If value is `java.util.Properties`, it expands to property list of key/value pairs, otherwise to string.
+
+- If the `generator \ target \ directory` element is not configured, append it using `jooqSource` value.
+
+#### Example
+
+Define variables in build:
+
+```scala
+jooqCodegenVariables ++= Map(
+  "JDBC_DRIVER" -> "com.mysql.cj.jdbc.Driver",
+  "JDBC_URL" -> "jdbc:mysql://localhost/testdb",
+  "JDBC_PROPS" -> {
+    val props = new java.util.Properties()
+    props.setProperty("user", "root")
+    props.setProperty("password", "secret")
+    props
+  },
 )
 ```
 
-You can confirm substitution values using `jooqCodegenSubstitutions`.
-```
-> show jooqCodegenSubstitutions
-* ...Env vars...
-* (baseDirectory, /path/to/base-directory)
-* (compile:sourceManaged, /path/to/source-managed)
-* (sourceManaged, /path/to/source-managed)
-* (scalaVersion, 2.12.6)
-* (publish::skip, false)
-* (Answer, 42)
-```
+And configuration is below:
 
-### jOOQ-codegen configuration text substitution
-You can substitute text using placeholder(`${KEY}`) in configuration file.
-
-e.g. Configuration file contains some placeholders:
 ```xml
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.15.0.xsd">
     <jdbc>
-        <!-- ...snip... -->
-        <user>${DB_USER}</user>
-        <password>${DB_PASSWORD}</password>
+        <driver>${JDBC_DRIVER}</driver>
+        <url>${JDBC_URL}</url>
+        <properties>${JDBC_PROPS}</properties>
     </jdbc>
     <generator>
-        <!-- ...snip... -->
         <target>
             <packageName>com.example</packageName>
-            <directory>${sourceManaged}</directory>
         </target>
     </generator>
 </configuration>
 ```
 
-Plugin replace placeholders to substitution values:
+Then rewrites to:
+
 ```xml
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.15.0.xsd">
     <jdbc>
-        <!-- ...snip... -->
-        <user>your-user</user>
-        <password>your-password</password>
+        <driver>com.mysql.cj.jdbc.Driver</driver>
+        <url>jdbc:mysql://localhost/testdb</url>
+        <properties>
+            <property>
+                <key>user</key>
+                <value>root</value>
+            </property>
+            <property>
+                <key>password</key>
+                <value>secret</value>
+            </property>
+        </properties>
     </jdbc>
     <generator>
-        <!-- ...snip... -->
         <target>
             <packageName>com.example</packageName>
-            <directory>/path/to/source-managed</directory>
+            <directory>/path/to/project/target/scala-2.13/src_managed/main</directory>
         </target>
     </generator>
 </configuration>
 ```
 
+---
 ## License
 
 Copyright 2015 Tsukasa Kitachi
