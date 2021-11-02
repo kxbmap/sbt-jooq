@@ -2,7 +2,7 @@ import sbt.librarymanagement.VersionNumber
 
 object Versions {
 
-  final val scriptedScalaVersion = "2.13.6"
+  final val scriptedScalaVersion = "2.13.7"
 
   final val jooqVersion = "3.15.4"
 
