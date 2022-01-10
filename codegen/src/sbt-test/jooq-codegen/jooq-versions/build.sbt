@@ -22,6 +22,10 @@ TaskKey[Unit]("disableIncompatibleTests") := {
   val key = "RUNTIME_JAVA_HOME"
   val home = if (insideCI.value) Some(sys.env(key)) else sys.env.get(key)
   val version = home.map(file(_).getName.dropWhile(!_.isDigit).stripPrefix("1.").takeWhile(_.isDigit).toInt)
-  if (version.exists(_ < 11))
-    IO.touch(sbtTestDirectory.value / "version" / "3.15" / "disabled")
+  if (version.exists(_ < 11)) {
+    val disables = Seq("3.15", "3.16")
+    disables.foreach { v =>
+      IO.touch(sbtTestDirectory.value / "version" / v / "disabled")
+    }
+  }
 }
