@@ -40,7 +40,7 @@ object Versions {
 
   final val flywaySbtVersion = "7.4.0"
 
-  final val scalaTestVersion = "3.2.10"
+  final val scalaTestVersion = "3.2.11"
 
   def minorVersion(version: String): String =
     version match {
