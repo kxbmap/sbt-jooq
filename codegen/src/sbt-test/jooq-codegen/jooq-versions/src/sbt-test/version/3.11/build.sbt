@@ -1,7 +1,5 @@
 ThisBuild / scalaVersion := sys.props("scripted.scala.version")
 
-ThisBuild / javacOptions ++= Seq("-source", "8", "-target", "8")
-
 enablePlugins(JooqCodegenPlugin)
 
 jooqVersion := sys.props("scripted.jooq.3_11.version")

@@ -19,13 +19,13 @@ commands += Command.command("enableTemplatePlugin") { state =>
 }
 
 TaskKey[Unit]("disableIncompatibleTests") := {
-  val key = "RUNTIME_JAVA_HOME"
-  val home = if (insideCI.value) Some(sys.env(key)) else sys.env.get(key)
-  val version = home.map(file(_).getName.dropWhile(!_.isDigit).stripPrefix("1.").takeWhile(_.isDigit).toInt)
-  if (version.exists(_ < 11)) {
-    val disables = Seq("3.15", "3.16")
-    disables.foreach { v =>
-      IO.touch(sbtTestDirectory.value / "version" / v / "disabled")
+  val java = sys.props("java.version").stripPrefix("1.").takeWhile(_.isDigit).toInt
+  if (java < 11) {
+    val dir = sbtTestDirectory.value / "version"
+    val disables: NameFilter = {
+      val s = SemanticSelector(">=3.15")
+      n => s.matches(VersionNumber(n))
     }
+    IO.touch(IO.listFiles(dir, DirectoryFilter && disables).map(_ / "disabled"))
   }
 }

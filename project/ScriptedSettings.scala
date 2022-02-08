@@ -24,6 +24,7 @@ object ScriptedSettings extends AutoPlugin {
     ) ++ jooqVersions.map { v =>
       s"-Dscripted.jooq.${minorVersion(v).replace('.', '_')}.version=$v"
     },
+    scripted / javaHome := sys.env.get("SCRIPTED_JAVA_HOME").map(file),
   )
 
 }
