@@ -28,25 +28,16 @@ public class GenerationTool {
 
     private static final Logger logger = LoggerFactory.getLogger(GenerationTool.class);
 
-    private final MethodHandle delegate;
-    private final String[] args;
+    private static final Class<?> delegateClass;
+    private static final MethodHandle delegateMain;
 
-    public GenerationTool(MethodHandle delegate, String[] args) {
-        this.delegate = delegate;
-        this.args = args;
+    static {
+        final Class<?> clazz = detectGenerationToolClass();
+        delegateClass = clazz;
+        delegateMain = getMainMethod(clazz);
     }
 
-    public void generate() throws Throwable {
-        invokeDelegate();
-    }
-
-    private void invokeDelegate() throws Throwable {
-        //noinspection ConfusingArgumentToVarargsMethod
-        delegate.invokeExact(args);
-    }
-
-
-    private static Class<?> detectGenerationToolClass() throws ClassNotFoundException {
+    private static Class<?> detectGenerationToolClass() {
         try {
             return Class.forName("org.jooq.codegen.GenerationTool");
         } catch (ClassNotFoundException e) {
@@ -54,20 +45,25 @@ public class GenerationTool {
                 return Class.forName("org.jooq.util.GenerationTool");
             } catch (ClassNotFoundException suppressed) {
                 e.addSuppressed(suppressed);
-                throw e;
+                throw new RuntimeException(e);
             }
         }
     }
 
-    private static MethodHandle getMainMethod(Class<?> mainClass) throws ReflectiveOperationException {
+    private static MethodHandle getMainMethod(Class<?> mainClass) {
         final MethodType mainType = MethodType.methodType(void.class, String[].class);
-        return MethodHandles.publicLookup().findStatic(mainClass, "main", mainType);
+        try {
+            return MethodHandles.publicLookup().findStatic(mainClass, "main", mainType);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private static void showRunningInfo(Class<?> mainClass) {
+
+    private static void showRunningInfo() {
         final String vendor = System.getProperty("java.vendor");
         final String version = System.getProperty("java.version");
-        logger.info("Running {} ({} Java {})", mainClass.getName(), vendor, version);
+        logger.info("Running {} ({} Java {})", delegateClass.getName(), vendor, version);
     }
 
     private static void showJooqLogo() {
@@ -77,12 +73,15 @@ public class GenerationTool {
         }
     }
 
+    public void generate(String[] args) throws Throwable {
+        //noinspection ConfusingArgumentToVarargsMethod
+        delegateMain.invokeExact(args);
+    }
+
     public static void main(String[] args) throws Throwable {
-        final Class<?> mainClass = detectGenerationToolClass();
-        final MethodHandle delegate = getMainMethod(mainClass);
-        showRunningInfo(mainClass);
+        showRunningInfo();
         showJooqLogo();
-        new GenerationTool(delegate, args).generate();
+        new GenerationTool().generate(args);
     }
 
 }
