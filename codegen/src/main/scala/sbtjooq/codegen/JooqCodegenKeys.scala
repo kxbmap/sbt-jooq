@@ -16,7 +16,7 @@
 
 package sbtjooq.codegen
 
-import sbt._
+import sbt.*
 import scala.xml.{Node, NodeSeq}
 
 trait JooqCodegenKeys {

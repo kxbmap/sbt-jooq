@@ -16,14 +16,14 @@
 
 package sbtjooq.codegen
 
-import sbt._
+import sbt.*
 import sbt.Def.Initialize
-import sbt.Keys._
+import sbt.Keys.*
 import sbt.io.Using
-import sbtjooq.JooqKeys._
+import sbtjooq.JooqKeys.*
 import sbtjooq.JooqPlugin
-import sbtjooq.codegen.JooqCodegenKeys._
-import sbtjooq.codegen.internal._
+import sbtjooq.codegen.JooqCodegenKeys.*
+import sbtjooq.codegen.internal.*
 import scala.xml.{Node, XML}
 
 object JooqCodegenPlugin extends AutoPlugin {
@@ -42,12 +42,12 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqCodegen)
 
-  override def projectSettings: Seq[Setting[_]] =
+  override def projectSettings: Seq[Setting[?]] =
     jooqCodegenDefaultSettings ++
       inConfig(Compile)(jooqCodegenSettings) ++
       jooqCodegenDependencies(Compile)
 
-  override def globalSettings: Seq[Setting[_]] = Seq(
+  override def globalSettings: Seq[Setting[?]] = Seq(
     jooqCodegenMode := CodegenMode.Auto,
     jooqCodegenConfig := CodegenConfig.empty,
     jooqCodegenVariables := Map.empty,
@@ -55,7 +55,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
   )
 
-  private def jooqCodegenDefaultSettings: Seq[Setting[_]] =
+  private def jooqCodegenDefaultSettings: Seq[Setting[?]] =
     inConfig(JooqCodegen)(
       Defaults.configSettings ++
         Seq(
@@ -88,7 +88,7 @@ object JooqCodegenPlugin extends AutoPlugin {
           ).map(_ % JooqCodegen),
       )
 
-  def jooqCodegenDependencies(config: Configuration): Seq[Setting[_]] = Seq(
+  def jooqCodegenDependencies(config: Configuration): Seq[Setting[?]] = Seq(
     libraryDependencies ++=
       Codegen.compileDependencies(
         (config / autoJooqLibrary).value,
@@ -98,7 +98,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       ).map(_ % config)
   )
 
-  lazy val jooqCodegenSettings: Seq[Setting[_]] = Seq(
+  lazy val jooqCodegenSettings: Seq[Setting[?]] = Seq(
     javacOptions ++=
       Codegen.javacOptions(
         autoJooqLibrary.value,
@@ -225,7 +225,7 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def generatorTargetsTask: Initialize[Task[Seq[(File, File)]]] = Def.task {
-    import sbt.util.CacheImplicits._
+    import sbt.util.CacheImplicits.*
     def parse(file: File): (File, File) = file -> GeneratorTarget.get(IO.reader(file)(XML.load))
     val prev = jooqCodegenGeneratorTargets.previous.getOrElse(Seq.empty)
     val files = jooqCodegenTransformedConfigFiles.value

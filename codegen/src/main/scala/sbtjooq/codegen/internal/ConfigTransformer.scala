@@ -16,7 +16,7 @@
 
 package sbtjooq.codegen.internal
 
-import sbt._
+import sbt.*
 import scala.xml.{Elem, Node, NodeSeq, Text}
 
 object ConfigTransformer {
@@ -27,14 +27,14 @@ object ConfigTransformer {
   def appendGeneratorTargetDirectory(target: File): ConfigTransformer = {
     def append(node: Node, child: Node): Node =
       (node, child) match {
-        case (e @ Elem(p, l, a, s, xs @ _*), x) if x.isAtom && e.text.trim.isEmpty =>
-          Elem(p, l, a, s, false, xs :+ x: _*)
-        case (Elem(p, l, a, s, xs @ _*), c @ Elem(_, _, _, _, cc @ _*)) =>
+        case (e @ Elem(p, l, a, s, xs*), x) if x.isAtom && e.text.trim.isEmpty =>
+          Elem(p, l, a, s, false, (xs :+ x)*)
+        case (Elem(p, l, a, s, xs*), c @ Elem(_, _, _, _, cc*)) =>
           xs.span(_.label != c.label) match {
-            case (ls, Seq(t, rs @ _*)) =>
-              Elem(p, l, a, s, false, ls ++ cc.foldLeft(t)(append) ++ rs: _*)
+            case (ls, Seq(t, rs*)) =>
+              Elem(p, l, a, s, false, (ls ++ cc.foldLeft(t)(append) ++ rs)*)
             case _ =>
-              Elem(p, l, a, s, false, xs :+ c: _*)
+              Elem(p, l, a, s, false, (xs :+ c)*)
           }
         case _ => node
       }
@@ -64,13 +64,13 @@ object ConfigTransformer {
           case (k, r) => expand(k) ++ replace(r.drop(1))
         }
       locally {
-        case e @ Elem(p, l, a, s, xs @ _*) => Elem(p, l, a, s, xs.isEmpty, xs.flatMap(go(e :: parents)): _*)
+        case e @ Elem(p, l, a, s, xs*) => Elem(p, l, a, s, xs.isEmpty, xs.flatMap(go(e :: parents))*)
         case Text(text) => replace(text)
         case node => node
       }
     }
     locally {
-      case e @ Elem(p, l, a, s, xs @ _*) => Elem(p, l, a, s, xs.isEmpty, xs.flatMap(go(e :: Nil)): _*)
+      case e @ Elem(p, l, a, s, xs*) => Elem(p, l, a, s, xs.isEmpty, xs.flatMap(go(e :: Nil))*)
       case node => node
     }
   }

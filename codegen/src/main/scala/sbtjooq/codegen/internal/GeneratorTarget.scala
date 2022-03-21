@@ -16,7 +16,7 @@
 
 package sbtjooq.codegen.internal
 
-import sbt._
+import sbt.*
 import scala.xml.Node
 
 object GeneratorTarget {

@@ -17,7 +17,7 @@
 package sbtjooq.codegen
 
 import java.io.FileNotFoundException
-import sbt._
+import sbt.*
 import scala.xml.{Node, NodeSeq}
 
 package object internal {

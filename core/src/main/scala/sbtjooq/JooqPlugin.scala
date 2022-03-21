@@ -16,25 +16,25 @@
 
 package sbtjooq
 
-import sbt.Keys._
-import sbt._
-import sbtjooq.JooqKeys._
+import sbt.Keys.*
+import sbt.*
+import sbtjooq.JooqKeys.*
 
 object JooqPlugin extends AutoPlugin {
 
   object autoImport extends JooqKeys
 
-  override def globalSettings: Seq[Setting[_]] = Seq(
+  override def globalSettings: Seq[Setting[?]] = Seq(
     jooqVersion := BuildInfo.defaultJooqVersion,
     jooqOrganization := "org.jooq",
     jooqModules := Seq("jooq"),
     autoJooqLibrary := true,
   )
 
-  override def projectSettings: Seq[Setting[_]] =
+  override def projectSettings: Seq[Setting[?]] =
     jooqDependencies(Compile)
 
-  def jooqDependencies(config: Configuration): Seq[Setting[_]] = Seq(
+  def jooqDependencies(config: Configuration): Seq[Setting[?]] = Seq(
     libraryDependencies ++= {
       if ((config / autoJooqLibrary).value)
         (config / jooqModules).value.map((config / jooqOrganization).value % _ % (config / jooqVersion).value % config)

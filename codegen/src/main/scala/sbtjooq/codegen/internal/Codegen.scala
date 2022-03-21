@@ -16,7 +16,7 @@
 
 package sbtjooq.codegen.internal
 
-import sbt._
+import sbt.*
 import sbtjooq.codegen.BuildInfo
 import sbtjooq.JooqVersion
 

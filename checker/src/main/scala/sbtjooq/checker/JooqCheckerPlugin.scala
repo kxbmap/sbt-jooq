@@ -16,13 +16,13 @@
 
 package sbtjooq.checker
 
-import sbt._
-import sbt.Keys._
+import sbt.*
+import sbt.Keys.*
 import sbtjooq.JooqPlugin
-import sbtjooq.checker.JooqCheckerKeys._
+import sbtjooq.checker.JooqCheckerKeys.*
 import sbtjooq.checker.internal.JooqWarts
 import wartremover.WartRemover
-import wartremover.WartRemover.autoImport._
+import wartremover.WartRemover.autoImport.*
 
 object JooqCheckerPlugin extends AutoPlugin {
 
@@ -34,18 +34,18 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   }
 
-  override def globalSettings: Seq[Setting[_]] = Seq(
+  override def globalSettings: Seq[Setting[?]] = Seq(
     jooqCheckerLevels := CheckerLevels.default,
     jooqCheckerJooqWartsVersion := BuildInfo.defaultJooqWartsVersion,
   )
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)
 
-  override def projectSettings: Seq[Setting[_]] =
+  override def projectSettings: Seq[Setting[?]] =
     jooqCheckerDefaultSettings ++
       inConfig(Compile)(inTask(compile)(jooqCheckerSettings))
 
-  private def jooqCheckerDefaultSettings: Seq[Setting[_]] = Seq(
+  private def jooqCheckerDefaultSettings: Seq[Setting[?]] = Seq(
     libraryDependencies +=
       ("com.github.kxbmap" %% "jooq-warts" % jooqCheckerJooqWartsVersion.value % JooqChecker).intransitive()
   ) ++
@@ -56,7 +56,7 @@ object JooqCheckerPlugin extends AutoPlugin {
       )
     )
 
-  lazy val jooqCheckerSettings: Seq[Setting[_]] = Seq(
+  lazy val jooqCheckerSettings: Seq[Setting[?]] = Seq(
     wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
     wartremoverErrors := wartremoverErrors.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.errors,
     wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings,

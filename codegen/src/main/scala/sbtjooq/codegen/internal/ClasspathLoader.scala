@@ -17,7 +17,7 @@
 package sbtjooq.codegen.internal
 
 import java.net.URLClassLoader
-import sbt._
+import sbt.*
 import sbt.Def.Classpath
 import sbt.io.Using
 

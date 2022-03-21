@@ -16,7 +16,7 @@
 
 package sbtjooq
 
-import sbt._
+import sbt.*
 
 trait JooqKeys {
 

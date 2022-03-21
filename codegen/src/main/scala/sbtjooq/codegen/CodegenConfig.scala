@@ -16,7 +16,7 @@
 
 package sbtjooq.codegen
 
-import sbt._
+import sbt.*
 import scala.language.implicitConversions
 import scala.xml.{Elem, Node, NodeBuffer}
 

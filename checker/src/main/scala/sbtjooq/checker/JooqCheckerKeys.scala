@@ -16,7 +16,7 @@
 
 package sbtjooq.checker
 
-import sbt._
+import sbt.*
 
 trait JooqCheckerKeys {
 

@@ -16,7 +16,7 @@
 
 package sbtjooq.codegen
 
-import sbt._
+import sbt.*
 
 class CodegenConfigTest extends UnitSpec {
 

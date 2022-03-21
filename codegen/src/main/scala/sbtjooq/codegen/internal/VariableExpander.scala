@@ -17,7 +17,7 @@
 package sbtjooq.codegen.internal
 
 import java.util.Properties
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 import scala.xml.{NodeSeq, Text}
 
 object VariableExpander {
