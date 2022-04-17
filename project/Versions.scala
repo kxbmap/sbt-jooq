@@ -4,9 +4,9 @@ object Versions {
 
   final val scriptedScalaVersion = "2.13.8"
 
-  final val jooqVersion = "3.16.4"
+  final val jooqVersion = "3.16.5"
 
-  val jooqVersions = Seq(
+  val jooqVersions: Seq[String] = Seq(
     jooqVersion,
     "3.15.8",
     "3.14.15",
@@ -16,7 +16,7 @@ object Versions {
     "3.10.8",
   )
 
-  final val scalaXMLVersion = "2.0.1"
+  final val scalaXMLVersion = "2.1.0"
 
   final val logbackVersion = "1.2.11"
 
@@ -24,7 +24,7 @@ object Versions {
 
   final val h2V1Version = "1.4.200"
 
-  final val sbtWartRemoverVersion = "2.4.19"
+  final val wartRemoverVersion = "3.0.1"
 
   final val jooqWartsVersion = "0.1.2"
 

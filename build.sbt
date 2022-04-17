@@ -74,7 +74,7 @@ lazy val checker = project
   .settings(
     name := "sbt-jooq-checker",
     scripted := scripted.dependsOn(core / publishLocal).evaluated,
-    addSbtPlugin("org.wartremover" % "sbt-wartremover" % sbtWartRemoverVersion),
+    addSbtPlugin("org.wartremover" % "sbt-wartremover" % wartRemoverVersion),
     buildInfoKeys := Seq[BuildInfoKey](
       "defaultJooqWartsVersion" -> jooqWartsVersion
     ),
