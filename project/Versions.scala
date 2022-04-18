@@ -20,7 +20,7 @@ object Versions {
 
   final val logbackVersion = "1.2.11"
 
-  final val h2Version = "2.1.210"
+  final val h2Version = "2.1.212"
 
   final val h2V1Version = "1.4.200"
 
