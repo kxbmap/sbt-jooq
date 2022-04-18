@@ -12,12 +12,6 @@ TaskKey[Unit]("cleanup") := {
   IO.deleteFilesEmptyDirs(Seq(dir))
 }
 
-commands += Command.command("enableTemplatePlugin") { state =>
-  val plugin = file(sys.props("scripted.template.plugin"))
-  IO.copyFile(plugin, baseDirectory.value / "project" / plugin.getName)
-  "reload" :: state
-}
-
 TaskKey[Unit]("disableIncompatibleTests") := {
   val java = sys.props("java.version").stripPrefix("1.").takeWhile(_.isDigit).toInt
   if (java < 11) {

@@ -1,4 +1,3 @@
-> enableTemplatePlugin
 > disableIncompatibleTests
 > scripted
 > cleanup

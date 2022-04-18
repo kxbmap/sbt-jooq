@@ -34,13 +34,6 @@ lazy val codegen = project
       core / publishLocal,
       codegenTool / publishLocal,
     ).evaluated,
-    scriptedLaunchOpts ++= {
-      val testFiles = sourceDirectory.value / "sbt-test-files"
-      Seq(
-        s"-Dscripted.template.plugin=${testFiles / "TemplatePlugin.scala"}",
-        s"-Dscripted.template.dir=${testFiles / "template"}",
-      )
-    },
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
       "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
