@@ -1,5 +1,3 @@
-> setup
-
 > set jooqCodegenMode := CodegenMode.Auto
 > compile
 > compile

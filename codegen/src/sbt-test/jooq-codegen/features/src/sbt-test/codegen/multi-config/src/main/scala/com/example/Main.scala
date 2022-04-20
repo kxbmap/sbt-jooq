@@ -10,8 +10,8 @@ object Main extends App {
   Class.forName("org.h2.Driver")
 
   Using.resources(
-    DriverManager.getConnection("jdbc:h2:./db0"),
-    DriverManager.getConnection("jdbc:h2:./db1"),
+    DriverManager.getConnection(sys.props("scripted.jdbc.url.0")),
+    DriverManager.getConnection(sys.props("scripted.jdbc.url.1")),
   ) { (conn0, conn1) =>
     val q0 = DSL.using(conn0).selectFrom(T0.EMPLOYEE.as("e"))
     println(q0.getSQL)

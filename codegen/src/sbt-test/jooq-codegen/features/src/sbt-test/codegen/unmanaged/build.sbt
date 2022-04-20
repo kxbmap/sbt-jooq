@@ -1,5 +1,10 @@
 ThisBuild / scalaVersion := sys.props("scripted.scala.version")
 
+libraryDependencies ++=
+  Seq(Runtime, JooqCodegen).map { conf =>
+    "com.h2database" % "h2" % sys.props("scripted.h2.version") % conf
+  }
+
 enablePlugins(JooqCodegenPlugin)
 
 jooqCodegenMode := CodegenMode.Unmanaged
@@ -10,7 +15,7 @@ jooqCodegenConfig :=
   <configuration>
     <jdbc>
       <driver>org.h2.Driver</driver>
-      <url>jdbc:h2:./test</url>
+      <url>{sys.props("scripted.jdbc.url")}</url>
     </jdbc>
     <generator>
       <database>

@@ -7,6 +7,11 @@ scriptedLaunchOpts ++=
     case (k, v) if k.startsWith("scripted.") => s"-D$k=$v"
   }.toSeq
 
+scriptedLaunchOpts += {
+  val setup = (baseDirectory.value / "sql" / "setup.sql").toString.replace('\\', '/')
+  s"-Dscripted.jdbc.url=jdbc:h2:mem:;INIT=runscript from '$setup'"
+}
+
 TaskKey[Unit]("cleanup") := {
   val dir = file(sys.props("user.home")) / ".ivy2" / "local" / organization.value
   IO.deleteFilesEmptyDirs(Seq(dir))

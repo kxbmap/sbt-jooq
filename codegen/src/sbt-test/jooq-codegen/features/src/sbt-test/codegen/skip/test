@@ -1,5 +1,3 @@
-> setup
-
 > set Compile / jooqCodegen / skip := true
 > jooqCodegen
 -> compile

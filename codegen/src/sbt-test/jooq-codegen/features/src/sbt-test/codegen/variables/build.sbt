@@ -1,12 +1,17 @@
 ThisBuild / scalaVersion := sys.props("scripted.scala.version")
 
+libraryDependencies ++=
+  Seq(Runtime, JooqCodegen).map { conf =>
+    "com.h2database" % "h2" % sys.props("scripted.h2.version") % conf
+  }
+
 enablePlugins(JooqCodegenPlugin)
 
 jooqVersion := sys.props("scripted.jooq.version")
 
 jooqCodegenVariables ++= Map(
   "JDBC_DRIVER" -> "org.h2.Driver",
-  "JDBC_URL" -> "jdbc:h2:./test",
+  "JDBC_URL" -> sys.props("scripted.jdbc.url"),
   "JDBC_PROPS" -> {
     val props = new java.util.Properties()
     props.setProperty("user", "")

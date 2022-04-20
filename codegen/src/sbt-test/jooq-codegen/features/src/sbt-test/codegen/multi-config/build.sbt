@@ -1,14 +1,19 @@
 ThisBuild / scalaVersion := sys.props("scripted.scala.version")
 
+libraryDependencies ++=
+  Seq(Runtime, JooqCodegen).map { conf =>
+    "com.h2database" % "h2" % sys.props("scripted.h2.version") % conf
+  }
+
 enablePlugins(JooqCodegenPlugin)
 
 jooqVersion := sys.props("scripted.jooq.version")
 
-def configXML(db: String) =
+def configXML(pkg: String, url: String) =
   <configuration>
     <jdbc>
       <driver>org.h2.Driver</driver>
-      <url>jdbc:h2:./{db}</url>
+      <url>{url}</url>
     </jdbc>
     <generator>
       <database>
@@ -17,9 +22,12 @@ def configXML(db: String) =
         <inputSchema>PUBLIC</inputSchema>
       </database>
       <target>
-        <packageName>com.example.{db}</packageName>
+        <packageName>com.example.{pkg}</packageName>
       </target>
     </generator>
   </configuration>
 
-jooqCodegenConfig ++= Seq(configXML("db0"), configXML("db1"))
+jooqCodegenConfig ++= Seq(
+  configXML("db0", sys.props("scripted.jdbc.url.0")),
+  configXML("db1", sys.props("scripted.jdbc.url.1")),
+)

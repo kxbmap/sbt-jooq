@@ -8,7 +8,7 @@ import scala.util.Using
 object Main extends App {
   Class.forName("org.h2.Driver")
 
-  Using.resource(DriverManager.getConnection("jdbc:h2:./test")) { conn =>
+  Using.resource(DriverManager.getConnection(sys.props("scripted.jdbc.url"))) { conn =>
     val query = DSL.using(conn).selectFrom(EMPLOYEE.as("e"))
     println(query.getSQL)
     println(query.fetch())
