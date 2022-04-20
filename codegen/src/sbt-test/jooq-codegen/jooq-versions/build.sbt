@@ -13,8 +13,8 @@ scriptedLaunchOpts += {
 }
 
 TaskKey[Unit]("cleanup") := {
-  val dir = file(sys.props("user.home")) / ".ivy2" / "local" / organization.value
-  IO.deleteFilesEmptyDirs(Seq(dir))
+  val dir = ivyPaths.value.ivyHome.map(_ / "local" / organization.value)
+  IO.deleteFilesEmptyDirs(dir)
 }
 
 TaskKey[Unit]("disableIncompatibleTests") := {
