@@ -1,15 +1,14 @@
 package com.example
 
 import com.example.db.Tables._
-import java.sql.DriverManager
 import org.jooq.impl.DSL
 import scala.util.Using
 
 object Main extends App {
   Class.forName("org.h2.Driver")
 
-  Using.resource(DriverManager.getConnection(sys.props("scripted.jdbc.url"))) { conn =>
-    val query = DSL.using(conn).selectFrom(EMPLOYEE.as("e"))
+  Using.resource(DSL.using(sys.props("scripted.jdbc.url"))) { create =>
+    val query = create.selectFrom(EMPLOYEE.as("e"))
     println(query.getSQL)
     println(query.fetch())
   }
