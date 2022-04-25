@@ -12,7 +12,8 @@ object ScriptedSettings extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     scriptedSbt := sbtVersion.value,
-    scriptedBufferLog := false,
+    scriptedBatchExecution := true,
+    scriptedParallelInstances := 2,
     scriptedLaunchOpts ++= Seq(
       "-Xmx1024M",
       s"-Dscripted.plugin.version=${version.value}",
@@ -26,5 +27,18 @@ object ScriptedSettings extends AutoPlugin {
     },
     scripted / javaHome := sys.env.get("SCRIPTED_JAVA_HOME").map(file),
   )
+
+  lazy val scriptedJdbcUrls =
+    scriptedLaunchOpts ++= {
+      val urls = (0 to 1).map { n =>
+        val testFiles = sourceDirectory.value / "sbt-test-files"
+        val setup = (testFiles / "sql" / s"setup$n.sql").toString.replace('\\', '/')
+        n -> s"jdbc:h2:mem:;INIT=runscript from '$setup'"
+      }
+      s"-Dscripted.jdbc.url=${urls.head._2}" +:
+        urls.map {
+          case (n, url) => s"-Dscripted.jdbc.url.$n=$url"
+        }
+    }
 
 }

@@ -1,16 +1,9 @@
 enablePlugins(SbtPlugin)
 
-scriptedBufferLog := false
-
 scriptedLaunchOpts ++=
   sys.props.collect {
     case (k, v) if k.startsWith("scripted.") => s"-D$k=$v"
   }.toSeq
-
-scriptedLaunchOpts += {
-  val setup = (baseDirectory.value / "sql" / "setup.sql").toString.replace('\\', '/')
-  s"-Dscripted.jdbc.url=jdbc:h2:mem:;INIT=runscript from '$setup'"
-}
 
 TaskKey[Unit]("cleanup") := {
   val dir = ivyPaths.value.ivyHome.map(_ / "local" / organization.value)

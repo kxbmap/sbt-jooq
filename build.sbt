@@ -30,10 +30,8 @@ lazy val codegen = project
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-codegen",
-    scripted := scripted.dependsOn(
-      core / publishLocal,
-      codegenTool / publishLocal,
-    ).evaluated,
+    scripted := scripted.dependsOn(core / publishLocal, codegenTool / publishLocal).evaluated,
+    ScriptedSettings.scriptedJdbcUrls,
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
       "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
