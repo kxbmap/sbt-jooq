@@ -23,7 +23,7 @@ object ReleaseSettings extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     readmeFile := baseDirectory.value / "README.md",
     updateReadme := updateReadmeTask.value,
-    releaseVersionBump := Bump.Bugfix,
+    releaseVersionBump := Bump.Minor,
     releaseProcess := Seq(
       checkSnapshotDependencies,
       inquireVersions,
