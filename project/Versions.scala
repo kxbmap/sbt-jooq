@@ -4,11 +4,11 @@ object Versions {
 
   final val scriptedScalaVersion = "2.13.8"
 
-  final val jooqVersion = "3.16.5"
+  final val jooqVersion = "3.16.6"
 
   val jooqVersions: Seq[String] = Seq(
     jooqVersion,
-    "3.15.8",
+    "3.15.10",
     "3.14.15",
     "3.13.6",
     "3.12.4",
@@ -24,7 +24,7 @@ object Versions {
 
   final val h2V1Version = "1.4.200"
 
-  final val wartRemoverVersion = "3.0.1"
+  final val wartRemoverVersion = "3.0.2"
 
   final val jooqWartsVersion = "0.1.2"
 
@@ -40,7 +40,7 @@ object Versions {
 
   final val flywaySbtVersion = "7.4.0"
 
-  final val scalaTestVersion = "3.2.11"
+  final val scalaTestVersion = "3.2.12"
 
   def minorVersion(version: String): String =
     version match {
