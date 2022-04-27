@@ -14,7 +14,7 @@ The plugin for easy use of jOOQ-codegen.
 Add the following to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.7.0")
+addSbtPlugin("com.github.kxbmap" % "sbt-jooq-codegen" % "0.7.1")
 ```
 
 Then in `build.sbt`:
@@ -24,7 +24,7 @@ Then in `build.sbt`:
 enablePlugins(JooqCodegenPlugin)
 
 // Add a driver dependency for the database you are using to "jooq-codegen" scope
-libraryDependencies += "com.h2database" % "h2" % "1.4.200" % JooqCodegen
+libraryDependencies += "com.h2database" % "h2" % "2.1.212" % JooqCodegen
 ```
 
 ---
@@ -46,12 +46,12 @@ If generated files present, there is no effect.
 #### jooqVersion
 
 - Optional (but recommended)
-- Default: `"3.15.4"`
+- Default: `"3.16.6"`
 
 Version of the jOOQ libraries to be used.
 
 ```scala
-jooqVersion := "3.15.4"
+jooqVersion := "3.16.6"
 ```
 
 #### jooqOrganization
@@ -62,7 +62,7 @@ jooqVersion := "3.15.4"
 Organization/GroupID of jOOQ libraries.
 
 If you want to use the commercial version of jOOQ, set the appropriate one. For details, please refer to
-the [jOOQ manual](https://www.jooq.org/doc/3.15/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
+the [jOOQ manual](https://www.jooq.org/doc/3.16/manual/getting-started/tutorials/jooq-in-7-steps/jooq-in-7-steps-step1/).
 
 ```scala
 jooqOrganization := "org.jooq"
@@ -199,7 +199,7 @@ jooqCodegenVariables ++= Map(
 And configuration is below:
 
 ```xml
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.15.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.16.0.xsd">
     <jdbc>
         <driver>${JDBC_DRIVER}</driver>
         <url>${JDBC_URL}</url>
@@ -216,7 +216,7 @@ And configuration is below:
 Then rewrites to:
 
 ```xml
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.15.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.16.0.xsd">
     <jdbc>
         <driver>com.mysql.cj.jdbc.Driver</driver>
         <url>jdbc:mysql://localhost/testdb</url>
