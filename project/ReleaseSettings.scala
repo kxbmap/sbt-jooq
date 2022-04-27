@@ -32,7 +32,7 @@ object ReleaseSettings extends AutoPlugin {
       releaseStepCommand("headerCheckAll"),
       releaseStepCommand("scalafmtCheckAll;scalafmtSbtCheck"),
       runTest,
-      releaseStepCommand("scripted"),
+      // releaseStepCommand("scripted"),
       releaseStepTask(updateReadme),
       commitReadme,
       commitReleaseVersion,
