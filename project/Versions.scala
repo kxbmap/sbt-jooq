@@ -24,7 +24,7 @@ object Versions {
 
   final val h2V1Version = "1.4.200"
 
-  final val wartRemoverVersion = "3.0.4"
+  final val wartRemoverVersion = "3.0.5"
 
   final val jooqWartsVersion = "0.1.2"
 
