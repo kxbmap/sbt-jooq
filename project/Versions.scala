@@ -4,10 +4,11 @@ object Versions {
 
   final val scriptedScalaVersion = "2.13.8"
 
-  final val jooqVersion = "3.16.7"
+  final val jooqVersion = "3.17.0"
 
   val jooqVersions: Seq[String] = Seq(
     jooqVersion,
+    "3.16.7",
     "3.15.11",
     "3.14.16",
     "3.13.6",

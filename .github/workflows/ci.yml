@@ -11,12 +11,12 @@ jobs:
       matrix:
         task: [ core, checker, codegen, compat, flyway ]
         scripted-java:
-          - 11  # LTS / JAXB and javax.annotation no longer bundled
           - 17  # LTS
         include:
           - task: test
           - { task: compat, scripted-java: 8 }  # baseline
           - { task: compat, scripted-java: 9 }  # Jigsaw / JAXB and javax.annotation bundled
+          - { task: compat, scripted-java: 11 } # LTS / JAXB and javax.annotation no longer bundled
     steps:
       - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
