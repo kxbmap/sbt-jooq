@@ -12,8 +12,6 @@ object ScriptedSettings extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     scriptedSbt := sbtVersion.value,
-    scriptedBatchExecution := true,
-    scriptedParallelInstances := 2,
     scriptedLaunchOpts ++= Seq(
       "-Xmx1024M",
       s"-Dscripted.plugin.version=${version.value}",
@@ -26,7 +24,11 @@ object ScriptedSettings extends AutoPlugin {
       s"-Dscripted.jooq.${minorVersion(v).replace('.', '_')}.version=$v"
     },
     scripted / javaHome := sys.env.get("SCRIPTED_JAVA_HOME").map(file),
-  )
+  ) ++ sys.env.get("CI_TASK").toSeq.flatMap {
+    case "codegen" => Seq(scriptedBatchExecution := true, scriptedParallelInstances := 2)
+    case "compat" => Seq(scriptedBufferLog := false)
+    case _ => Nil
+  }
 
   lazy val scriptedJdbcUrls =
     scriptedLaunchOpts ++= {

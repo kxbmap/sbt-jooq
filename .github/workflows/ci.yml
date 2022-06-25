@@ -37,8 +37,9 @@ jobs:
       - name: Build and test
         env:
           JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
+          CI_TASK: "${{ matrix.task }}"
         run: |
-          case ${{ matrix.task }} in
+          case "$CI_TASK" in
             test)
               sbt -v test docs/mdoc scalafmtCheckAll scalafmtSbtCheck headerCheckAll
               ;;

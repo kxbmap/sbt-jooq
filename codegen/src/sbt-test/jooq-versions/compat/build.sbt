@@ -1,5 +1,8 @@
 enablePlugins(SbtPlugin)
 
+scriptedBatchExecution := true
+scriptedParallelInstances := 2
+
 scriptedLaunchOpts ++=
   sys.props.collect {
     case (k, v) if k.startsWith("scripted.") => s"-D$k=$v"
