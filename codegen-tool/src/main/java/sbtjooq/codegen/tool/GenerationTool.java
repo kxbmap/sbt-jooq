@@ -23,7 +23,9 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-
+/**
+ * Wrapper of jOOQ GenerationTool
+ */
 public class GenerationTool {
 
     private static final Logger logger = LoggerFactory.getLogger(GenerationTool.class);
@@ -73,11 +75,21 @@ public class GenerationTool {
         }
     }
 
-    public void generate(String[] args) throws Throwable {
+    /**
+     * Invoke jOOQ GenerationTool
+     * @param configurations configuration files
+     * @throws Throwable thrown by jOOQ GenerationTool
+     */
+    public void generate(String[] configurations) throws Throwable {
         //noinspection ConfusingArgumentToVarargsMethod
-        delegateMain.invokeExact(args);
+        delegateMain.invokeExact(configurations);
     }
 
+    /**
+     * Entry point
+     * @param args configuration files
+     * @throws Throwable thrown by jOOQ GenerationTool
+     */
     public static void main(String[] args) throws Throwable {
         showRunningInfo();
         showJooqLogo();
