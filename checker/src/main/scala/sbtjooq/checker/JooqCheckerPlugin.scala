@@ -35,8 +35,7 @@ object JooqCheckerPlugin extends AutoPlugin {
   }
 
   override def globalSettings: Seq[Setting[?]] = Seq(
-    jooqCheckerLevels := CheckerLevels.default,
-    jooqCheckerJooqWartsVersion := BuildInfo.defaultJooqWartsVersion,
+    jooqCheckerLevels := CheckerLevels.default
   )
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)
@@ -47,7 +46,7 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   private def jooqCheckerDefaultSettings: Seq[Setting[?]] = Seq(
     libraryDependencies +=
-      ("com.github.kxbmap" %% "jooq-warts" % jooqCheckerJooqWartsVersion.value % JooqChecker).intransitive()
+      ("com.github.kxbmap" %% "sbt-jooq-checker-tool" % BuildInfo.sbtJooqVersion % JooqChecker).intransitive()
   ) ++
     JooqPlugin.jooqDependencies(JooqChecker) ++
     inConfig(JooqChecker)(

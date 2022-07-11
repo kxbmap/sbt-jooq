@@ -20,9 +20,9 @@ import wartremover.Wart
 
 object JooqWarts {
 
-  val PlainSQL: Wart = Wart.custom("jooqwarts.PlainSQL")
+  val PlainSQL: Wart = Wart.custom("sbtjooq.checker.tool.PlainSQL")
 
-  val SQLDialect: Wart = Wart.custom("jooqwarts.SQLDialect")
+  val SQLDialect: Wart = Wart.custom("sbtjooq.checker.tool.SQLDialect")
 
   val all: Set[Wart] = Set(PlainSQL, SQLDialect)
 

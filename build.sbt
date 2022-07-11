@@ -64,12 +64,28 @@ lazy val checker = project
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
   .settings(
     name := "sbt-jooq-checker",
-    scripted := scripted.dependsOn(core / publishLocal).evaluated,
+    scripted := scripted.dependsOn(core / publishLocal, checkerTool / publishLocal).evaluated,
     addSbtPlugin("org.wartremover" % "sbt-wartremover" % wartRemoverVersion),
     buildInfoKeys := Seq[BuildInfoKey](
-      "defaultJooqWartsVersion" -> jooqWartsVersion
+      "sbtJooqVersion" -> version.value
     ),
     buildInfoPackage := "sbtjooq.checker",
+  )
+
+lazy val checkerTool = project
+  .in(file("checker-tool"))
+  .settings(
+    name := "sbt-jooq-checker-tool",
+    scalaVersion := scala213,
+    crossScalaVersions := Seq(scala213, scala212),
+    releaseCrossBuild := true,
+    libraryDependencies ++= Seq(
+      "org.jooq" % "jooq" % jooqVersion,
+      "org.wartremover" % "wartremover" % wartRemoverVersion cross CrossVersion.full,
+      "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
+    ),
+    scalacOptions += "-Xsource:3",
+    Test / scalacOptions += "-Xlint:-unused,_",
   )
 
 lazy val docs = project
