@@ -1,7 +1,8 @@
 enablePlugins(SbtPlugin)
 
-scriptedBatchExecution := true
+scriptedBatchExecution := insideCI.value
 scriptedParallelInstances := 2
+scriptedBufferLog := insideCI.value
 
 scriptedLaunchOpts ++=
   sys.props.collect {

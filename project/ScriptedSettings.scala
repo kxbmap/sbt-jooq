@@ -24,11 +24,12 @@ object ScriptedSettings extends AutoPlugin {
       s"-Dscripted.jooq.${minorVersion(v).replace('.', '_')}.version=$v"
     },
     scripted / javaHome := sys.env.get("SCRIPTED_JAVA_HOME").map(file),
-  ) ++ sys.env.get("CI_TASK").toSeq.flatMap {
-    case "codegen" => Seq(scriptedBatchExecution := true, scriptedParallelInstances := 2)
-    case "compat" => Seq(scriptedBufferLog := false)
-    case _ => Nil
-  }
+    scriptedBatchExecution := insideCI.value && ciTaskIs("codegen"),
+    scriptedParallelInstances := 2,
+    scriptedBufferLog := insideCI.value && !ciTaskIs("compat"),
+  )
+
+  private def ciTaskIs(task: String) = sys.env.get("CI_TASK").contains(task)
 
   lazy val scriptedJdbcUrls =
     scriptedLaunchOpts ++= {
