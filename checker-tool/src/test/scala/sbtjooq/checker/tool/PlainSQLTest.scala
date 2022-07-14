@@ -38,24 +38,50 @@ class PlainSQLTest extends UnitSpec {
 
     }
 
-    "in @Allow.PlainSQL scope" should {
+    "in @Allow.PlainSQL scope" when {
 
-      "be @PlainSQL API callable" in {
-        val result = WartTestTraverser(PlainSQL) {
-          @Allow.PlainSQL
-          val allowedVal = plainSQL
-          @Allow.PlainSQL
-          def allowedDef = plainSQL
-          @Allow.PlainSQL
-          class AllowedClass {
-            def sql: SQL = plainSQL
+      "val definition" should {
+        "be @PlainSQL API callable" in {
+          val result = WartTestTraverser(PlainSQL) {
+            @Allow.PlainSQL
+            val allowedVal = plainSQL
           }
-          @Allow.PlainSQL
-          object AllowedObject {
-            def sql: SQL = plainSQL
-          }
+          assertEmpty(result)
         }
-        assertEmpty(result)
+      }
+
+      "def definition" should {
+        "be @PlainSQL API callable" in {
+          val result = WartTestTraverser(PlainSQL) {
+            @Allow.PlainSQL
+            def allowedDef = plainSQL
+          }
+          assertEmpty(result)
+        }
+      }
+
+      "class definition" should {
+        "be @PlainSQL API callable" in {
+          val result = WartTestTraverser(PlainSQL) {
+            @Allow.PlainSQL
+            class AllowedClass {
+              def sql: SQL = plainSQL
+            }
+          }
+          assertEmpty(result)
+        }
+      }
+
+      "object definition" should {
+        "be @PlainSQL API callable" in {
+          val result = WartTestTraverser(PlainSQL) {
+            @Allow.PlainSQL
+            object AllowedObject {
+              def sql: SQL = plainSQL
+            }
+          }
+          assertEmpty(result)
+        }
       }
 
     }

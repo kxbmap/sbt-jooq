@@ -10,6 +10,8 @@ object ScriptedSettings extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
+  final val scriptedScalaVersion = sys.env.getOrElse("SCRIPTED_SCALA", scala213)
+
   override def projectSettings: Seq[Setting[_]] = Seq(
     scriptedSbt := sbtVersion.value,
     scriptedLaunchOpts ++= Seq(

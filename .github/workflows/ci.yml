@@ -10,13 +10,19 @@ jobs:
       fail-fast: false
       matrix:
         task: [ core, checker, codegen, compat, flyway ]
+        scripted-scala:
+          - 2.13.8
         scripted-java:
           - 17  # LTS
         include:
           - task: test
-          - { task: compat, scripted-java: 8 }  # baseline
-          - { task: compat, scripted-java: 9 }  # Jigsaw / JAXB and javax.annotation bundled
-          - { task: compat, scripted-java: 11 } # LTS / JAXB and javax.annotation no longer bundled
+          - { task: compat, scripted-scala: 2.13.8, scripted-java: 8 }  # baseline
+          - { task: compat, scripted-scala: 2.13.8, scripted-java: 9 }  # Jigsaw / JAXB and javax.annotation bundled
+          - { task: compat, scripted-scala: 2.13.8, scripted-java: 11 } # LTS / JAXB and javax.annotation no longer bundled
+          - { task: checker, scripted-scala: 3.1.3, scripted-java: 17 }
+          - { task: checker, scripted-scala: 2.12.16, scripted-java: 17 }
+    env:
+      JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
     steps:
       - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
@@ -35,19 +41,22 @@ jobs:
           echo "SCRIPTED_JAVA_HOME=$(jabba which --home "${SCRIPTED_JAVA}")" >> $GITHUB_ENV
 
       - name: Build and test
+        if: ${{ matrix.task == 'test' }}
+        run: |
+          sbt -v +test docs/mdoc +scalafmtCheckAll scalafmtSbtCheck +headerCheckAll
+
+      - name: Build and scripted
+        if: ${{ matrix.task != 'test' }}
         env:
-          JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
-          CI_TASK: "${{ matrix.task }}"
+          CI_TASK: ${{ matrix.task }}
+          SCRIPTED_SCALA: ${{ matrix.scripted-scala }}
         run: |
           case "$CI_TASK" in
-            test)
-              sbt -v test docs/mdoc scalafmtCheckAll scalafmtSbtCheck headerCheckAll
-              ;;
             core)
               sbt -v "core/scripted jooq/*"
               ;;
             checker)
-              sbt -v "checker/scripted jooq-checker/*"
+              sbt -v "++${SCRIPTED_SCALA}" "checker/scripted jooq-checker/*"
               ;;
             codegen)
               sbt -v "codegen/scripted jooq-codegen/*"

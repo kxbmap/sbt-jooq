@@ -4,8 +4,7 @@ object Versions {
 
   final val scala212 = "2.12.16"
   final val scala213 = "2.13.8"
-
-  final val scriptedScalaVersion = scala213
+  final val scala3 = "3.1.3"
 
   final val jooqVersion = "3.17.2"
 

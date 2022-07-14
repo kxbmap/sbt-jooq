@@ -1,3 +1,4 @@
+import ProjectUtil._
 import Versions._
 
 name := "sbt-jooq"
@@ -5,15 +6,6 @@ name := "sbt-jooq"
 publish / skip := true
 
 enablePlugins(ReleaseSettings)
-
-ThisBuild / scalacOptions ++= Seq(
-  "-release",
-  "8",
-  "-deprecation",
-  "-unchecked",
-  "-feature",
-  "-Xlint",
-)
 
 lazy val core = project
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
@@ -60,6 +52,11 @@ lazy val codegenTool = project
     Compile / javacOptions ++= Seq("--release", "8"),
   )
 
+commands += Command.command("checkerScripted") { s =>
+  val sv = ScriptedSettings.scriptedScalaVersion
+  s"++$sv" :: "checker/scripted" :: s
+}
+
 lazy val checker = project
   .dependsOn(core)
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
@@ -78,15 +75,19 @@ lazy val checkerTool = project
   .settings(
     name := "sbt-jooq-checker-tool",
     scalaVersion := scala213,
-    crossScalaVersions := Seq(scala213, scala212),
+    crossScalaVersions := Seq(scala3, scala213, scala212),
     releaseCrossBuild := true,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion,
       "org.wartremover" % "wartremover" % wartRemoverVersion cross CrossVersion.full,
       "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
     ),
-    scalacOptions += "-Xsource:3",
-    Test / scalacOptions += "-Xlint:-unused,_",
+    scalacOptions ++= partialVersionSeq(scalaVersion.value) {
+      case (2, _) => Seq("-Xsource:3")
+    },
+    Test / scalacOptions ++= partialVersionSeq(scalaVersion.value) {
+      case (2, _) => Seq("-Xlint:-unused")
+    },
   )
 
 lazy val docs = project
