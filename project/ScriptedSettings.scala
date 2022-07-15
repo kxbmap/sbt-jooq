@@ -17,6 +17,7 @@ object ScriptedSettings extends AutoPlugin {
       s"-Dscripted.plugin.version=${version.value}",
       s"-Dscripted.scala.version=$scriptedScalaVersion",
       s"-Dscripted.jooq.version=$jooqVersion",
+      s"-Dscripted.jetbrains-annotations.version=$jetbrainsAnnotationsVersion",
       s"-Dscripted.h2.version=$h2Version",
       s"-Dscripted.h2.v1.version=$h2V1Version",
       s"-Dscripted.flywaysbt.version=$flywaySbtVersion",

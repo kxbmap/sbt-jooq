@@ -10,7 +10,10 @@ scriptedLaunchOpts ++=
 lazy val dep = project
   .settings(
     autoScalaLibrary := false,
-    libraryDependencies += "org.jooq" % "jooq" % sys.props("scripted.jooq.version"),
+    libraryDependencies ++= Seq(
+      "org.jooq" % "jooq" % sys.props("scripted.jooq.version"),
+      "org.jetbrains" % "annotations" % sys.props("scripted.jetbrains-annotations.version"),
+    ),
   )
 
 lazy val copyLibs = taskKey[Unit]("")
