@@ -35,7 +35,8 @@ object JooqCheckerPlugin extends AutoPlugin {
   }
 
   override def globalSettings: Seq[Setting[?]] = Seq(
-    jooqCheckerLevels := CheckerLevels.default
+    jooqCheckerLevelPlainSQL := CheckerLevel.Error,
+    jooqCheckerLevelSQLDialect := CheckerLevel.Error
   )
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)
@@ -57,8 +58,14 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   lazy val jooqCheckerSettings: Seq[Setting[?]] = Seq(
     wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
-    wartremoverErrors := wartremoverErrors.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.errors,
-    wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings
+    wartremoverErrors := {
+      val errors = wartremoverErrors.value
+      (errors ++ JooqWarts.errors(jooqCheckerLevelPlainSQL.value, jooqCheckerLevelSQLDialect.value)).distinct
+    },
+    wartremoverWarnings := {
+      val warnings = wartremoverWarnings.value
+      (warnings ++ JooqWarts.warnings(jooqCheckerLevelPlainSQL.value, jooqCheckerLevelSQLDialect.value)).distinct
+    }
   )
 
 }

@@ -16,6 +16,7 @@
 
 package sbtjooq.checker.internal
 
+import sbtjooq.checker.CheckerLevel
 import wartremover.Wart
 
 object JooqWarts {
@@ -24,6 +25,18 @@ object JooqWarts {
 
   val SQLDialect: Wart = Wart.custom("sbtjooq.checker.tool.SQLDialect")
 
-  val all: Set[Wart] = Set(PlainSQL, SQLDialect)
+  def errors(plainSQL: CheckerLevel, sqlDialect: CheckerLevel): Seq[Wart] =
+    collect(CheckerLevel.Error)(plainSQL, sqlDialect)
+
+  def warnings(plainSQL: CheckerLevel, sqlDialect: CheckerLevel): Seq[Wart] =
+    collect(CheckerLevel.Warning)(plainSQL, sqlDialect)
+
+  private def collect(level: CheckerLevel)(plainSQL: CheckerLevel, sqlDialect: CheckerLevel): Seq[Wart] =
+    Seq(
+      plainSQL -> PlainSQL,
+      sqlDialect -> SQLDialect
+    ).collect {
+      case (`level`, w) => w
+    }
 
 }

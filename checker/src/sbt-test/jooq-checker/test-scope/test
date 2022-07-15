@@ -1,12 +1,12 @@
-> set Test / jooqCheckerLevels ~= (_.withSQLDialect(CheckerLevel.Disabled))
+> set Test / jooqCheckerLevelSQLDialect := CheckerLevel.Disabled
 > show Test / compile / scalacOptions
 > Test / compile
 
-> set Test / jooqCheckerLevels ~= (_.withSQLDialect(CheckerLevel.Warning))
+> set Test / jooqCheckerLevelSQLDialect := CheckerLevel.Warning
 > show Test / compile / scalacOptions
 > Test / compile
 
-> set Test / jooqCheckerLevels ~= (_.withSQLDialect(CheckerLevel.Error))
+> set Test / jooqCheckerLevelSQLDialect := CheckerLevel.Error
 > show Test / compile / scalacOptions
 -> Test / compile
 

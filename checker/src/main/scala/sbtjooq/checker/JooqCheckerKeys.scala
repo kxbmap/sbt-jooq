@@ -22,7 +22,8 @@ trait JooqCheckerKeys {
 
   val JooqChecker = config("jooq-checker").hide
 
-  val jooqCheckerLevels = settingKey[CheckerLevels]("checker levels")
+  val jooqCheckerLevelPlainSQL = settingKey[CheckerLevel]("Error level of PlainSQL checker")
+  val jooqCheckerLevelSQLDialect = settingKey[CheckerLevel]("Error level of SQLDialect checker")
 
 }
 

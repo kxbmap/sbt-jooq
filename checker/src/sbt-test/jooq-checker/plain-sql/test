@@ -1,12 +1,12 @@
-> set jooqCheckerLevels ~= (_.withPlainSQL(CheckerLevel.Disabled))
+> set jooqCheckerLevelPlainSQL := CheckerLevel.Disabled
 > show Compile / compile / scalacOptions
 > compile
 
-> set jooqCheckerLevels ~= (_.withPlainSQL(CheckerLevel.Warning))
+> set jooqCheckerLevelPlainSQL := CheckerLevel.Warning
 > show Compile / compile / scalacOptions
 > compile
 
-> set jooqCheckerLevels ~= (_.withPlainSQL(CheckerLevel.Error))
+> set jooqCheckerLevelPlainSQL := CheckerLevel.Error
 > show Compile / compile / scalacOptions
 -> compile
 
