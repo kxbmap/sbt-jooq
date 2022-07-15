@@ -22,14 +22,14 @@ object ScriptedSettings extends AutoPlugin {
       s"-Dscripted.jetbrains-annotations.version=$jetbrainsAnnotationsVersion",
       s"-Dscripted.h2.version=$h2Version",
       s"-Dscripted.h2.v1.version=$h2V1Version",
-      s"-Dscripted.flywaysbt.version=$flywaySbtVersion",
+      s"-Dscripted.flywaysbt.version=$flywaySbtVersion"
     ) ++ jooqVersions.map { v =>
       s"-Dscripted.jooq.${minorVersion(v).replace('.', '_')}.version=$v"
     },
     scripted / javaHome := sys.env.get("SCRIPTED_JAVA_HOME").map(file),
     scriptedBatchExecution := insideCI.value && ciTaskIs("codegen"),
     scriptedParallelInstances := 2,
-    scriptedBufferLog := insideCI.value && !ciTaskIs("compat"),
+    scriptedBufferLog := insideCI.value && !ciTaskIs("compat")
   )
 
   private def ciTaskIs(task: String) = sys.env.get("CI_TASK").contains(task)

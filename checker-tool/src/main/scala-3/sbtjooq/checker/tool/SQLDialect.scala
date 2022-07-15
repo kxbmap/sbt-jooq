@@ -37,7 +37,7 @@ object SQLDialect extends WartTraverser:
         a match
           case Apply(
                 Select(_, "<init>"),
-                Apply(Apply(_, Typed(Repeated(values, _), _) :: Nil), Apply(_, _ :: Nil) :: Nil) :: Nil,
+                Apply(Apply(_, Typed(Repeated(values, _), _) :: Nil), Apply(_, _ :: Nil) :: Nil) :: Nil
               ) =>
             val ds = values.collect {
               case Ident(x) => x

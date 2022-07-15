@@ -12,7 +12,7 @@ object ScalacOptions extends AutoPlugin {
       "8",
       "-deprecation",
       "-unchecked",
-      "-feature",
+      "-feature"
     ) ++ partialVersionSeq(scalaVersion.value) {
       case (2, _) => Seq("-Xlint")
     }

@@ -45,7 +45,7 @@ final class CheckerLevels private (val sqlDialect: CheckerLevel, val plainSQL: C
 
   private def collect(level: CheckerLevel): Seq[Wart] = Seq(
     if (sqlDialect == level) Seq(JooqWarts.SQLDialect) else Nil,
-    if (plainSQL == level) Seq(JooqWarts.PlainSQL) else Nil,
+    if (plainSQL == level) Seq(JooqWarts.PlainSQL) else Nil
   ).flatten
 
   override def toString: String = s"CheckerLevels(sqlDialect = $sqlDialect, plainSQL = $plainSQL)"
@@ -55,7 +55,7 @@ object CheckerLevels {
 
   def default: CheckerLevels = new CheckerLevels(
     sqlDialect = CheckerLevel.Error,
-    plainSQL = CheckerLevel.Error,
+    plainSQL = CheckerLevel.Error
   )
 
 }

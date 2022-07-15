@@ -24,7 +24,7 @@ object BuildInfoSettings extends AutoPlugin {
       (Compile / packageBin / mappings).value.filter {
         case (_, x) => !excludes(x)
       }
-    },
+    }
   )
 
 }

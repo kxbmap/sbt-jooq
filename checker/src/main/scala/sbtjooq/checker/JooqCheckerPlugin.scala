@@ -58,7 +58,7 @@ object JooqCheckerPlugin extends AutoPlugin {
   lazy val jooqCheckerSettings: Seq[Setting[?]] = Seq(
     wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
     wartremoverErrors := wartremoverErrors.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.errors,
-    wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings,
+    wartremoverWarnings := wartremoverWarnings.value.filterNot(JooqWarts.all) ++ jooqCheckerLevels.value.warnings
   )
 
 }

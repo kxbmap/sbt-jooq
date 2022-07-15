@@ -13,9 +13,9 @@ lazy val core = project
     name := "sbt-jooq-core",
     buildInfoKeys := Seq[BuildInfoKey](
       "defaultJooqVersion" -> jooqVersion,
-      "defaultJetbrainsAnnotationsVersion" -> jetbrainsAnnotationsVersion,
+      "defaultJetbrainsAnnotationsVersion" -> jetbrainsAnnotationsVersion
     ),
-    buildInfoPackage := "sbtjooq",
+    buildInfoPackage := "sbtjooq"
   )
 
 lazy val codegen = project
@@ -27,7 +27,7 @@ lazy val codegen = project
     ScriptedSettings.scriptedJdbcUrls,
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
-      "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
+      "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "sbtJooqVersion" -> version.value,
@@ -35,9 +35,9 @@ lazy val codegen = project
       "jaxbApiVersion" -> jaxbApiVersion,
       "jaxbCoreVersion" -> jaxbCoreVersion,
       "jaxbImplVersion" -> jaxbImplVersion,
-      "javaxAnnotationApiVersion" -> javaxAnnotationApiVersion,
+      "javaxAnnotationApiVersion" -> javaxAnnotationApiVersion
     ),
-    buildInfoPackage := "sbtjooq.codegen",
+    buildInfoPackage := "sbtjooq.codegen"
   )
 
 lazy val codegenTool = project
@@ -49,7 +49,7 @@ lazy val codegenTool = project
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % logbackVersion
     ),
-    Compile / javacOptions ++= Seq("--release", "8"),
+    Compile / javacOptions ++= Seq("--release", "8")
   )
 
 commands += Command.command("checkerScripted") { s =>
@@ -67,7 +67,7 @@ lazy val checker = project
     buildInfoKeys := Seq[BuildInfoKey](
       "sbtJooqVersion" -> version.value
     ),
-    buildInfoPackage := "sbtjooq.checker",
+    buildInfoPackage := "sbtjooq.checker"
   )
 
 lazy val checkerTool = project
@@ -80,14 +80,14 @@ lazy val checkerTool = project
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion,
       "org.wartremover" % "wartremover" % wartRemoverVersion cross CrossVersion.full,
-      "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
+      "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test
     ),
     scalacOptions ++= partialVersionSeq(scalaVersion.value) {
       case (2, _) => Seq("-Xsource:3")
     },
     Test / scalacOptions ++= partialVersionSeq(scalaVersion.value) {
       case (2, _) => Seq("-Xlint:-unused")
-    },
+    }
   )
 
 lazy val docs = project
@@ -100,7 +100,7 @@ lazy val docs = project
       "VERSION" -> version.value,
       "JOOQ_VERSION" -> jooqVersion,
       "JOOQ_MINOR_VERSION" -> minorVersion(jooqVersion),
-      "H2_VERSION" -> h2Version,
+      "H2_VERSION" -> h2Version
     ),
     scalacOptions ++= Seq(
       "-Wconf:cat=unused-nowarn:s"
@@ -108,5 +108,5 @@ lazy val docs = project
     libraryDependencies += sbtDependency.value,
     libraryDependencySchemes ++= Seq(
       "org.scala-lang.modules" %% "scala-xml" % "always"
-    ),
+    )
   )

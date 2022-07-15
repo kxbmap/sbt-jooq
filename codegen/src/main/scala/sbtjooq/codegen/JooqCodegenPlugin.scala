@@ -52,7 +52,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     jooqCodegenConfig := CodegenConfig.empty,
     jooqCodegenVariables := Map.empty,
     jooqCodegenVariableHandler := VariableExpander.defaultHandler,
-    jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala",
+    jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala"
   )
 
   private def jooqCodegenDefaultSettings: Seq[Setting[?]] =
@@ -65,7 +65,7 @@ object JooqCodegenPlugin extends AutoPlugin {
           Seq(
             mainClass := Some(Codegen.mainClass),
             fork := Codegen.needsFork(autoJooqLibrary.value, jooqVersion.value, javaHome.value),
-            javaOptions ++= Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, javaHome.value),
+            javaOptions ++= Codegen.javaOptions(autoJooqLibrary.value, jooqVersion.value, javaHome.value)
           )
         )
     ) ++
@@ -75,7 +75,7 @@ object JooqCodegenPlugin extends AutoPlugin {
           Codegen.dependencies(
             (JooqCodegen / autoJooqLibrary).value,
             (JooqCodegen / jooqVersion).value,
-            (JooqCodegen / run / javaHome).value,
+            (JooqCodegen / run / javaHome).value
           ).map(_ % JooqCodegen),
         libraryDependencies ++=
           Classpaths.autoLibraryDependency(
@@ -84,8 +84,8 @@ object JooqCodegenPlugin extends AutoPlugin {
               && (JooqCodegen / managedScalaInstance).value,
             plugin = false,
             (JooqCodegen / scalaOrganization).value,
-            (JooqCodegen / scalaVersion).value,
-          ).map(_ % JooqCodegen),
+            (JooqCodegen / scalaVersion).value
+          ).map(_ % JooqCodegen)
       )
 
   def jooqCodegenDependencies(config: Configuration): Seq[Setting[?]] = Seq(
@@ -94,7 +94,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         (config / autoJooqLibrary).value,
         (config / compile / javaHome).value,
         (JooqCodegen / jooqVersion).value,
-        (JooqCodegen / run / javaHome).value,
+        (JooqCodegen / run / javaHome).value
       ).map(_ % config)
   )
 
@@ -104,7 +104,7 @@ object JooqCodegenPlugin extends AutoPlugin {
         autoJooqLibrary.value,
         (compile / javaHome).value,
         (JooqCodegen / jooqVersion).value,
-        (JooqCodegen / run / javaHome).value,
+        (JooqCodegen / run / javaHome).value
       ),
     jooqCodegen := codegenTask.value,
     jooqCodegen / skip := skip.value,
@@ -131,13 +131,13 @@ object JooqCodegenPlugin extends AutoPlugin {
     },
     jooqCodegenConfigTransformer := ConfigTransformer(
       jooqSource.value,
-      VariableExpander(jooqCodegenVariables.value, jooqCodegenVariableHandler.value),
+      VariableExpander(jooqCodegenVariables.value, jooqCodegenVariableHandler.value)
     ),
     jooqCodegenTransformedConfigs := transformConfigsTask.value,
     jooqCodegenTransformedConfigFiles := transformedConfigFilesTask.value,
     jooqCodegenGeneratorTargets := generatorTargetsTask.value,
     jooqCodegenGeneratedSourcesFinders := generatedSourcesFindersTask.value,
-    jooqCodegenGeneratedSources := generatedSourcesTask.value,
+    jooqCodegenGeneratedSources := generatedSourcesTask.value
   )
 
   private def codegenTask: Initialize[Task[Seq[File]]] = Def.task {
@@ -147,7 +147,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       Def.taskDyn(
         Def.sequential(
           warnIfConfigIsEmpty,
-          runCodegen(jooqCodegenTransformedConfigFiles.value),
+          runCodegen(jooqCodegenTransformedConfigFiles.value)
         )
       ).value
   }
@@ -161,7 +161,7 @@ object JooqCodegenPlugin extends AutoPlugin {
           warnIfConfigIsEmpty,
           runCodegen(jooqCodegenGeneratedSourcesFinders.value.collect {
             case (config, finder) if finder.get().isEmpty => config
-          }),
+          })
         )
       ).value
   }
@@ -171,7 +171,7 @@ object JooqCodegenPlugin extends AutoPlugin {
     else
       Def.sequential(
         (JooqCodegen / run).toTask(configs.mkString(" ", " ", "")),
-        jooqCodegenGeneratedSources,
+        jooqCodegenGeneratedSources
       )
 
   private lazy val warnIfConfigIsEmpty: Initialize[Task[Unit]] = Def.task {
@@ -240,7 +240,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       case (conf, target) =>
         conf -> target.descendantsExcept(
           (jooqCodegenGeneratedSources / includeFilter).value,
-          (jooqCodegenGeneratedSources / excludeFilter).value,
+          (jooqCodegenGeneratedSources / excludeFilter).value
         )
     }
   }

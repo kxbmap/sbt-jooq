@@ -121,7 +121,7 @@ class SQLDialectTest extends UnitSpec {
         }
         assertErrors(result)(
           "The allowed dialects in scope [MYSQL] do not include any of the supported dialects: [POSTGRES]",
-          "The allowed dialects in scope [MYSQL] do not include any of the supported dialects: [H2]",
+          "The allowed dialects in scope [MYSQL] do not include any of the supported dialects: [H2]"
         )
       }
 

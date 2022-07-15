@@ -29,7 +29,7 @@ object JooqPlugin extends AutoPlugin {
     jooqOrganization := "org.jooq",
     jooqModules := Seq("jooq"),
     autoJooqLibrary := true,
-    jetbrainsAnnotationsVersion := BuildInfo.defaultJetbrainsAnnotationsVersion,
+    jetbrainsAnnotationsVersion := BuildInfo.defaultJetbrainsAnnotationsVersion
   )
 
   override def projectSettings: Seq[Setting[?]] =
@@ -48,7 +48,7 @@ object JooqPlugin extends AutoPlugin {
         Seq("org.jetbrains" % "annotations" % jetbrainsAnnotationsVersion.value % c)
       } else
         Nil
-    },
+    }
   )
 
 }

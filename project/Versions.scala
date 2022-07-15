@@ -16,7 +16,7 @@ object Versions {
     "3.13.6",
     "3.12.4",
     "3.11.12",
-    "3.10.8",
+    "3.10.8"
   )
 
   final val jetbrainsAnnotationsVersion = "23.0.0"

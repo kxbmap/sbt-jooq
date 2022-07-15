@@ -38,7 +38,7 @@ object Codegen {
       auto: Boolean,
       javaHome: Option[File],
       codegenJooqVersion: JooqVersion,
-      codegenJavaHome: Option[File],
+      codegenJavaHome: Option[File]
   ): Seq[ModuleID] =
     if (auto)
       javaxAnnotationDependencies(JavaVersion.get(javaHome), codegenJooqVersion, JavaVersion.get(codegenJavaHome))
@@ -49,7 +49,7 @@ object Codegen {
       auto: Boolean,
       javaHome: Option[File],
       codegenJooqVersion: JooqVersion,
-      codegenJavaHome: Option[File],
+      codegenJavaHome: Option[File]
   ): Seq[String] =
     if (auto)
       javaxAnnotationAddModulesOption(JavaVersion.get(javaHome), codegenJooqVersion, JavaVersion.get(codegenJavaHome))
@@ -66,7 +66,7 @@ object Codegen {
         "javax.activation" % "activation" % BuildInfo.javaxActivationVersion,
         "javax.xml.bind" % "jaxb-api" % BuildInfo.jaxbApiVersion,
         "com.sun.xml.bind" % "jaxb-core" % BuildInfo.jaxbCoreVersion,
-        "com.sun.xml.bind" % "jaxb-impl" % BuildInfo.jaxbImplVersion,
+        "com.sun.xml.bind" % "jaxb-impl" % BuildInfo.jaxbImplVersion
       )
     else
       Nil
@@ -80,7 +80,7 @@ object Codegen {
   private def javaxAnnotationDependencies(
       javaVersion: JavaVersion,
       codegenJooqVersion: JooqVersion,
-      codegenJavaVersion: JavaVersion,
+      codegenJavaVersion: JavaVersion
   ): Seq[ModuleID] =
     if (
       !javaVersion.isJavaEEModulesBundled
@@ -94,7 +94,7 @@ object Codegen {
   private def javaxAnnotationAddModulesOption(
       javaVersion: JavaVersion,
       codegenJooqVersion: JooqVersion,
-      codegenJavaVersion: JavaVersion,
+      codegenJavaVersion: JavaVersion
   ): Seq[String] =
     if (
       javaVersion.isJigsawEnabled

@@ -41,8 +41,8 @@ object ReleaseSettings extends AutoPlugin {
       releaseStepCommand("sonatypeBundleRelease"),
       setNextVersion,
       commitNextVersion,
-      releaseStepCommand("reload"),
-    ),
+      releaseStepCommand("reload")
+    )
   )
 
   private val docs = LocalProject("docs")
@@ -56,7 +56,7 @@ object ReleaseSettings extends AutoPlugin {
         Def.task[Unit] {
           val src = (docs / mdocOut).value / name
           IO.copy(Seq(src -> readme))
-        },
+        }
       )
     }
 

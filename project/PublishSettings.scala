@@ -20,7 +20,7 @@ object PublishSettings extends AutoPlugin {
     organizationName := "Tsukasa Kitachi",
     startYear := Some(2015),
     licenses := Seq(License.Apache2),
-    versionScheme := Some("early-semver"),
+    versionScheme := Some("early-semver")
   )
 
   override def projectSettings: Seq[Setting[_]] = Seq(
@@ -28,7 +28,7 @@ object PublishSettings extends AutoPlugin {
     publishTo := sonatypePublishToBundle.value,
     sonatypeProjectHosting := Some(GitHubHosting("kxbmap", "sbt-jooq", "Tsukasa Kitachi", "kxbmap@gmail.com")),
     pomIncludeRepository := { _ => false },
-    releasePublishArtifactsAction := publishSigned.value,
+    releasePublishArtifactsAction := publishSigned.value
   )
 
 }

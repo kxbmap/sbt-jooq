@@ -2,7 +2,7 @@ scalacOptions ++= Seq(
   "-deprecation",
   "-unchecked",
   "-feature",
-  "-Xlint:-unused,_",
+  "-Xlint:-unused,_"
 )
 
 addSbtPlugin("com.github.sbt" % "sbt-release" % "1.1.0")
