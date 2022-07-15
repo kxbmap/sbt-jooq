@@ -13,4 +13,4 @@
 > set jooqCodegenMode := CodegenMode.Auto
 > set Compile / jooqSource := crossTarget.value / "jooq-generated"
 > compile
-$ exists target/scala-2.13/jooq-generated/com/example/db/Tables.java
+> check

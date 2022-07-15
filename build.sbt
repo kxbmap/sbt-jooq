@@ -74,7 +74,7 @@ lazy val checkerTool = project
   .in(file("checker-tool"))
   .settings(
     name := "sbt-jooq-checker-tool",
-    scalaVersion := scala213,
+    scalaVersion := scala3,
     crossScalaVersions := Seq(scala3, scala213, scala212),
     releaseCrossBuild := true,
     libraryDependencies ++= Seq(

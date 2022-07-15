@@ -26,3 +26,8 @@ jooqCodegenConfig :=
       </target>
     </generator>
   </configuration>
+
+TaskKey[Unit]("check") := {
+  val file = crossTarget.value / "jooq-generated" / "com" / "example" / "db" / "Tables.java"
+  require(file.exists(), s"$file not exists")
+}

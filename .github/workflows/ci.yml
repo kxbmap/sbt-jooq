@@ -10,17 +10,30 @@ jobs:
       fail-fast: false
       matrix:
         task: [ core, checker, codegen, compat, flyway ]
-        scripted-scala:
-          - 2.13.8
         scripted-java:
+          - 8   # baseline
+          - 9   # Jigsaw / JAXB and javax.annotation bundled
+          - 11  # LTS / JAXB and javax.annotation no longer bundled
           - 17  # LTS
+        scripted-scala:
+          - 3.1.3
+          - 2.13.8
         include:
           - task: test
-          - { task: compat, scripted-scala: 2.13.8, scripted-java: 8 }  # baseline
-          - { task: compat, scripted-scala: 2.13.8, scripted-java: 9 }  # Jigsaw / JAXB and javax.annotation bundled
-          - { task: compat, scripted-scala: 2.13.8, scripted-java: 11 } # LTS / JAXB and javax.annotation no longer bundled
-          - { task: checker, scripted-scala: 3.1.3, scripted-java: 17 }
-          - { task: checker, scripted-scala: 2.12.16, scripted-java: 17 }
+          - { task: checker, scripted-java: 17, scripted-scala: 2.12.16 }
+        exclude:
+          - { task: core, scripted-java: 8 }
+          - { task: core, scripted-java: 9 }
+          - { task: core, scripted-java: 11 }
+          - { task: checker, scripted-java: 8 }
+          - { task: checker, scripted-java: 9 }
+          - { task: checker, scripted-java: 11 }
+          - { task: codegen, scripted-java: 8 }
+          - { task: codegen, scripted-java: 9 }
+          - { task: codegen, scripted-java: 11 }
+          - { task: flyway, scripted-java: 8 }
+          - { task: flyway, scripted-java: 9 }
+          - { task: flyway, scripted-java: 11 }
     env:
       JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
     steps:
