@@ -52,11 +52,6 @@ lazy val codegenTool = project
     Compile / javacOptions ++= Seq("--release", "8")
   )
 
-commands += Command.command("checkerScripted") { s =>
-  val sv = ScriptedSettings.scriptedScalaVersion
-  s"++$sv" :: "checker/scripted" :: s
-}
-
 lazy val checker = project
   .dependsOn(core)
   .enablePlugins(SbtPlugin, BuildInfoPlugin)
