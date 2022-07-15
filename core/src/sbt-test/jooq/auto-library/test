@@ -10,5 +10,3 @@ $ copy-file changes/MainJooq.scala src/sbt-test/jooq/auto-library/src/main/scala
 $ copy-file changes/copy-libs.test src/sbt-test/jooq/auto-library/test
 > copyLibs
 > scripted
-
-> cleanup

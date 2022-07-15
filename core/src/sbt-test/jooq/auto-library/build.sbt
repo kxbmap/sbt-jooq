@@ -1,5 +1,7 @@
 enablePlugins(SbtPlugin)
 
+publish / skip := true
+
 scriptedBufferLog := false
 
 scriptedLaunchOpts ++=
@@ -7,26 +9,18 @@ scriptedLaunchOpts ++=
     case (k, v) if k.startsWith("scripted.") => s"-D$k=$v"
   }.toSeq
 
-lazy val dep = project
+lazy val copy = project
   .settings(
     autoScalaLibrary := false,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % sys.props("scripted.jooq.version"),
-      "org.jetbrains" % "annotations" % sys.props("scripted.jetbrains-annotations.version"),
-    ),
+      "org.jetbrains" % "annotations" % sys.props("scripted.jetbrains-annotations.version")
+    )
   )
 
-lazy val copyLibs = taskKey[Unit]("")
-lazy val cleanup = taskKey[Unit]("")
-
-copyLibs := {
-  val jars = (dep / Compile / managedClasspath).value.files.map { f =>
+TaskKey[Unit]("copyLibs") := {
+  val jars = (copy / Compile / managedClasspath).value.files.map { f =>
     f -> sbtTestDirectory.value / "jooq" / "auto-library" / "lib" / f.getName
   }
   IO.copy(jars)
-}
-
-cleanup := {
-  val dir = file(sys.props("user.home")) / ".ivy2" / "local" / organization.value / name.value
-  IO.deleteFilesEmptyDirs(Seq(dir))
 }
