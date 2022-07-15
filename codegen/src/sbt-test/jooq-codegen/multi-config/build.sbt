@@ -29,5 +29,5 @@ def configXML(pkg: String, url: String) =
 
 jooqCodegenConfig ++= Seq(
   configXML("db0", sys.props("scripted.jdbc.url.0")),
-  configXML("db1", sys.props("scripted.jdbc.url.1")),
+  configXML("db1", sys.props("scripted.jdbc.url.1"))
 )

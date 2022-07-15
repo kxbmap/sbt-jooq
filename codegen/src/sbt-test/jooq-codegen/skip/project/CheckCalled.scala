@@ -27,7 +27,7 @@ object CheckCalled extends AutoPlugin {
       val n = (Space ~> IntBasic).parsed
       val c = counter.getAndSet(0)
       require(c == n, s"Required to called $n times, but called $c times")
-    },
+    }
   )
 
 }

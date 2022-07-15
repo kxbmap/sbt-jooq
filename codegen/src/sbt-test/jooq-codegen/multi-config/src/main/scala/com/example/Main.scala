@@ -10,7 +10,7 @@ object Main extends App {
 
   Using.resources(
     DSL.using(sys.props("scripted.jdbc.url.0")),
-    DSL.using(sys.props("scripted.jdbc.url.1")),
+    DSL.using(sys.props("scripted.jdbc.url.1"))
   ) { (create0, create1) =>
     val q0 = create0.selectFrom(T0.EMPLOYEE.as("e"))
     println(q0.getSQL)

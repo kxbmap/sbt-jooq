@@ -13,7 +13,7 @@ TaskKey[Unit]("checkCodegenDependencies") := {
     "javax.activation" % "activation" % "???",
     "javax.xml.bind" % "jaxb-api" % "???",
     "com.sun.xml.bind" % "jaxb-core" % "???",
-    "com.sun.xml.bind" % "jaxb-impl" % "???",
+    "com.sun.xml.bind" % "jaxb-impl" % "???"
   )
   if (xs.exists(x => deps.exists(m => x.organization == m.organization && x.name == m.name)))
     sys.error(s"libraryDependencies should not contains JAXB libraries")

@@ -20,7 +20,7 @@ jooqCodegenVariables ++= Map(
   },
   "DATABASE_NAME" -> "org.jooq.meta.h2.H2Database",
   "INPUT_SCHEMA" -> "PUBLIC",
-  "PACKAGE" -> "com.example.db",
+  "PACKAGE" -> "com.example.db"
 )
 
 jooqCodegenConfig :=

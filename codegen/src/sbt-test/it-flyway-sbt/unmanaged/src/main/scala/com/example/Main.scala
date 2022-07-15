@@ -18,7 +18,7 @@ object Main extends App {
       DSL.concat(a.FIRST_NAME, DSL.inline(" "), a.LAST_NAME).as("Author"),
       l.CD.as("Language"),
       bs.NAME.as("Book Store"),
-      b2bs.STOCK.as("Stock"),
+      b2bs.STOCK.as("Stock")
     )
     .from(b)
     .join(a).on(b.AUTHOR_ID.equal(a.ID))
