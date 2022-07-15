@@ -58,14 +58,12 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   lazy val jooqCheckerSettings: Seq[Setting[?]] = Seq(
     wartremoverClasspaths ++= (JooqChecker / managedClasspath).value.files.map(_.toURI.toString),
-    wartremoverErrors := {
-      val errors = wartremoverErrors.value
-      (errors ++ JooqWarts.errors(jooqCheckerLevelPlainSQL.value, jooqCheckerLevelSQLDialect.value)).distinct
-    },
-    wartremoverWarnings := {
-      val warnings = wartremoverWarnings.value
-      (warnings ++ JooqWarts.warnings(jooqCheckerLevelPlainSQL.value, jooqCheckerLevelSQLDialect.value)).distinct
-    }
+    wartremoverErrors :=
+      wartremoverErrors.value.filterNot(JooqWarts.all) ++
+        JooqWarts.errors(jooqCheckerLevelPlainSQL.value, jooqCheckerLevelSQLDialect.value),
+    wartremoverWarnings :=
+      wartremoverWarnings.value.filterNot(JooqWarts.all) ++
+        JooqWarts.warnings(jooqCheckerLevelPlainSQL.value, jooqCheckerLevelSQLDialect.value)
   )
 
 }
