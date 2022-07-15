@@ -76,7 +76,6 @@ lazy val checkerTool = project
     name := "sbt-jooq-checker-tool",
     scalaVersion := scala3,
     crossScalaVersions := Seq(scala3, scala213, scala212),
-    releaseCrossBuild := true,
     libraryDependencies ++= Seq(
       "org.jooq" % "jooq" % jooqVersion,
       "org.wartremover" % "wartremover" % wartRemoverVersion cross CrossVersion.full,
