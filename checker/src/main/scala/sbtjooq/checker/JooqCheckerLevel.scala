@@ -16,14 +16,14 @@
 
 package sbtjooq.checker
 
-sealed trait CheckerLevel
+sealed trait JooqCheckerLevel
 
-object CheckerLevel {
+object JooqCheckerLevel {
 
-  case object Disabled extends CheckerLevel
+  case object Disabled extends JooqCheckerLevel
 
-  case object Warning extends CheckerLevel
+  case object Warning extends JooqCheckerLevel
 
-  case object Error extends CheckerLevel
+  case object Error extends JooqCheckerLevel
 
 }

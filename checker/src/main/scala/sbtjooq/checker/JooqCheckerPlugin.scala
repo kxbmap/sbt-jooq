@@ -30,13 +30,16 @@ object JooqCheckerPlugin extends AutoPlugin {
 
   object autoImport extends JooqCheckerKeys {
 
-    final val CheckerLevel = sbtjooq.checker.CheckerLevel
+    final val JooqCheckerLevel = sbtjooq.checker.JooqCheckerLevel
+
+    @deprecated("Use JooqCheckerLevel instead", "0.8.0")
+    final val CheckerLevel = sbtjooq.checker.JooqCheckerLevel
 
   }
 
   override def globalSettings: Seq[Setting[?]] = Seq(
-    jooqCheckerLevelPlainSQL := CheckerLevel.Error,
-    jooqCheckerLevelSQLDialect := CheckerLevel.Error
+    jooqCheckerLevelPlainSQL := JooqCheckerLevel.Error,
+    jooqCheckerLevelSQLDialect := JooqCheckerLevel.Error
   )
 
   override def projectConfigurations: Seq[Configuration] = Seq(JooqChecker)

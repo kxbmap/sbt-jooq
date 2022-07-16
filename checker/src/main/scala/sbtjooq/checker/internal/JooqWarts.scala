@@ -16,7 +16,7 @@
 
 package sbtjooq.checker.internal
 
-import sbtjooq.checker.CheckerLevel
+import sbtjooq.checker.JooqCheckerLevel
 import wartremover.Wart
 
 object JooqWarts {
@@ -27,13 +27,13 @@ object JooqWarts {
 
   val all: Set[Wart] = Set(PlainSQL, SQLDialect)
 
-  def errors(plainSQL: CheckerLevel, sqlDialect: CheckerLevel): Seq[Wart] =
-    collect(CheckerLevel.Error)(plainSQL, sqlDialect)
+  def errors(plainSQL: JooqCheckerLevel, sqlDialect: JooqCheckerLevel): Seq[Wart] =
+    collect(JooqCheckerLevel.Error)(plainSQL, sqlDialect)
 
-  def warnings(plainSQL: CheckerLevel, sqlDialect: CheckerLevel): Seq[Wart] =
-    collect(CheckerLevel.Warning)(plainSQL, sqlDialect)
+  def warnings(plainSQL: JooqCheckerLevel, sqlDialect: JooqCheckerLevel): Seq[Wart] =
+    collect(JooqCheckerLevel.Warning)(plainSQL, sqlDialect)
 
-  private def collect(level: CheckerLevel)(plainSQL: CheckerLevel, sqlDialect: CheckerLevel): Seq[Wart] =
+  private def collect(level: JooqCheckerLevel)(plainSQL: JooqCheckerLevel, sqlDialect: JooqCheckerLevel): Seq[Wart] =
     Seq(
       plainSQL -> PlainSQL,
       sqlDialect -> SQLDialect
