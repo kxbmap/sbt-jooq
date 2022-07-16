@@ -1,16 +1,16 @@
-> set jooqCodegenMode := CodegenMode.Auto
+> set jooqCodegenMode := JooqCodegenMode.Auto
 > compile
 > compile
 > checkCalled 1
 > clean
 
-> set jooqCodegenMode := CodegenMode.Always
+> set jooqCodegenMode := JooqCodegenMode.Always
 > compile
 > compile
 > checkCalled 2
 > clean
 
-> set jooqCodegenMode := CodegenMode.Auto
+> set jooqCodegenMode := JooqCodegenMode.Auto
 > set Compile / jooqSource := crossTarget.value / "jooq-generated"
 > compile
 > check

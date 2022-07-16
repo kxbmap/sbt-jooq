@@ -7,7 +7,7 @@ libraryDependencies ++=
 
 enablePlugins(JooqCodegenPlugin)
 
-jooqCodegenMode := CodegenMode.Unmanaged
+jooqCodegenMode := JooqCodegenMode.Unmanaged
 
 jooqVersion := sys.props("scripted.jooq.version")
 

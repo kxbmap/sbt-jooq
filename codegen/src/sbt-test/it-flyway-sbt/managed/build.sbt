@@ -2,7 +2,7 @@ ThisBuild / scalaVersion := sys.props("scripted.scala.version")
 
 enablePlugins(JooqCodegenPlugin)
 
-jooqCodegenMode := CodegenMode.Always
+jooqCodegenMode := JooqCodegenMode.Always
 
 jooqVersion := sys.props("scripted.jooq.version")
 

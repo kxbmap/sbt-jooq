@@ -28,7 +28,7 @@ trait JooqCodegenKeys {
   val jooqCodegenIfAbsent = taskKey[Seq[File]]("Run jOOQ-codegen if generated files absent")
 
   // User settings
-  val jooqCodegenMode = settingKey[CodegenMode]("jOOQ-codegen execution mode")
+  val jooqCodegenMode = settingKey[JooqCodegenMode]("jOOQ-codegen execution mode")
   val jooqCodegenConfig = settingKey[CodegenConfig]("jOOQ-codegen configuration")
   val jooqCodegenVariables = settingKey[Map[String, Any]]("Variables to replace configuration placeholders")
 

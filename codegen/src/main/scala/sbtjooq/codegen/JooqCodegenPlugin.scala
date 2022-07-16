@@ -32,8 +32,13 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   object autoImport extends JooqCodegenKeys {
 
-    type CodegenMode = sbtjooq.codegen.CodegenMode
-    final val CodegenMode = sbtjooq.codegen.CodegenMode
+    type JooqCodegenMode = sbtjooq.codegen.JooqCodegenMode
+    final val JooqCodegenMode = sbtjooq.codegen.JooqCodegenMode
+
+    @deprecated("Use JooqCodegenMode instead", "0.8.0")
+    type CodegenMode = sbtjooq.codegen.JooqCodegenMode
+    @deprecated("Use JooqCodegenMode instead", "0.8.0")
+    final val CodegenMode = sbtjooq.codegen.JooqCodegenMode
 
     type CodegenConfig = sbtjooq.codegen.CodegenConfig
     final val CodegenConfig = sbtjooq.codegen.CodegenConfig
@@ -48,7 +53,7 @@ object JooqCodegenPlugin extends AutoPlugin {
       jooqCodegenDependencies(Compile)
 
   override def globalSettings: Seq[Setting[?]] = Seq(
-    jooqCodegenMode := CodegenMode.Auto,
+    jooqCodegenMode := JooqCodegenMode.Auto,
     jooqCodegenConfig := CodegenConfig.empty,
     jooqCodegenVariables := Map.empty,
     jooqCodegenVariableHandler := VariableExpander.defaultHandler,
@@ -189,9 +194,9 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   private def sourceGeneratorsSetting: Initialize[Seq[Task[Seq[File]]]] = Def.setting {
     jooqCodegenMode.value match {
-      case CodegenMode.Auto => jooqCodegenIfAbsent.taskValue :: Nil
-      case CodegenMode.Always => jooqCodegen.taskValue :: Nil
-      case CodegenMode.Unmanaged => Nil
+      case JooqCodegenMode.Auto => jooqCodegenIfAbsent.taskValue :: Nil
+      case JooqCodegenMode.Always => jooqCodegen.taskValue :: Nil
+      case JooqCodegenMode.Unmanaged => Nil
     }
   }
 

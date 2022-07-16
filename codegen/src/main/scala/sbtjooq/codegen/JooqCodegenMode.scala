@@ -16,17 +16,17 @@
 
 package sbtjooq.codegen
 
-sealed trait CodegenMode
+sealed trait JooqCodegenMode
 
-object CodegenMode {
+object JooqCodegenMode {
 
-  case object Auto extends CodegenMode
+  case object Auto extends JooqCodegenMode
 
-  case object Always extends CodegenMode
+  case object Always extends JooqCodegenMode
 
-  case object Unmanaged extends CodegenMode
+  case object Unmanaged extends JooqCodegenMode
 
-  implicit class CodegenModeOps(mode: CodegenMode) {
+  implicit class JooqCodegenModeOps(mode: JooqCodegenMode) {
     def isUnmanaged: Boolean = mode == Unmanaged
   }
 
