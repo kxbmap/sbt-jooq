@@ -18,9 +18,9 @@ package sbtjooq.codegen
 
 import sbt.*
 
-class CodegenConfigTest extends UnitSpec {
+class JooqCodegenConfigTest extends UnitSpec {
 
-  val key = settingKey[CodegenConfig]("")
+  val key = settingKey[JooqCodegenConfig]("")
 
   "From a file" when {
     ":=" should {
@@ -170,7 +170,7 @@ class CodegenConfigTest extends UnitSpec {
     ":=" should {
       "compiles" in {
         assertCompiles(
-          """key := Seq[CodegenConfig](
+          """key := Seq[JooqCodegenConfig](
             |  file("foo.xml"),
             |  uri("classpath:foo.xml"),
             |  <configuration></configuration>,
@@ -182,7 +182,7 @@ class CodegenConfigTest extends UnitSpec {
     "+=" should {
       "NOT compile" in {
         assertTypeError(
-          """key += Seq[CodegenConfig](
+          """key += Seq[JooqCodegenConfig](
             |  file("foo.xml"),
             |  uri("classpath:foo.xml"),
             |  <configuration></configuration>
@@ -193,7 +193,7 @@ class CodegenConfigTest extends UnitSpec {
     "++=" should {
       "compiles" in {
         assertCompiles(
-          """key ++= Seq[CodegenConfig](
+          """key ++= Seq[JooqCodegenConfig](
             |  file("foo.xml"),
             |  uri("classpath:foo.xml"),
             |  <configuration></configuration>
@@ -203,11 +203,11 @@ class CodegenConfigTest extends UnitSpec {
     }
   }
 
-  "CodegenConfig" when {
+  "JooqCodegenConfig" when {
     ":=" should {
       "compiles" in {
         assertCompiles(
-          """val config: CodegenConfig = ???
+          """val config: JooqCodegenConfig = ???
             |key := config
             |""".stripMargin
         )
@@ -216,7 +216,7 @@ class CodegenConfigTest extends UnitSpec {
     "+=" should {
       "NOT compile" in {
         assertTypeError(
-          """val config: CodegenConfig = ???
+          """val config: JooqCodegenConfig = ???
             |key += config
             |""".stripMargin
         )
@@ -225,7 +225,7 @@ class CodegenConfigTest extends UnitSpec {
     "++=" should {
       "compiles" in {
         assertCompiles(
-          """val config: CodegenConfig = ???
+          """val config: JooqCodegenConfig = ???
             |key ++= config
             |""".stripMargin
         )
@@ -233,11 +233,11 @@ class CodegenConfigTest extends UnitSpec {
     }
   }
 
-  "CodegenConfig.Single" when {
+  "JooqCodegenConfig.Single" when {
     ":=" should {
       "compiles" in {
         assertCompiles(
-          """val config: CodegenConfig.Single = ???
+          """val config: JooqCodegenConfig.Single = ???
             |key := config
             |""".stripMargin
         )
@@ -246,7 +246,7 @@ class CodegenConfigTest extends UnitSpec {
     "+=" should {
       "compiles" in {
         assertCompiles(
-          """val config: CodegenConfig.Single = ???
+          """val config: JooqCodegenConfig.Single = ???
             |key += config
             |""".stripMargin
         )
@@ -255,7 +255,7 @@ class CodegenConfigTest extends UnitSpec {
     "++=" should {
       "compiles" in {
         assertCompiles(
-          """val config: CodegenConfig.Single = ???
+          """val config: JooqCodegenConfig.Single = ???
             |key ++= config
             |""".stripMargin
         )
@@ -263,11 +263,11 @@ class CodegenConfigTest extends UnitSpec {
     }
   }
 
-  "CodegenConfig.Sequence" when {
+  "JooqCodegenConfig.Sequence" when {
     ":=" should {
       "compiles" in {
         assertCompiles(
-          """val config: CodegenConfig.Sequence = ???
+          """val config: JooqCodegenConfig.Sequence = ???
             |key := config
             |""".stripMargin
         )
@@ -276,7 +276,7 @@ class CodegenConfigTest extends UnitSpec {
     "+=" should {
       "NOT compile" in {
         assertTypeError(
-          """val config: CodegenConfig.Sequence = ???
+          """val config: JooqCodegenConfig.Sequence = ???
             |key += config
             |""".stripMargin
         )
@@ -285,7 +285,7 @@ class CodegenConfigTest extends UnitSpec {
     "++=" should {
       "compiles" in {
         assertCompiles(
-          """val config: CodegenConfig.Sequence = ???
+          """val config: JooqCodegenConfig.Sequence = ???
             |key ++= config
             |""".stripMargin
         )

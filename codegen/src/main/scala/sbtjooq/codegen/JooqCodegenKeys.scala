@@ -29,7 +29,7 @@ trait JooqCodegenKeys {
 
   // User settings
   val jooqCodegenMode = settingKey[JooqCodegenMode]("jOOQ-codegen execution mode")
-  val jooqCodegenConfig = settingKey[CodegenConfig]("jOOQ-codegen configuration")
+  val jooqCodegenConfig = settingKey[JooqCodegenConfig]("jOOQ-codegen configuration")
   val jooqCodegenVariables = settingKey[Map[String, Any]]("Variables to replace configuration placeholders")
 
   // Customizable

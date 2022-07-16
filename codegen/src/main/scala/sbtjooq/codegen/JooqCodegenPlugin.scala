@@ -40,8 +40,13 @@ object JooqCodegenPlugin extends AutoPlugin {
     @deprecated("Use JooqCodegenMode instead", "0.8.0")
     final val CodegenMode = sbtjooq.codegen.JooqCodegenMode
 
-    type CodegenConfig = sbtjooq.codegen.CodegenConfig
-    final val CodegenConfig = sbtjooq.codegen.CodegenConfig
+    type JooqCodegenConfig = sbtjooq.codegen.JooqCodegenConfig
+    final val JooqCodegenConfig = sbtjooq.codegen.JooqCodegenConfig
+
+    @deprecated("Use JooqCodegenConfig instead", "0.8.0")
+    type CodegenConfig = sbtjooq.codegen.JooqCodegenConfig
+    @deprecated("Use JooqCodegenConfig instead", "0.8.0")
+    final val CodegenConfig = sbtjooq.codegen.JooqCodegenConfig
 
   }
 
@@ -54,7 +59,7 @@ object JooqCodegenPlugin extends AutoPlugin {
 
   override def globalSettings: Seq[Setting[?]] = Seq(
     jooqCodegenMode := JooqCodegenMode.Auto,
-    jooqCodegenConfig := CodegenConfig.empty,
+    jooqCodegenConfig := JooqCodegenConfig.empty,
     jooqCodegenVariables := Map.empty,
     jooqCodegenVariableHandler := VariableExpander.defaultHandler,
     jooqCodegenGeneratedSources / includeFilter := "*.java" | "*.scala"
@@ -201,11 +206,11 @@ object JooqCodegenPlugin extends AutoPlugin {
   }
 
   private def transformConfigsTask: Initialize[Task[Seq[Node]]] = Def.taskDyn {
-    def load(config: CodegenConfig.Single): Initialize[Task[Node]] =
+    def load(config: JooqCodegenConfig.Single): Initialize[Task[Node]] =
       config match {
-        case CodegenConfig.FromFile(file) => Def.task(IO.reader(file.getAbsoluteFile)(XML.load))
-        case CodegenConfig.FromXML(xml) => Def.task(xml)
-        case CodegenConfig.FromResource(resource) =>
+        case JooqCodegenConfig.FromFile(file) => Def.task(IO.reader(file.getAbsoluteFile)(XML.load))
+        case JooqCodegenConfig.FromXML(xml) => Def.task(xml)
+        case JooqCodegenConfig.FromResource(resource) =>
           Def.task(ClasspathLoader.using((JooqCodegen / fullClasspath).value) { loader =>
             loader.getResourceAsStream(resource) match {
               case null => throw new MessageOnlyException(s"resource $resource not found in classpath")

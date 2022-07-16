@@ -20,11 +20,11 @@ import sbt.*
 import scala.language.implicitConversions
 import scala.xml.{Elem, Node, NodeBuffer}
 
-sealed trait CodegenConfig
+sealed trait JooqCodegenConfig
 
-object CodegenConfig {
+object JooqCodegenConfig {
 
-  sealed trait Single extends CodegenConfig
+  sealed trait Single extends JooqCodegenConfig
 
   case class FromFile(file: File) extends Single
 
@@ -32,9 +32,9 @@ object CodegenConfig {
 
   case class FromXML(xml: Node) extends Single
 
-  case class Sequence(seq: Seq[Single]) extends CodegenConfig
+  case class Sequence(seq: Seq[Single]) extends JooqCodegenConfig
 
-  implicit class CodegenConfigOps(config: CodegenConfig) {
+  implicit class CodegenConfigOps(config: JooqCodegenConfig) {
     def toSeq: Seq[Single] =
       config match {
         case single: Single => Seq(single)
@@ -47,14 +47,14 @@ object CodegenConfig {
         case _ => false
       }
 
-    def +(other: Single): CodegenConfig =
+    def +(other: Single): JooqCodegenConfig =
       Sequence(toSeq :+ other)
 
-    def ++(other: CodegenConfig): CodegenConfig =
+    def ++(other: JooqCodegenConfig): JooqCodegenConfig =
       Sequence(toSeq ++ other.toSeq)
   }
 
-  def empty: CodegenConfig = Sequence(Seq.empty)
+  def empty: JooqCodegenConfig = Sequence(Seq.empty)
 
   def fromURI(uri: URI): Single =
     uri.getScheme match {
@@ -71,16 +71,17 @@ object CodegenConfig {
 
   implicit def uriToCodegenConfig(uri: URI): Single = fromURI(uri)
 
-  implicit def seqToCodegenConfig[A](seq: Seq[A])(implicit ev: A => CodegenConfig): Sequence =
+  implicit def seqToCodegenConfig[A](seq: Seq[A])(implicit ev: A => JooqCodegenConfig): Sequence =
     Sequence(seq.flatMap(ev(_).toSeq))
 
   implicit def nodeBufferToCodegenConfig(buffer: NodeBuffer): Sequence =
     Sequence(buffer.map(FromXML))
 
-  implicit val appendCodegenConfigToCodegenConfig: Append.Values[CodegenConfig, CodegenConfig] = _ ++ _
+  implicit val appendCodegenConfigToCodegenConfig: Append.Values[JooqCodegenConfig, JooqCodegenConfig] = _ ++ _
 
-  implicit def appendSingleToCodegenConfig[A](implicit ev: A => Single): Append.Value[CodegenConfig, A] = _ + _
+  implicit def appendSingleToCodegenConfig[A](implicit ev: A => Single): Append.Value[JooqCodegenConfig, A] = _ + _
 
-  implicit def appendSequenceToCodegenConfig[A](implicit ev: A => Sequence): Append.Values[CodegenConfig, A] = _ ++ _
+  implicit def appendSequenceToCodegenConfig[A](implicit ev: A => Sequence): Append.Values[JooqCodegenConfig, A] =
+    _ ++ _
 
 }

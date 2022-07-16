@@ -122,7 +122,7 @@ jooqCodegenConfig :=
 
 ```scala mdoc:compile-only
 // Set multiple configurations
-jooqCodegenConfig := Seq[CodegenConfig](
+jooqCodegenConfig := Seq[JooqCodegenConfig](
   file("path/to/jooq-codegen.xml"),
   uri("classpath:path/to/jooq-codegen.xml"),
   <configuration>
