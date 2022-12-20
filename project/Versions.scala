@@ -2,15 +2,15 @@ import sbt.librarymanagement.VersionNumber
 
 object Versions {
 
-  final val scala212 = "2.12.16"
-  final val scala213 = "2.13.8"
-  final val scala3 = "3.1.3"
+  final val scala212 = "2.12.17"
+  final val scala213 = "2.13.10"
+  final val scala3 = "3.2.1"
 
-  final val jooqVersion = "3.17.2"
+  final val jooqVersion = "3.17.6"
 
   val jooqVersions: Seq[String] = Seq(
     jooqVersion,
-    "3.16.8",
+    "3.16.11",
     "3.15.12",
     "3.14.16",
     "3.13.6",
@@ -23,13 +23,13 @@ object Versions {
 
   final val scalaXMLVersion = "2.1.0"
 
-  final val logbackVersion = "1.2.11"
+  final val logbackVersion = "1.4.5"
 
   final val h2Version = "2.1.214"
 
   final val h2V1Version = "1.4.200"
 
-  final val wartRemoverVersion = "3.0.5"
+  final val wartRemoverVersion = "3.0.7"
 
   final val javaxActivationVersion = "1.1.1"
 
@@ -43,7 +43,7 @@ object Versions {
 
   final val flywaySbtVersion = "7.4.0"
 
-  final val scalaTestVersion = "3.2.12"
+  final val scalaTestVersion = "3.2.14"
 
   def minorVersion(version: String): String =
     version match {
