@@ -12,8 +12,7 @@ lazy val core = project
   .settings(
     name := "sbt-jooq-core",
     buildInfoKeys := Seq[BuildInfoKey](
-      "defaultJooqVersion" -> jooqVersion,
-      "defaultJetbrainsAnnotationsVersion" -> jetbrainsAnnotationsVersion
+      "defaultJooqVersion" -> jooqVersion
     ),
     buildInfoPackage := "sbtjooq"
   )

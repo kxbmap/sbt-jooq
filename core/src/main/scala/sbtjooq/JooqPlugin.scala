@@ -28,8 +28,7 @@ object JooqPlugin extends AutoPlugin {
     jooqVersion := BuildInfo.defaultJooqVersion,
     jooqOrganization := "org.jooq",
     jooqModules := Seq("jooq"),
-    autoJooqLibrary := true,
-    jetbrainsAnnotationsVersion := BuildInfo.defaultJetbrainsAnnotationsVersion
+    autoJooqLibrary := true
   )
 
   override def projectSettings: Seq[Setting[?]] =
@@ -40,13 +39,6 @@ object JooqPlugin extends AutoPlugin {
       if ((config / autoJooqLibrary).value)
         (config / jooqModules).value.map((config / jooqOrganization).value % _ % (config / jooqVersion).value % config)
       else
-        Nil
-    },
-    libraryDependencies ++= {
-      if ((config / autoJooqLibrary).value && (config / jooqVersion).value.matches(">=3.14")) {
-        val c = if (config == Compile) Provided else config
-        Seq("org.jetbrains" % "annotations" % jetbrainsAnnotationsVersion.value % c)
-      } else
         Nil
     }
   )

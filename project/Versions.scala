@@ -19,8 +19,6 @@ object Versions {
     "3.10.8"
   )
 
-  final val jetbrainsAnnotationsVersion = "23.0.0"
-
   final val scalaXMLVersion = "2.1.0"
 
   final val logbackVersion = "1.3.5"

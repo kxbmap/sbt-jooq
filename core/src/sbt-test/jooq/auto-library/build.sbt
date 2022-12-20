@@ -12,10 +12,7 @@ scriptedLaunchOpts ++=
 lazy val copy = project
   .settings(
     autoScalaLibrary := false,
-    libraryDependencies ++= Seq(
-      "org.jooq" % "jooq" % sys.props("scripted.jooq.version"),
-      "org.jetbrains" % "annotations" % sys.props("scripted.jetbrains-annotations.version")
-    )
+    libraryDependencies += "org.jooq" % "jooq" % sys.props("scripted.jooq.version")
   )
 
 TaskKey[Unit]("copyLibs") := {

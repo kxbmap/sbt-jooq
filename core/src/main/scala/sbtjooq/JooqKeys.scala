@@ -25,8 +25,6 @@ trait JooqKeys {
   val jooqModules = settingKey[Seq[String]]("jOOQ modules")
   val autoJooqLibrary = settingKey[Boolean]("Add jOOQ dependencies if true")
 
-  val jetbrainsAnnotationsVersion = settingKey[String]("Jetbrains Annotations version")
-
 }
 
 object JooqKeys extends JooqKeys
