@@ -38,20 +38,19 @@ jobs:
       JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
     steps:
       - uses: actions/checkout@v3
-      - uses: olafurpg/setup-scala@v13
-        with:
-          java-version: "zulu@1.17"
-      - uses: coursier/cache-action@v6
 
-      - name: Install Java for scripted
+      - id: scripted_java
         if: ${{ matrix['scripted-java'] != null }}
-        env:
-          SCRIPTED_JAVA: "zulu@1.${{ matrix.scripted-java }}"
-        run: |
-          SCRIPTED_JAVA="$(jabba ls-remote | grep "${SCRIPTED_JAVA}\." | head -n 1)"
-          echo "Installing ${SCRIPTED_JAVA}"
-          jabba install "${SCRIPTED_JAVA}"
-          echo "SCRIPTED_JAVA_HOME=$(jabba which --home "${SCRIPTED_JAVA}")" >> $GITHUB_ENV
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: ${{ matrix.scripted-java }}
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 17
+          cache: sbt
 
       - name: Build and test
         if: ${{ matrix.task == 'test' }}
@@ -63,6 +62,7 @@ jobs:
         env:
           CI_TASK: ${{ matrix.task }}
           SCRIPTED_SCALA: ${{ matrix.scripted-scala }}
+          SCRIPTED_JAVA_HOME: ${{ steps.scripted_java.outputs.path }}
         run: |
           case "$CI_TASK" in
             core)
@@ -84,10 +84,3 @@ jobs:
               echo "unknown task"
               exit 1
           esac
-
-      - name: Cleanup
-        run: |
-          rm -rf "$HOME/.ivy2/local" || true
-          find $HOME/.sbt             -name "*.lock"                -delete || true
-          find $HOME/.ivy2/cache      -name "ivydata-*.properties"  -delete || true
-          find $HOME/.cache/coursier  -name "ivydata-*.properties"  -delete || true
