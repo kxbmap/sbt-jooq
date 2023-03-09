@@ -17,7 +17,7 @@ jobs:
           - 17  # LTS
           - 19  # STS
         scripted-scala:
-          - 3.2.1
+          - 3.2.2
           - 2.13.10
         include:
           - task: test
