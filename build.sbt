@@ -96,6 +96,7 @@ lazy val docs = project
       "H2_VERSION" -> h2Version
     ),
     scalacOptions ++= Seq(
+      "-Xsource:3",
       "-Wconf:cat=unused-nowarn:s"
     ),
     libraryDependencies += sbtDependency.value,

@@ -5,13 +5,13 @@
 jOOQ plugin for sbt 1.3+
 
 ```scala mdoc:invisible
-import sbt._
-import sbt.Keys._
-import sbtjooq.JooqPlugin.autoImport._
+import sbt.*
+import sbt.Keys.*
+import sbtjooq.JooqPlugin.autoImport.*
 import sbtjooq.codegen.JooqCodegenPlugin
-import sbtjooq.codegen.JooqCodegenPlugin.autoImport._
-import sbtjooq.codegen.internal._
-import scala.collection.JavaConverters._
+import sbtjooq.codegen.JooqCodegenPlugin.autoImport.*
+import sbtjooq.codegen.internal.*
+import scala.jdk.CollectionConverters.*
 ```
 
 ## JooqCodegenPlugin
