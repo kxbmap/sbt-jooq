@@ -28,7 +28,7 @@ object Versions {
 
   final val h2V1Version = "1.4.200"
 
-  final val wartRemoverVersion = "3.0.7"
+  final val wartRemoverVersion = "3.0.11"
 
   final val javaxActivationVersion = "1.1.1"
 
@@ -42,7 +42,7 @@ object Versions {
 
   final val flywaySbtVersion = "7.4.0"
 
-  final val scalaTestVersion = "3.2.14"
+  final val scalaTestVersion = "3.2.15"
 
   def minorVersion(version: String): String =
     version match {
