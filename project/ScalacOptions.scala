@@ -1,12 +1,12 @@
-import sbt._
-import sbt.Keys._
-import ProjectUtil._
+import sbt.*
+import sbt.Keys.*
+import ProjectUtil.*
 
 object ScalacOptions extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     scalacOptions ++= Seq(
       "-release",
       "8",

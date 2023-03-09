@@ -1,12 +1,12 @@
-import com.jsuereth.sbtpgp.PgpKeys._
+import com.jsuereth.sbtpgp.PgpKeys.*
 import com.jsuereth.sbtpgp.SbtPgp
-import sbt._
-import sbt.Keys._
+import sbt.*
+import sbt.Keys.*
 import sbtrelease.ReleasePlugin
-import sbtrelease.ReleasePlugin.autoImport._
+import sbtrelease.ReleasePlugin.autoImport.*
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.GitHubHosting
-import xerial.sbt.Sonatype.SonatypeKeys._
+import xerial.sbt.Sonatype.SonatypeKeys.*
 
 object PublishSettings extends AutoPlugin {
 
@@ -14,7 +14,7 @@ object PublishSettings extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  override def buildSettings: Seq[Setting[_]] = Seq(
+  override def buildSettings: Seq[Setting[?]] = Seq(
     description := "jOOQ plugin for sbt 1.3+",
     organization := "com.github.kxbmap",
     organizationName := "Tsukasa Kitachi",
@@ -23,7 +23,7 @@ object PublishSettings extends AutoPlugin {
     versionScheme := Some("early-semver")
   )
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     publishMavenStyle := true,
     publishTo := sonatypePublishToBundle.value,
     sonatypeProjectHosting := Some(GitHubHosting("kxbmap", "sbt-jooq", "Tsukasa Kitachi", "kxbmap@gmail.com")),

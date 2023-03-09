@@ -1,6 +1,6 @@
-import sbt.Keys._
-import sbt._
-import sbtbuildinfo.BuildInfoKeys._
+import sbt.Keys.*
+import sbt.*
+import sbtbuildinfo.BuildInfoKeys.*
 import sbtbuildinfo.{BuildInfoOption, BuildInfoPlugin}
 
 object BuildInfoSettings extends AutoPlugin {
@@ -9,7 +9,7 @@ object BuildInfoSettings extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     buildInfoOptions ++= Seq(BuildInfoOption.PackagePrivate, BuildInfoOption.ConstantValue),
     buildInfoUsePackageAsPath := true,
     Compile / packageSrc / mappings += {

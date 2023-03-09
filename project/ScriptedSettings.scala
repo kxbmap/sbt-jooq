@@ -1,7 +1,7 @@
-import Versions._
-import sbt._
-import sbt.Keys._
-import sbt.ScriptedPlugin.autoImport._
+import Versions.*
+import sbt.*
+import sbt.Keys.*
+import sbt.ScriptedPlugin.autoImport.*
 import sbt.plugins.SbtPlugin
 
 object ScriptedSettings extends AutoPlugin {
@@ -12,7 +12,7 @@ object ScriptedSettings extends AutoPlugin {
 
   final val scriptedScalaVersion = sys.env.getOrElse("SCRIPTED_SCALA", scala3)
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     scriptedSbt := sbtVersion.value,
     scriptedLaunchOpts ++= Seq(
       "-Xmx1024M",

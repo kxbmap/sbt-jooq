@@ -1,11 +1,11 @@
 import com.jsuereth.sbtpgp.SbtPgp
-import mdoc.MdocPlugin.autoImport._
-import sbt._
+import mdoc.MdocPlugin.autoImport.*
+import sbt.*
 import sbt.Def.Initialize
-import sbt.Keys._
+import sbt.Keys.*
 import sbtrelease.ReleasePlugin
-import sbtrelease.ReleasePlugin.autoImport._
-import sbtrelease.ReleaseStateTransformations._
+import sbtrelease.ReleasePlugin.autoImport.*
+import sbtrelease.ReleaseStateTransformations.*
 import sbtrelease.Version.Bump
 import xerial.sbt.Sonatype
 
@@ -18,9 +18,9 @@ object ReleaseSettings extends AutoPlugin {
     val updateReadme = taskKey[Unit]("Update readme file")
   }
 
-  import autoImport._
+  import autoImport.*
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     readmeFile := baseDirectory.value / "README.md",
     updateReadme := updateReadmeTask.value,
     releaseVersionBump := Bump.Minor,

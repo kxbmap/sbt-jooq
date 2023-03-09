@@ -1,11 +1,11 @@
-import sbt.Keys._
-import sbt._
+import sbt.Keys.*
+import sbt.*
 
 object ConsoleSettings extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  override def projectSettings: Seq[Setting[_]] =
+  override def projectSettings: Seq[Setting[?]] =
     Seq(Compile, Test).map(_ / console / scalacOptions += "-Xlint:-unused")
 
 }

@@ -1,5 +1,5 @@
-import ProjectUtil._
-import Versions._
+import ProjectUtil.*
+import Versions.*
 
 name := "sbt-jooq"
 
