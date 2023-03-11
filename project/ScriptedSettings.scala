@@ -10,14 +10,21 @@ object ScriptedSettings extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  final val scriptedScalaVersion = sys.env.getOrElse("SCRIPTED_SCALA", scala3)
+  object autoImport {
+
+    val scriptedScalaVersion = settingKey[String]("Scala version used by scripted projects")
+
+  }
+
+  import autoImport.*
 
   override def projectSettings: Seq[Setting[?]] = Seq(
     scriptedSbt := sbtVersion.value,
+    scriptedScalaVersion := sys.env.getOrElse("SCRIPTED_SCALA", scala3),
     scriptedLaunchOpts ++= Seq(
       "-Xmx1024M",
       s"-Dscripted.plugin.version=${version.value}",
-      s"-Dscripted.scala.version=$scriptedScalaVersion",
+      s"-Dscripted.scala.version=${scriptedScalaVersion.value}",
       s"-Dscripted.jooq.version=$jooqVersion",
       s"-Dscripted.h2.version=$h2Version",
       s"-Dscripted.h2.v1.version=$h2V1Version",
