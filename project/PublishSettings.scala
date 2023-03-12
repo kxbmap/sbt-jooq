@@ -20,7 +20,7 @@ object PublishSettings extends AutoPlugin {
     organizationName := "Tsukasa Kitachi",
     startYear := Some(2015),
     licenses := Seq(License.Apache2),
-    versionScheme := Some("early-semver")
+    versionScheme := Some(VersionScheme.EarlySemVer)
   )
 
   override def projectSettings: Seq[Setting[?]] = Seq(
