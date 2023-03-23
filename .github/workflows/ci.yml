@@ -15,7 +15,7 @@ jobs:
           - 9   # Jigsaw / JAXB and javax.annotation bundled
           - 11  # LTS / JAXB and javax.annotation no longer bundled
           - 17  # LTS
-          - 19  # STS
+          - 20  # Latest
         scripted-scala:
           - 3.2.2
           - 2.13.10
