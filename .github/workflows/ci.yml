@@ -56,7 +56,7 @@ jobs:
       - name: Build and test
         if: ${{ matrix.task == 'test' }}
         run: |
-          sbt -v +test docs/mdoc +scalafmtCheckAll scalafmtSbtCheck +headerCheckAll
+          sbt -v +test docs/mdoc +scalafmtCheckAll scalafmtSbtCheck +headerCheckAll versionPolicyCheck
 
       - name: Build and scripted
         if: ${{ matrix.task != 'test' }}

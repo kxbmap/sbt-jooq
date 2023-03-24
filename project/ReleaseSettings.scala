@@ -7,11 +7,13 @@ import sbtrelease.ReleasePlugin
 import sbtrelease.ReleasePlugin.autoImport.*
 import sbtrelease.ReleaseStateTransformations.*
 import sbtrelease.Version.Bump
+import sbtversionpolicy.SbtVersionPolicyPlugin
+import sbtversionpolicy.SbtVersionPolicyPlugin.autoImport.*
 import xerial.sbt.Sonatype
 
 object ReleaseSettings extends AutoPlugin {
 
-  override def requires: Plugins = Sonatype && ReleasePlugin && SbtPgp
+  override def requires: Plugins = Sonatype && ReleasePlugin && SbtPgp && SbtVersionPolicyPlugin
 
   object autoImport {
     val readmeFile = settingKey[File]("Readme file name")
@@ -20,10 +22,14 @@ object ReleaseSettings extends AutoPlugin {
 
   import autoImport.*
 
+  override def buildSettings: Seq[Setting[?]] = Seq(
+    versionPolicyIntention := Compatibility.None
+  )
+
   override def projectSettings: Seq[Setting[?]] = Seq(
     readmeFile := baseDirectory.value / "README.md",
     updateReadme := updateReadmeTask.value,
-    releaseVersionBump := Bump.Minor,
+    releaseVersionBump := earlySemVerBump(version.value, versionPolicyIntention.value),
     releaseProcess := Seq(
       checkSnapshotDependencies,
       inquireVersions,
@@ -32,6 +38,7 @@ object ReleaseSettings extends AutoPlugin {
       releaseStepCommandAndRemaining("+headerCheckAll"),
       releaseStepCommandAndRemaining("+scalafmtCheckAll"),
       releaseStepCommand("scalafmtSbtCheck"),
+      releaseStepCommand("versionCheck"),
       releaseStepCommandAndRemaining("+test"),
       releaseStepCommand("scripted"),
       releaseStepTask(updateReadme),
@@ -45,6 +52,20 @@ object ReleaseSettings extends AutoPlugin {
       releaseStepCommand("reload")
     )
   )
+
+  private def earlySemVerBump(version: String, policy: Compatibility): Bump =
+    if (version.startsWith("0."))
+      policy match {
+        case Compatibility.None => Bump.Minor
+        case Compatibility.BinaryCompatible => Bump.Bugfix
+        case Compatibility.BinaryAndSourceCompatible => Bump.Bugfix
+      }
+    else
+      policy match {
+        case Compatibility.None => Bump.Major
+        case Compatibility.BinaryCompatible => Bump.Minor
+        case Compatibility.BinaryAndSourceCompatible => Bump.Bugfix
+      }
 
   private val docs = LocalProject("docs")
 
