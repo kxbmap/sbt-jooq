@@ -17,11 +17,11 @@ jobs:
           - 17  # LTS
           - 20  # Latest
         scripted-scala:
-          - 3.2.2
-          - 2.13.10
+          - 3.3.1
+          - 2.13.12
         include:
           - task: test
-          - { task: checker, scripted-java: 17, scripted-scala: 2.12.17 }
+          - { task: checker, scripted-java: 17, scripted-scala: 2.12.18 }
         exclude:
           - { task: core, scripted-java: 8 }
           - { task: core, scripted-java: 9 }
