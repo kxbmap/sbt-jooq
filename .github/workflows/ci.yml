@@ -15,13 +15,14 @@ jobs:
           - 9   # Jigsaw / JAXB and javax.annotation bundled
           - 11  # LTS / JAXB and javax.annotation no longer bundled
           - 17  # LTS
-          - 20  # Latest
+          - 21  # LTS
         scripted-scala:
           - 3.3.1
           - 2.13.12
         include:
           - task: test
           - { task: checker, scripted-java: 17, scripted-scala: 2.12.18 }
+          - { task: checker, scripted-java: 21, scripted-scala: 2.12.18 }
         exclude:
           - { task: core, scripted-java: 8 }
           - { task: core, scripted-java: 9 }
@@ -50,7 +51,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: zulu
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: Build and test
