@@ -11,7 +11,7 @@ scriptedLaunchOpts ++=
     case (k, v) if k.startsWith("scripted.") => s"-D$k=$v"
   }.toSeq
 
-TaskKey[Unit]("disableIncompatibleTests") := {
+TaskKey[Unit]("disableUnsupportedVersionTests") := {
   val java = sys.props("java.version").stripPrefix("1.").takeWhile(_.isDigit).toInt
   Seq(
     11 -> ">=3.15",

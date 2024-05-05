@@ -6,10 +6,11 @@ object Versions {
   final val scala213 = "2.13.14"
   final val scala3 = "3.3.3"
 
-  final val jooqVersion = "3.18.15"
+  final val jooqVersion = "3.19.8"
 
   val jooqVersions: Seq[String] = Seq(
     jooqVersion,
+    "3.18.15",
     "3.17.24",
     "3.16.23",
     "3.15.12",
