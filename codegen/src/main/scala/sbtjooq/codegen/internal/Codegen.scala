@@ -83,9 +83,9 @@ object Codegen {
       codegenJavaVersion: JavaVersion
   ): Seq[ModuleID] =
     if (
-      !javaVersion.isJavaEEModulesBundled
-      && !codegenJooqVersion.generatedAnnotationDisabledByDefault
-      && (codegenJooqVersion, codegenJavaVersion).useJavaxAnnotationByDefault
+      !javaVersion.isJavaEEModulesBundled &&
+      !codegenJooqVersion.generatedAnnotationDisabledByDefault &&
+      (codegenJooqVersion, codegenJavaVersion).useJavaxAnnotationByDefault
     )
       Seq("javax.annotation" % "javax.annotation-api" % BuildInfo.javaxAnnotationApiVersion)
     else
@@ -97,10 +97,10 @@ object Codegen {
       codegenJavaVersion: JavaVersion
   ): Seq[String] =
     if (
-      javaVersion.isJigsawEnabled
-      && javaVersion.isJavaEEModulesBundled
-      && !codegenJooqVersion.generatedAnnotationDisabledByDefault
-      && (codegenJooqVersion, codegenJavaVersion).useJavaxAnnotationByDefault
+      javaVersion.isJigsawEnabled &&
+      javaVersion.isJavaEEModulesBundled &&
+      !codegenJooqVersion.generatedAnnotationDisabledByDefault &&
+      (codegenJooqVersion, codegenJavaVersion).useJavaxAnnotationByDefault
     )
       Seq("--add-modules", "java.xml.ws.annotation")
     else
@@ -115,8 +115,7 @@ object Codegen {
   }
 
   private implicit class CodegenVersionsOps(versions: (JooqVersion, JavaVersion)) {
-    def jooq: JooqVersion = versions._1
-    def java: JavaVersion = versions._2
+    private val (jooq, java) = versions
 
     def useJavaxAnnotationByDefault: Boolean =
       java.major <= 8 || jooq.matches("<3.12")

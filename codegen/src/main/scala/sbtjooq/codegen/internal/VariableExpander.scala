@@ -18,7 +18,7 @@ package sbtjooq.codegen.internal
 
 import java.util.Properties
 import scala.collection.JavaConverters.*
-import scala.xml.{NodeSeq, Text}
+import scala.xml.{Elem, NodeSeq, Text}
 
 object VariableExpander {
 
@@ -27,17 +27,18 @@ object VariableExpander {
   def apply(vars: Map[String, Any], handler: Handler = defaultHandler): VariableExpander =
     vars.get(_).map(handler.applyOrElse(_, fallback))
 
-  def defaultHandler: Handler = {
-    case props: Properties =>
-      props.entrySet().asScala.map { e =>
-        <property>
-          <key>{e.getKey}</key>
-          <value>{e.getValue}</value>
-        </property>
-      }.toSeq
-  }
-
   private def fallback: Any => NodeSeq =
     x => Text(x.toString)
+
+  def defaultHandler: Handler = {
+    case props: Properties =>
+      props.entrySet().asScala.toSeq.map(e => prop(e.getKey, e.getValue))
+  }
+
+  private def prop(key: Any, value: Any): Elem =
+    <property>
+      <key>{key}</key>
+      <value>{value}</value>
+    </property>
 
 }
