@@ -104,3 +104,15 @@ lazy val docs = project
       "org.scala-lang.modules" %% "scala-xml" % "always"
     )
   )
+
+lazy val versions = project
+  .in(file(".versions"))
+  .settings(
+    publish / skip := true,
+    scalaVersion := scala3,
+    libraryDependencies ++= Seq(scala213, scala212).map("org.scala-lang" % "scala-library" % _),
+    libraryDependencies ++= jooqVersions.map("org.jooq" % "jooq" % _),
+    libraryDependencies ++= Seq(
+      "com.h2database" % "h2" % h2Version
+    )
+  )
