@@ -41,7 +41,7 @@ object Versions {
 
   final val javaxAnnotationApiVersion = "1.3.2"
 
-  final val flywaySbtVersion = "7.4.0"
+  final val flywaySbtVersion = "10.21.0"
 
   final val scalaTestVersion = "3.2.19"
 
