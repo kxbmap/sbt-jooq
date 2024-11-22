@@ -22,8 +22,8 @@ import scala.annotation.tailrec
 
 object SQLDialect extends WartTraverser:
 
-  private[this] val dialects = Dialect.values().map(d => d.name() -> d).toMap
-  private[this] val families = Dialect.families().toSet
+  private val dialects = Dialect.values().map(d => d.name() -> d).toMap
+  private val families = Dialect.families().toSet
 
   override def apply(u: WartUniverse): u.Traverser =
     new u.Traverser(this):
@@ -50,7 +50,7 @@ object SQLDialect extends WartTraverser:
       private def showDialects(xs: Iterable[Dialect]): String =
         xs.toSeq.sorted.mkString("[", ", ", "]")
 
-      private[this] var owners: List[Symbol] = Nil
+      private var owners: List[Symbol] = Nil
 
       override def traverseTree(tree: Tree)(owner: Symbol): Unit =
         owners ::= owner
