@@ -39,7 +39,7 @@ jobs:
     env:
       JAVA_OPTS: -Xmx3G -Xss6M -Dfile.encoding=utf8
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - id: scripted_java
         if: ${{ matrix['scripted-java'] != null }}
